@@ -36,11 +36,11 @@
                         type="password"
                         required
                         autocomplete="current-password"
-                        :placeholder="__('Password')"
+                        :placeholder="__('********')"
                         viewable
                     />
 
-                    <flux:error name="email"/>
+                    <flux:error name="password"/>
                 </flux:field>
 
                 @if (Route::has('password.request'))
