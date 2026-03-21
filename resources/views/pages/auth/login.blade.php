@@ -5,7 +5,7 @@
         <!-- Session Status -->
         <x-auth-session-status class="text-center" :status="session('status')"/>
 
-        <form method="POST" action="{{ route('login.store') }}" class="bg-white p-8 rounded-md flex flex-col gap-6 form-line relative">
+        <x-auth.form method="POST" action="{{ route('login') }}">
             @csrf
 
             <!-- Email Address -->
@@ -58,7 +58,7 @@
                     {{ __('Log in') }}
                 </flux:button>
             </div>
-        </form>
+        </x-auth.form>
 
         @if (Route::has('register'))
             <div class="space-x-1 text-sm text-center rtl:space-x-reverse text-zinc-600 dark:text-zinc-400">

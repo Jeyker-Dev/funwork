@@ -5,7 +5,7 @@
         <!-- Session Status -->
         <x-auth-session-status class="text-center" :status="session('status')" />
 
-        <form method="POST" action="{{ route('password.update') }}" class="flex flex-col gap-6">
+        <x-auth.form method="POST" action="{{ route('password.update') }}">
             @csrf
             <!-- Token -->
             <input type="hidden" name="token" value="{{ request()->route('token') }}">
@@ -47,6 +47,6 @@
                     {{ __('Reset password') }}
                 </flux:button>
             </div>
-        </form>
+        </x-auth.form>
     </div>
 </x-layouts::auth>
