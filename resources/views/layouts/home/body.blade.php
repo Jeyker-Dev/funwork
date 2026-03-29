@@ -4,7 +4,8 @@
     @include('partials.head')
 </head>
 <body class="min-h-screen bg-white dark:bg-zinc-800">
-<h1>Hello</h1>
+
+<x-layouts::home.header />
 
 {{ $slot }}
 
