@@ -37,7 +37,7 @@
                 />
             </div>
 
-            <form method="POST" action="{{ route('two-factor.login.store') }}">
+            <x-auth.form method="POST" action="{{ route('two-factor.login.store') }}">
                 @csrf
 
                 <div class="space-y-5 text-center">
@@ -89,7 +89,7 @@
                         <span x-show="showRecoveryInput" @click="toggleInput()">{{ __('login using an authentication code') }}</span>
                     </div>
                 </div>
-            </form>
+            </x-auth.form>
         </div>
     </div>
 </x-layouts::auth>

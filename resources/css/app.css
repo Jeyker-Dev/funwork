@@ -23,7 +23,7 @@
     --color-zinc-900: #171717;
     --color-zinc-950: #0a0a0a;
 
-    --color-accent: var(--color-neutral-800);
+    --color-accent: var(--color-orange-500);
     --color-accent-content: var(--color-neutral-800);
     --color-accent-foreground: var(--color-white);
 }
@@ -58,7 +58,26 @@
 input:focus[data-flux-control],
 textarea:focus[data-flux-control],
 select:focus[data-flux-control] {
-    @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
+    @apply outline-hidden ring-1 ring-accent ring-offset-2 ring-offset-accent-foreground;
+}
+
+input:focus[data-flux-control] {
+    @apply ring-0 ring-offset-0;
+}
+
+.form-line::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(to right, #f59e42, #facc15);
+    border-radius: 10px;
+}
+
+.gray-search > [data-flux-control] {
+    background-color: oklch(96.7% 0.003 264.542);
+    border: none !important;
+    border-radius: 20px !important;
 }
 
 /* \[:where(&)\]:size-4 {

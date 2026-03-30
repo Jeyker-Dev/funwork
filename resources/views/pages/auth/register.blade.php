@@ -5,59 +5,81 @@
         <!-- Session Status -->
         <x-auth-session-status class="text-center" :status="session('status')" />
 
-        <form method="POST" action="{{ route('register.store') }}" class="flex flex-col gap-6">
+        <x-auth.form method="POST" action="{{ route('register.store') }}">
             @csrf
             <!-- Name -->
-            <flux:input
-                name="name"
-                :label="__('Name')"
-                :value="old('name')"
-                type="text"
-                required
-                autofocus
-                autocomplete="name"
-                :placeholder="__('Full name')"
-            />
+            <flux:field>
+                <flux:label class="uppercase text-xs font-semibold!">{{ __('Full Name') }}</flux:label>
+
+                <flux:input
+                    name="name"
+                    :value="old('name')"
+                    type="text"
+                    required
+                    autofocus
+                    autocomplete="name"
+                    :placeholder="__('John Doe')"
+                />
+
+                <flux:error name="name"/>
+            </flux:field>
 
             <!-- Email Address -->
-            <flux:input
-                name="email"
-                :label="__('Email address')"
-                :value="old('email')"
-                type="email"
-                required
-                autocomplete="email"
-                placeholder="email@example.com"
-            />
+            <!-- Email Address -->
+            <flux:field>
+                <flux:label class="uppercase text-xs font-semibold!">{{ __('Email Address') }}</flux:label>
+
+                <flux:input
+                    name="email"
+                    type="email"
+                    placeholder="name@example.com"
+                    :value="old('email')"
+                    required
+                    autofocus
+                    autocomplete="email"
+                />
+
+                <flux:error name="email"/>
+            </flux:field>
 
             <!-- Password -->
-            <flux:input
-                name="password"
-                :label="__('Password')"
-                type="password"
-                required
-                autocomplete="new-password"
-                :placeholder="__('Password')"
-                viewable
-            />
+            <flux:field>
+                <flux:label class="uppercase text-xs font-semibold!">{{ __('Password') }}</flux:label>
+
+                <flux:input
+                    name="password"
+                    type="password"
+                    required
+                    autocomplete="current-password"
+                    :placeholder="__('********')"
+                    viewable
+                />
+
+                <flux:error name="password"/>
+            </flux:field>
 
             <!-- Confirm Password -->
-            <flux:input
-                name="password_confirmation"
-                :label="__('Confirm password')"
-                type="password"
-                required
-                autocomplete="new-password"
-                :placeholder="__('Confirm password')"
-                viewable
-            />
+            <flux:field>
+                <flux:label class="uppercase text-xs font-semibold!">{{ __('Confirm Password') }}</flux:label>
+
+                <flux:input
+                    name="password_confirmation"
+                    type="password"
+                    required
+                    autocomplete="new-password"
+                    :placeholder="__('********')"
+                    viewable
+                />
+
+                <flux:error name="password"/>
+            </flux:field>
 
             <div class="flex items-center justify-end">
                 <flux:button type="submit" variant="primary" class="w-full" data-test="register-user-button">
                     {{ __('Create account') }}
                 </flux:button>
             </div>
-        </form>
+        </x-auth.form>
 
         <div class="space-x-1 rtl:space-x-reverse text-center text-sm text-zinc-600 dark:text-zinc-400">
             <span>{{ __('Already have an account?') }}</span>
