@@ -4,7 +4,7 @@
     <flux:spacer />
 
     <!-- Search input for desktop -->
-    <flux:navbar class="-mb-px max-lg:hidden w-6/12">
+    <flux:navbar class="-mb-px max-md:hidden w-6/12">
         <flux:input icon="magnifying-glass" placeholder="Search Projects" class="no-ring gray-search"  />
     </flux:navbar>
 
