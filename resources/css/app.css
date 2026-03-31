@@ -74,6 +74,15 @@ input:focus[data-flux-control] {
     border-radius: 10px;
 }
 
+.line-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(to right, #f59e42, #facc15);
+    border-radius: 100px;
+}
+
 .gray-search > [data-flux-control] {
     background-color: oklch(96.7% 0.003 264.542);
     border: none !important;

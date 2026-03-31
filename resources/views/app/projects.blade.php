@@ -20,7 +20,11 @@
                 </p>
             @endif
 
-            <livewire:projects.create-project/>
+            @if($projects->isEmpty())
+                <livewire:projects.create-project/>
+            @else
+                <livewire:projects.show-projects />
+            @endif
         </div>
     </flux:main>
 </x-layouts::home>
