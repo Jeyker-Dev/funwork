@@ -2,19 +2,35 @@
 
 use Livewire\Component;
 use App\Models\Projects;
+use Livewire\Attributes\On;
 
 new class extends Component
 {
+    public string $search = '';
+
     public function with(): array
     {
         return [
-            'projects' => Projects::all(),
+            'projects' => Projects::where('name', 'like', '%' . $this->search . '%')->get(),
         ];
     }
+
+    #[On('project-created')]
+    public function refreshProjects(): void
+    {
+        $this->with();
+    }
+
+    #[On('search-updated')]
+    public function syncSearch(string $search): void
+    {
+        $this->search = $search;
+    }
+
 };
 ?>
 
-<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 lg:gap-10 xl:gap-4 2xl:gap-6">
     @foreach($projects as $project)
         <flux:card class="space-y-6 mt-10 line-card relative overflow-hidden">
             <div class="flex items-center justify-between w-full">

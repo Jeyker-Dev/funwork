@@ -54,7 +54,9 @@ class ProjectForm extends Form
             heading: 'Project Created',
             text: 'The project has been successfully created.',
             variant: 'success',
-            duration: 2000,
+            duration: 3000,
         );
+
+        Flux::modals()->close();
     }
 }
