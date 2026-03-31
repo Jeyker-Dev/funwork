@@ -6,10 +6,12 @@ use Livewire\Attributes\On;
 
 new class extends Component
 {
+    public string $search = '';
+
     public function with(): array
     {
         return [
-            'projects' => Projects::all(),
+            'projects' => Projects::where('name', 'like', '%' . $this->search . '%')->get(),
         ];
     }
 
@@ -18,6 +20,13 @@ new class extends Component
     {
         $this->with();
     }
+
+    #[On('search-updated')]
+    public function syncSearch(string $search): void
+    {
+        $this->search = $search;
+    }
+
 };
 ?>
 
