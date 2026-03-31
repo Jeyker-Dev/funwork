@@ -2,6 +2,7 @@
 
 use Livewire\Component;
 use App\Models\Projects;
+use Livewire\Attributes\On;
 
 new class extends Component
 {
@@ -10,6 +11,12 @@ new class extends Component
         return [
             'projects' => Projects::all(),
         ];
+    }
+
+    #[On('project-created')]
+    public function refreshProjects(): void
+    {
+        $this->with();
     }
 };
 ?>

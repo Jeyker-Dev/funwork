@@ -6,9 +6,10 @@ use App\Livewire\Forms\ProjectForm;
 new class extends Component {
 
     public ProjectForm $form;
+
     public string $elementName = '';
 
-    public function mount($elementName)
+    public function mount($elementName): void
     {
         $this->elementName = $elementName;
     }
@@ -23,6 +24,8 @@ new class extends Component {
     public function save(): void
     {
         $this->form->store();
+
+        $this->dispatch('project-created');
     }
 };
 ?>
