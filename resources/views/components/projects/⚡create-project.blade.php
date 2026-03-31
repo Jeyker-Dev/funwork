@@ -1,11 +1,22 @@
 <?php
 
 use Livewire\Component;
+use App\Livewire\Forms\ProjectForm;
 
 new class extends Component {
-    public function save()
+
+    public ProjectForm $form;
+
+    public function with(): array
     {
-        dd('save');
+        return [
+            'user' => auth()->user(),
+        ];
+    }
+
+    public function save(): void
+    {
+        $this->form->store();
     }
 };
 ?>
@@ -29,7 +40,7 @@ new class extends Component {
     </flux:modal.trigger>
 
     <flux:modal name="create-project" class="w-72 md:w-full">
-        <form action="">
+        <form wire:submit.prevent="save">
             <div class="space-y-6">
                 <div>
                     <flux:heading class="text-lg md:text-xl">
@@ -43,27 +54,28 @@ new class extends Component {
 
                 <div class="flex flex-col md:flex-row md:items-center justify-between w-full gap-4 md:gap-0">
                     <div class="md:w-6/12">
-                        <flux:input label="Project Name" placeholder="Example: Q3 Brand Expansion"/>
+                        <flux:input label="Project Name" placeholder="Example: Q3 Brand Expansion" wire:model="form.name"/>
                     </div>
 
                     <div class="">
-                        <flux:radio.group label="Icon" wire:model="role" variant="segmented"
+                        <flux:radio.group label="Icon" wire:model="form.icon" variant="segmented"
                                           class="bg-linear-to-r from-orange-500 to-yellow-500">
-                            <flux:radio icon="wrench"/>
-                            <flux:radio icon="pencil-square"/>
-                            <flux:radio icon="eye"/>
+                            <flux:radio icon="wrench" value="wrench"/>
+                            <flux:radio icon="pencil-square" value="pencil-square"/>
+                            <flux:radio icon="eye" value="eye"/>
                         </flux:radio.group>
                     </div>
                 </div>
 
                 <div>
                     <flux:textarea label="Description"
-                                   placeholder="Describe the objectives and key results for this project..."/>
+                                   placeholder="Describe the objectives and key results for this project..."
+                                    wire:model="form.description"/>
                 </div>
 
                 <div class="flex flex-col md:flex-row md:items-center justify-between w-full gap-4 md:gap-0">
                     <div class="md:w-5/12">
-                        <flux:select variant="listbox" placeholder="Choose type..." label="Project type">
+                        <flux:select variant="listbox" placeholder="Choose type..." label="Project type" wire:model="form.type">
                             <flux:select.option>Programming</flux:select.option>
                             <flux:select.option>Study</flux:select.option>
                             <flux:select.option>Music</flux:select.option>
@@ -71,10 +83,10 @@ new class extends Component {
                     </div>
 
                     <div class="md:w-5/12">
-                        <flux:select variant="listbox" placeholder="Choose status..." label="Initial status">
-                            <flux:select.option>Planning</flux:select.option>
-                            <flux:select.option>Active</flux:select.option>
-                            <flux:select.option>On Hold</flux:select.option>
+                        <flux:select variant="listbox" placeholder="Choose status..." label="Initial status" wire:model="form.status">
+                            <flux:select.option value="planning">Planning</flux:select.option>
+                            <flux:select.option value="active">Active</flux:select.option>
+                            <flux:select.option value="on-hold">On Hold</flux:select.option>
                         </flux:select>
                     </div>
                 </div>
@@ -82,12 +94,12 @@ new class extends Component {
 
                 <div class="flex flex-col md:flex-row md:items-center justify-between w-full gap-4 md:gap-0">
                     <div class="md:w-5/12">
-                        <flux:input label="Due date" type="date"/>
+                        <flux:input label="Due date" type="date" wire:model="form.dueDate"/>
                     </div>
 
                     <div class="md:w-5/12">
-                        <flux:select variant="listbox" placeholder="Choose Owner..." label="Project Owner">
-                            <flux:select.option>Jeyker</flux:select.option>
+                        <flux:select variant="listbox" placeholder="Choose Owner..." label="Project Owner" wire:model="form.ownerId">
+                            <flux:select.option value="{{ $user->id }}">{{ $user->name }}</flux:select.option>
                         </flux:select>
                     </div>
                 </div>
@@ -99,9 +111,13 @@ new class extends Component {
 
                     <flux:spacer/>
 
-                    <flux:button type="submit" variant="primary">Create</flux:button>
+                    <flux:button type="submit" variant="primary" class="hover:bg-orange-600">Create</flux:button>
                 </div>
             </div>
         </form>
     </flux:modal>
+
+    @persist('toast')
+        <flux:toast />
+    @endpersist
 </div>

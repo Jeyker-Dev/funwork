@@ -1,0 +1,60 @@
+<?php
+
+namespace App\Livewire\Forms;
+
+use App\Models\Projects;
+use Livewire\Attributes\Validate;
+use Livewire\Form;
+use Flux\Flux;
+
+class ProjectForm extends Form
+{
+    #[Validate('required')]
+    public string $name = '';
+
+    #[Validate('required')]
+    public string $description = '';
+
+    #[Validate('required')]
+    public string $icon = '';
+
+    #[Validate('required')]
+    public string $type = '';
+
+    #[Validate('nullable|date_format:Y-m-d')]
+    public ?string $archiveDate = null;
+
+    #[Validate('required')]
+    public string $status = '';
+
+    #[Validate('nullable|date_format:Y-m-d')]
+    public ?string $dueDate = null;
+
+    #[Validate('required|integer')]
+    public ?int $ownerId = null;
+
+    public function store(): void
+    {
+        $this->validate();
+
+        Projects::create([
+            'name' => $this->name,
+            'description' => $this->description,
+            'icon' => $this->icon,
+            'type' => $this->type,
+            'archive_at' => $this->archiveDate,
+            'status' => $this->status,
+            'due_at' => $this->dueDate,
+            'owner_id' => $this->ownerId,
+        ]);
+
+        $this->reset();
+
+        Flux::toast(
+            heading: 'Project Created',
+            text: 'The project has been successfully created.',
+            variant: 'success',
+            duration: 2000,
+        );
+    }
+}
