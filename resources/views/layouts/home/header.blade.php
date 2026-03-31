@@ -39,7 +39,16 @@
                 <flux:menu.radio>Truly Delta</flux:menu.radio>
             </flux:menu.radio.group>
             <flux:menu.separator/>
-            <flux:menu.item icon="arrow-right-start-on-rectangle">Logout</flux:menu.item>
+            <form method="POST" action="{{ route('logout') }}" class="w-full">
+                @csrf
+                <flux:menu.item icon="arrow-right-start-on-rectangle"
+                                data-test="logout-button"
+                                as="button"
+                                type="submit">
+                    Logout
+                </flux:menu.item>
+            </form>
+
         </flux:menu>
     </flux:dropdown>
 </flux:header>

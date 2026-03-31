@@ -25,6 +25,5 @@
         @else
             <livewire:projects.show-projects/>
         @endif
-
     </flux:main>
 </x-layouts::home>
