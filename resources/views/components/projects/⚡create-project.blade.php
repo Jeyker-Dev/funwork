@@ -6,6 +6,12 @@ use App\Livewire\Forms\ProjectForm;
 new class extends Component {
 
     public ProjectForm $form;
+    public string $elementName = '';
+
+    public function mount($elementName)
+    {
+        $this->elementName = $elementName;
+    }
 
     public function with(): array
     {
@@ -22,22 +28,30 @@ new class extends Component {
 ?>
 
 <div>
-    <flux:modal.trigger name="create-project">
-        <div
-            class="flex flex-col items-center justify-center gap-4 border-2 border-dashed border-gray-300 rounded-lg p-6 mt-6 max-w-96 cursor-pointer">
-            <div class="flex flex-col items-center justify-center bg-gray-300 rounded-full w-10 h-10 md:w-12 md:h-12">
-                <flux:icon.plus variant="solid" class="text-black size-6 md:size-7"/>
+    @if($this->elementName === 'header')
+        <flux:modal.trigger name="create-project">
+            <flux:button icon="plus" class="bg-orange-500! text-white! border-0! hover:bg-orange-600! mx-6" href="#">
+                New project
+            </flux:button>
+        </flux:modal.trigger>
+    @else
+        <flux:modal.trigger name="create-project">
+            <div
+                class="flex flex-col items-center justify-center gap-4 border-2 border-dashed border-gray-300 rounded-lg p-6 mt-6 max-w-96 cursor-pointer">
+                <div class="flex flex-col items-center justify-center bg-gray-300 rounded-full w-10 h-10 md:w-12 md:h-12">
+                    <flux:icon.plus variant="solid" class="text-black size-6 md:size-7"/>
+                </div>
+
+                <p class="text-black font-bold md:text-lg">
+                    Create your first project
+                </p>
+
+                <p class="text-gray-500 font-normal text-center w-8/12 text-sm md:text-base">
+                    Start your first workspace and organize your tasks effortlessly.
+                </p>
             </div>
-
-            <p class="text-black font-bold md:text-lg">
-                Create your first project
-            </p>
-
-            <p class="text-gray-500 font-normal text-center w-8/12 text-sm md:text-base">
-                Start your first workspace and organize your tasks effortlessly.
-            </p>
-        </div>
-    </flux:modal.trigger>
+        </flux:modal.trigger>
+    @endif
 
     <flux:modal name="create-project" class="w-72 md:w-full">
         <form wire:submit.prevent="save">

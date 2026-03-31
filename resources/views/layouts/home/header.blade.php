@@ -1,3 +1,7 @@
+@php
+    $elementName = 'header';
+@endphp
+
 <flux:header class="bg-white">
     <x-app-logo name="FunWork"/>
 
@@ -26,9 +30,7 @@
     </flux:navbar>
 
     <!-- New project button for desktop -->
-    <flux:button icon="plus" class="bg-orange-500! text-white! border-0! hover:bg-orange-600! mx-6" href="#">
-        New project
-    </flux:button>
+    <livewire:projects.create-project :elementName="$elementName"/>
 
     <!-- User Dropdown content -->
     <flux:dropdown position="top" align="start">
