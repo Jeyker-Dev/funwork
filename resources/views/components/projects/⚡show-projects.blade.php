@@ -29,7 +29,7 @@ new class extends Component
 
             <div>
                 <flux:heading size="lg">{{ $project->name }}</flux:heading>
-                <flux:text class="mt-2 leading-normal">{{ $project->description }}</flux:text>
+                <flux:text class="mt-2 leading-normal line-clamp-8 md:line-clamp-10 lg:line-clamp-12">{{ $project->description }}</flux:text>
             </div>
 
             <flux:spacer class="bg-gray-100 h-0.5"/>
