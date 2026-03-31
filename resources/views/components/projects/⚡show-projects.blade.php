@@ -26,7 +26,6 @@ new class extends Component
     {
         $this->search = $search;
     }
-
 };
 ?>
 
@@ -61,10 +60,24 @@ new class extends Component
                         </div>
                     </div>
 
-                    <div>
-                        <flux:badge class="text-xs! px-4! sm:text-sm!" color="gray">
-                            {{ $project->status }}
-                        </flux:badge>
+                    <div class="flex items-center justify-between w-full">
+                        <div class="flex items-center gap-2 my-2">
+                            <flux:icon.bolt variant="solid" class="text-green-500 size-5" />
+
+                            <flux:text class="text-green-500 font-normal">
+                                {{ $project->status }}
+                            </flux:text>
+                        </div>
+
+                        <div>
+                            <div class="flex items-center gap-2 my-2">
+                                <flux:icon.calendar variant="solid" class="text-gray-500 size-5" />
+
+                                <flux:text class="text-gray-500 font-normal">
+                                    <span class="text-orange-500 font-bold">Due:</span> {{ \Carbon\Carbon::parse($project->due_at)->format('Y-m-d') }}
+                                </flux:text>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
