@@ -1,5 +1,7 @@
 @import 'tailwindcss';
 @import '../../vendor/livewire/flux/dist/flux.css';
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -10,6 +12,8 @@
 
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-manrope: 'Manrope', sans-serif;
+    --font-inter: 'Inter', sans-serif;
 
     --color-zinc-50: #fafafa;
     --color-zinc-100: #f5f5f5;
@@ -34,6 +38,19 @@
         --color-accent-content: var(--color-white);
         --color-accent-foreground: var(--color-neutral-800);
     }
+}
+
+h1,
+h2,
+h3,
+h4,
+[data-flux-heading] {
+    font-family: var(--font-manrope);
+}
+
+p,
+[data-flux-text] {
+    font-family: var(--font-inter);
 }
 
 @layer base {
@@ -72,6 +89,15 @@ input:focus[data-flux-control] {
     height: 4px;
     background: linear-gradient(to right, #f59e42, #facc15);
     border-radius: 10px;
+}
+
+.line-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(to right, #f59e42, #facc15);
+    border-radius: 100px;
 }
 
 .gray-search > [data-flux-control] {
