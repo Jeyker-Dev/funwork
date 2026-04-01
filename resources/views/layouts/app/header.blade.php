@@ -15,31 +15,40 @@
 
     <flux:spacer/>
 
-    <flux:navbar class="me-1.5 space-x-0.5 rtl:space-x-reverse py-0!">
-        <flux:tooltip :content="__('Search')" position="bottom">
-            <flux:navbar.item class="!h-10 [&>div>svg]:size-5" icon="magnifying-glass" href="#" :label="__('Search')"/>
-        </flux:tooltip>
-        <flux:tooltip :content="__('Repository')" position="bottom">
-            <flux:navbar.item
-                class="h-10 max-lg:hidden [&>div>svg]:size-5"
-                icon="folder-git-2"
-                href="https://github.com/laravel/livewire-starter-kit"
-                target="_blank"
-                :label="__('Repository')"
-            />
-        </flux:tooltip>
-        <flux:tooltip :content="__('Documentation')" position="bottom">
-            <flux:navbar.item
-                class="h-10 max-lg:hidden [&>div>svg]:size-5"
-                icon="book-open-text"
-                href="https://laravel.com/docs/starter-kits#livewire"
-                target="_blank"
-                :label="__('Documentation')"
-            />
-        </flux:tooltip>
-    </flux:navbar>
 
-    <x-desktop-user-menu/>
+    <div class="flex items-center gap-2">
+        <flux:dropdown position="bottom" align="end">
+            <flux:button variant="ghost" class="flex items-center! justify-center!" icon:trailing="chevron-down">
+                <div class="flex items-center gap-2">
+                    <x-projects.icon-project :project="$project" iconClass="size-4 text-gray-500!"
+                                             containerClass="w-6! h-6! bg-transparent!"/>
+
+                    <flux:heading class="text-sm">
+                        {{ $project->name }}
+                    </flux:heading>
+                </div>
+            </flux:button>
+
+
+            <flux:menu>
+                <flux:menu.group heading="Search Projects">
+                    <flux:menu.item>Profile</flux:menu.item>
+                    <flux:menu.item>Permissions</flux:menu.item>
+                </flux:menu.group>
+
+                <flux:menu.group heading="Projects">
+                    <flux:menu.item>Transactions</flux:menu.item>
+                    <flux:menu.item>Payouts</flux:menu.item>
+                    <flux:menu.item>Refunds</flux:menu.item>
+                </flux:menu.group>
+            </flux:menu>
+
+        </flux:dropdown>
+
+        <flux:button icon="cog-6-tooth" variant="ghost" class="size-10!"/>
+
+        <x-desktop-user-menu/>
+    </div>
 </flux:header>
 
 <!-- Mobile Menu -->
