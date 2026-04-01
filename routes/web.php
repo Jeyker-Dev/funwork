@@ -9,7 +9,9 @@ Route::get('/', function () {;
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('dashboard', 'dashboard')->name('dashboard');
 
-    Route::view('projects', 'app.projects')->name('projects');
+    Route::view('projects', 'app.projects.index')->name('projects');
+    Route::view('projects/{project]', 'app.projects.show')->name('projects.show');
+    Route::view('project/inbox', 'app.projects.inbox')->name('project.inbox');
 });
 
 require __DIR__.'/settings.php';

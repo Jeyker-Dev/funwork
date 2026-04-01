@@ -106,6 +106,10 @@ input:focus[data-flux-control] {
     border-radius: 20px !important;
 }
 
+[data-current] {
+    @apply bg-gray-300 text-orange-500 border-r-6 border-r-orange-500;
+}
+
 /* \[:where(&)\]:size-4 {
     @apply size-4;
 } */
