@@ -1,14 +1,17 @@
+@php
+    $project = \App\Models\Projects::findOrFail($projectId);
+@endphp
+
 <flux:header container class="bg-white">
     <flux:sidebar.toggle class="lg:hidden mr-2" icon="bars-2" inset="left"/>
 
-    <x-app-logo href="{{ route('dashboard') }}" wire:navigate/>
+    <div class="flex gap-4 items-center">
+        <x-projects.icon-project :project="$project"/>
 
-    <flux:navbar class="-mb-px max-lg:hidden">
-        <flux:navbar.item icon="layout-grid" :href="route('dashboard')" :current="request()->routeIs('dashboard')"
-                          wire:navigate>
-            {{ __('Dashboard') }}
-        </flux:navbar.item>
-    </flux:navbar>
+        <flux:heading class="text-xl lg:text-2xl">
+            {{ $project->name }}
+        </flux:heading>
+    </div>
 
     <flux:spacer/>
 

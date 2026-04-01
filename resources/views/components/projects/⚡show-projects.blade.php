@@ -31,12 +31,10 @@ new class extends Component
 
 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 lg:gap-10 xl:gap-4 2xl:gap-6">
     @foreach($projects as $project)
-        <a href="{{ route('projects.show', $project->id) }}" class="block">
+        <a href="{{ route('projects.show', ['project' => $project->id]) }}" class="block">
             <flux:card class="space-y-6 mt-10 line-card relative overflow-hidden transition-all delay-100 duration-300 ease-in-out hover:shadow-lg hover:translate-y-2 group">
                 <div class="flex items-center justify-between w-full">
-                    <div class="flex items-center justify-center bg-orange-100 rounded-md w-10 h-10">
-                        <flux:icon name="{{ $project->icon }}" variant="solid" class="text-amber-500 dark:text-amber-300" />
-                    </div>
+                    <x-projects.icon-project :project="$project" />
 
                     <flux:badge class="text-xs! px-4! sm:text-sm!" color="orange">
                         {{ $project->type }}

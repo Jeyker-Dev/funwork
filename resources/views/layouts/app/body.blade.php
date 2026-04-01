@@ -6,9 +6,9 @@
 
     <body class="min-h-screen bg-gray-100">
 
-        <x-layouts::app.sidebar />
+        <x-layouts::app.sidebar :projectId="$projectId" />
 
-        <x-layouts::app.header />
+        <x-layouts::app.header :projectId="$projectId" />
 
         {{ $slot }}
 

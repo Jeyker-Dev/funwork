@@ -8,8 +8,8 @@
         <flux:sidebar.group class="flex flex-col gap-4">
             <flux:sidebar.item
                 icon="home"
-                :href="route('projects.show')"
-                :current="request()->routeIs('projects.show')"
+                :href="route('projects.show', ['project' => $projectId])"
+                :current="request()->routeIs('projects.show', ['project' => $projectId])"
                 wire:navigate
                 class=""
             >
