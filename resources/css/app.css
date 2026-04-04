@@ -106,6 +106,12 @@ input:focus[data-flux-control] {
     border-radius: 20px !important;
 }
 
+.gray-search-2 > [data-flux-control] {
+    background-color: oklch(96.7% 0.003 264.542);
+    border: none !important;
+    border-radius: 5px !important;
+}
+
 [data-current] {
     @apply bg-gray-300 text-orange-500 border-r-6 border-r-orange-500;
 }

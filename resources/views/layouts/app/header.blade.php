@@ -32,14 +32,21 @@
 
             <flux:menu>
                 <flux:menu.group heading="Search Projects">
-                    <flux:menu.item>Profile</flux:menu.item>
-                    <flux:menu.item>Permissions</flux:menu.item>
+                    <flux:input icon="magnifying-glass" placeholder="Search Projects" size="sm" class="gray-search-2 mt-2 mb-4" wire:model.live="search"  />
                 </flux:menu.group>
 
                 <flux:menu.group heading="Projects">
-                    <flux:menu.item>Transactions</flux:menu.item>
-                    <flux:menu.item>Payouts</flux:menu.item>
-                    <flux:menu.item>Refunds</flux:menu.item>
+                    <flux:menu.item class="flex items-center gap-2 hover:border-r-3 hover:border-r-orange-500 cursor-pointer">
+                        <x-projects.icon-project
+                            :project="$project"
+                            iconClass="size-4"
+                            containerClass="w-6! h-6!"
+                        />
+
+                        <flux:text>
+                            {{ $project->name }}
+                        </flux:text>
+                    </flux:menu.item>
                 </flux:menu.group>
             </flux:menu>
 
