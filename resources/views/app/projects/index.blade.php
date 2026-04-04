@@ -1,7 +1,7 @@
 @php
-    use App\Models\Projects;
+    use App\Models\Project;
 
-    $projects = Projects::all();
+    $projects = Project::all();
 @endphp
 
 <x-layouts::home>

@@ -1,5 +1,5 @@
 @php
-    $project = \App\Models\Projects::findOrFail($projectId);
+    $project = \App\Models\Project::findOrFail($projectId);
 @endphp
 
 <flux:header container class="bg-white">
@@ -17,40 +17,7 @@
 
 
     <div class="flex items-center gap-2">
-        <flux:dropdown position="bottom" align="end">
-            <flux:button variant="ghost" class="flex items-center! justify-center!" icon:trailing="chevron-down">
-                <div class="flex items-center gap-2">
-                    <x-projects.icon-project :project="$project" iconClass="size-4 text-gray-500!"
-                                             containerClass="w-6! h-6! bg-transparent!"/>
-
-                    <flux:heading class="text-sm">
-                        {{ $project->name }}
-                    </flux:heading>
-                </div>
-            </flux:button>
-
-
-            <flux:menu>
-                <flux:menu.group heading="Search Projects">
-                    <flux:input icon="magnifying-glass" placeholder="Search Projects" size="sm" class="gray-search-2 mt-2 mb-4" wire:model.live="search"  />
-                </flux:menu.group>
-
-                <flux:menu.group heading="Projects">
-                    <flux:menu.item class="flex items-center gap-2 hover:border-r-3 hover:border-r-orange-500 cursor-pointer">
-                        <x-projects.icon-project
-                            :project="$project"
-                            iconClass="size-4"
-                            containerClass="w-6! h-6!"
-                        />
-
-                        <flux:text>
-                            {{ $project->name }}
-                        </flux:text>
-                    </flux:menu.item>
-                </flux:menu.group>
-            </flux:menu>
-
-        </flux:dropdown>
+        <livewire:projects.project-finder :project="$project"/>
 
         <flux:button icon="cog-6-tooth" variant="ghost" class="size-10!"/>
 

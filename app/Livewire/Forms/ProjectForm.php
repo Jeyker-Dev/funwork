@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Forms;
 
-use App\Models\Projects;
+use App\Models\Project;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 use Flux\Flux;
@@ -37,7 +37,7 @@ class ProjectForm extends Form
     {
         $this->validate();
 
-        Projects::create([
+        Project::create([
             'name' => $this->name,
             'description' => $this->description,
             'icon' => $this->icon,

@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Projects extends Model
+class Project extends Model
 {
     protected $fillable = [
         'owner_id',
