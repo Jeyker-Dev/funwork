@@ -54,5 +54,3 @@
         </flux:sidebar.item>
     </flux:sidebar.nav>
 </flux:sidebar>
-
-

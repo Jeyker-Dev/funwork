@@ -16,8 +16,9 @@ new class extends Component {
     {
         return [
             'projects' => Project::where('name', 'like', '%' . $this->search . '%')
-            ->limit(3)
-            ->get(),
+                ->where('id', '!=', $this->project->id)
+                ->limit(3)
+                ->get(),
         ];
     }
 };
@@ -35,7 +36,6 @@ new class extends Component {
                 </flux:heading>
             </div>
         </flux:button>
-
 
         <flux:menu>
             <flux:menu.group heading="Search Projects">
@@ -62,6 +62,5 @@ new class extends Component {
                 @endforeach
             </flux:menu.group>
         </flux:menu>
-
     </flux:dropdown>
 </div>
