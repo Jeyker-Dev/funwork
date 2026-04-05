@@ -11,19 +11,26 @@
                 :href="route('projects.show', ['project' => $projectId])"
                 :current="request()->routeIs('projects.show', ['project' => $projectId])"
                 wire:navigate
-                class=""
             >
                 {{ __('Home') }}
             </flux:sidebar.item>
 
             <flux:sidebar.item
-                icon="home"
-                :href="route('project.inbox')"
-                :current="request()->routeIs('project.inbox')"
+                icon="inbox"
+                :href="route('project.inbox', ['project' => $projectId])"
+                :current="request()->routeIs('project.inbox', ['project' => $projectId])"
                 wire:navigate
-                class=""
             >
                 {{ __('Inbox') }}
+            </flux:sidebar.item>
+
+            <flux:sidebar.item
+                icon="rectangle-stack"
+                :href="route('project.tasks', ['project' => $projectId])"
+                :current="request()->routeIs('project.tasks' , ['project' => $projectId])"
+                wire:navigate
+            >
+                {{ __('Tasks') }}
             </flux:sidebar.item>
         </flux:sidebar.group>
     </flux:sidebar.nav>
