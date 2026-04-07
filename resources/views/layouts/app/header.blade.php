@@ -1,8 +1,14 @@
 @php
     $project = \App\Models\Project::findOrFail($projectId);
+
+    $placeholder = '';
+
+    if(request()->routeIs('project.tasks')) {
+        $placeholder = 'Search tasks';
+    }
 @endphp
 
-<flux:header container class="bg-white">
+<flux:header class="bg-white flex items-center justify-between px-16!">
     <flux:sidebar.toggle class="lg:hidden mr-2" icon="bars-2" inset="left"/>
 
     <div class="flex gap-4 items-center">
@@ -13,7 +19,9 @@
         </flux:heading>
     </div>
 
-    <flux:spacer/>
+    @if(!request()->routeIs('projects.show'))
+        <livewire:utilities.search-input containerClass="min-w-xs" inputPlaceholder="{{ $placeholder }}" />
+    @endif
 
 
     <div class="flex items-center gap-2">

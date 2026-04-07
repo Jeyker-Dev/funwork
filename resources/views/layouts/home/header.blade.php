@@ -7,8 +7,7 @@
 
     <flux:spacer/>
 
-    <!-- Search input for desktop -->
-    <livewire:projects.search-project/>
+    <livewire:utilities.search-input containerClass="-mb-px max-md:hidden w-6/12" inputPlaceholder="Search Projects" />
 
     <flux:spacer/>
 
