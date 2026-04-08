@@ -4,16 +4,23 @@
             <h1 class="text-xl md:text-2xl font-bold mb-4">Tasks</h1>
 
             <p class="text-gray-500 font-normal text-sm md:text-base max-w-96 md:max-w-lg">
-                Here you can manage all your projects. Create new projects, view existing ones, and collaborate with
-                your team.
+                Manage and track your project tasks with your team in one place.
             </p>
         </div>
 
         <div class="grid grid-cols-3 gap-6">
             <x-projects.tasks.card class="border-[rgba(255,128,64,0.48)] bg-[rgba(255,128,64,0.16)]">
-                <p>
-                    TODO
-                </p>
+                <div class="flex items-center gap-2">
+                    <div class="bg-orange-500 w-2 h-2 rounded-full"></div>
+
+                    <p class="text-sm font-bold uppercase">
+                        Todo
+                    </p>
+
+                    <livewire:projects.tasks.task-count/>
+                </div>
+
+                <livewire:projects.tasks.create-task/>
             </x-projects.tasks.card>
 
             <x-projects.tasks.card class="border-[rgba(255,220,70,0.38)] bg-[rgba(255,220,70,0.17)]">
