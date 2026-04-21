@@ -3,6 +3,10 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', static function () {
+    if (Auth::check()) {
+        return redirect(route('projects'));
+    }
+
     return redirect(route('login'));
 });
 
