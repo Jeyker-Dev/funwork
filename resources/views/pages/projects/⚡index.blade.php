@@ -1,10 +1,28 @@
-@php
-    use App\Models\Project;
+<?php
 
-    $projects = Project::all();
-@endphp
+use Livewire\Component;
+use App\Models\Project;
+use Livewire\Attributes\Layout;
+use Livewire\Attributes\On;
 
-<x-layouts::home>
+new #[Layout('layouts.home', ['title' => 'Projects'])]
+class extends Component {
+    public function with(): array
+    {
+        return [
+            'projects' => Project::all(),
+        ];
+    }
+
+    #[On('project-created')]
+    public function refreshProjects(): void
+    {
+        $this->with();
+    }
+};
+?>
+
+<div>
     <flux:main class="bg-gray-100">
 
         <h1 class="text-xl md:text-2xl font-bold mb-4">Projects</h1>
@@ -21,9 +39,9 @@
         @endif
 
         @if($projects->isEmpty())
-            <livewire:projects.create-project/>
+            <livewire:projects.create-project elementName=""/>
         @else
             <livewire:projects.show-projects/>
         @endif
     </flux:main>
-</x-layouts::home>
+</div>

@@ -1,5 +1,8 @@
 @php
+use App\Models\Project;
+
     $elementName = 'header';
+    $projects = Project::all();
 @endphp
 
 <flux:header class="bg-white p-4">
@@ -15,8 +18,9 @@
 
     </flux:navbar>
 
-    <!-- New project button for desktop -->
-    <livewire:projects.create-project :elementName="$elementName"/>
+    @if(!$projects->isEmpty())
+        <livewire:projects.create-project :elementName="$elementName"/>
+    @endif
 
     <!-- User Dropdown content -->
     <x-desktop-user-menu/>
