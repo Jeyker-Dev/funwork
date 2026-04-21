@@ -10,7 +10,7 @@
 
         <div class="grid grid-cols-3 gap-6">
             <x-projects.tasks.card class="border-[rgba(255,128,64,0.48)] bg-[rgba(255,128,64,0.16)]">
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 mb-4">
                     <div class="bg-orange-500 w-2 h-2 rounded-full"></div>
 
                     <p class="text-sm font-bold uppercase">
