@@ -7,6 +7,12 @@ use App\Models\User;
 new class extends Component
 {
     public TaskForm $form;
+    public ?int $projectId = null;
+
+    public function mount(int $projectId): void
+    {
+        $this->projectId = $projectId;
+    }
 
     public function with(): array
     {
@@ -17,6 +23,8 @@ new class extends Component
 
     public function save(): void
     {
+        $this->form->projectId = $this->projectId;
+        $this->form->position = 1; // Set the position for the new task (you may want to calculate this based on existing tasks)
         $this->form->store();
     }
 };
@@ -80,4 +88,8 @@ new class extends Component
             </div>
         </form>
     </flux:modal>
+
+    @persist('toast')
+    <flux:toast />
+    @endpersist
 </div>

@@ -2,6 +2,8 @@
 
 namespace App\Livewire\Forms;
 
+use App\Models\Task;
+use Flux\Flux;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 
@@ -34,5 +36,27 @@ class TaskForm extends Form
     public function store()
     {
         $this->validate();
+
+        Task::create([
+            'title' => $this->title,
+            'description' => $this->description,
+            'status' => $this->status,
+            'priority' => $this->priority,
+            'due_date' => $this->dueDate,
+            'assigned_user_id' => $this->assignedUserId,
+            'project_id' => $this->projectId,
+            'position' => $this->position,
+        ]);
+
+        $this->reset();
+
+        Flux::toast(
+            heading: 'Task Created',
+            text: 'The task has been successfully created.',
+            variant: 'success',
+            duration: 3000,
+        );
+
+        Flux::modals()->close();
     }
 }

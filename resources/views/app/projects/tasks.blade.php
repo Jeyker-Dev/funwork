@@ -20,7 +20,7 @@
                     <livewire:projects.tasks.task-count/>
                 </div>
 
-                <livewire:projects.tasks.create-task/>
+                <livewire:projects.tasks.create-task :projectId="$project"/>
             </x-projects.tasks.card>
 
             <x-projects.tasks.card class="border-[rgba(255,220,70,0.38)] bg-[rgba(255,220,70,0.17)]">
