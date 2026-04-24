@@ -17,7 +17,7 @@
                         Todo
                     </p>
 
-                    <livewire:projects.tasks.task-count/>
+                    <livewire:projects.tasks.task-count :projectId="$project"/>
                 </div>
 
                 <livewire:projects.tasks.create-task :projectId="$project"/>
