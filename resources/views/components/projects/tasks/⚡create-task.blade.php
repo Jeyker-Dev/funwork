@@ -2,10 +2,18 @@
 
 use Livewire\Component;
 use App\Livewire\Forms\TaskForm;
+use App\Models\User;
 
 new class extends Component
 {
     public TaskForm $form;
+
+    public function with(): array
+    {
+        return [
+            'users' => User::all(),
+        ];
+    }
 
     public function save(): void
     {
@@ -57,7 +65,9 @@ new class extends Component
 
                     <div class="w-1/2">
                         <flux:select variant="listbox" label="Assigned User" placeholder="Choose user..." wire:model="form.assignedUserId">
-                            <flux:select.option>Low</flux:select.option>
+                            @foreach($users as $user)
+                                <flux:select.option value="{{ $user->id }}">{{ $user->name }}</flux:select.option>
+                            @endforeach
                         </flux:select>
                     </div>
                 </div>
