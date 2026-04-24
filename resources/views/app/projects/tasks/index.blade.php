@@ -20,40 +20,42 @@
                     <livewire:projects.tasks.task-count :projectId="$project"/>
                 </div>
 
-                <div class="flex flex-col items-center gap-4 w-full">
-                    <livewire:projects.tasks.create-task :projectId="$project"/>
+                <a href="{{ route('show.task', ['project' => $project, 'task' => 1]) }}">
+                    <div class="flex flex-col items-center gap-4 w-full">
+                        <livewire:projects.tasks.create-task :projectId="$project"/>
 
-                    <flux:card class="space-y-6 w-full">
-                        <div class="flex items-center justify-between">
-                            <flux:badge size="lg" class="uppercase" color="orange">
-                                Low
-                            </flux:badge>
+                        <flux:card class="space-y-6 w-full">
+                            <div class="flex items-center justify-between">
+                                <flux:badge size="lg" class="uppercase" color="orange">
+                                    Low
+                                </flux:badge>
 
-                            <flux:icon.ellipsis-vertical/>
-                        </div>
-
-                        <div>
-                            <flux:heading size="lg" class="font-bold!">
-                                Review Project Map
-                            </flux:heading>
-
-                            <flux:text class="text-gray-500 mt-2">
-                                Review the project map and provide feedback on the proposed structure and organization.
-                            </flux:text>
-                        </div>
-
-                        <div class="flex items-center justify-between">
-                            <flux:avatar tooltip="Caleb Porzio" src="https://unavatar.io/x/calebporzio" />
-
-                            <div class="flex items-center gap-2">
-                                <flux:icon.clock/>
-                                <p class="text-sm text-gray-500">
-                                    Due in 3 days
-                                </p>
+                                <flux:icon.ellipsis-vertical/>
                             </div>
-                        </div>
-                    </flux:card>
-                </div>
+
+                            <div>
+                                <flux:heading size="lg" class="font-bold!">
+                                    Review Project Map
+                                </flux:heading>
+
+                                <flux:text class="text-gray-500 mt-2">
+                                    Review the project map and provide feedback on the proposed structure and organization.
+                                </flux:text>
+                            </div>
+
+                            <div class="flex items-center justify-between">
+                                <flux:avatar tooltip="Caleb Porzio" src="https://unavatar.io/x/calebporzio" />
+
+                                <div class="flex items-center gap-2">
+                                    <flux:icon.clock/>
+                                    <p class="text-sm text-gray-500">
+                                        Due in 3 days
+                                    </p>
+                                </div>
+                            </div>
+                        </flux:card>
+                    </div>
+                </a>
             </x-projects.tasks.card>
 
             <x-projects.tasks.card class="border-[rgba(255,220,70,0.38)] bg-[rgba(255,220,70,0.17)]">
