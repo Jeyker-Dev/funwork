@@ -18,8 +18,6 @@
                     </p>
 
                     <livewire:projects.tasks.task-count :projectId="$project"/>
-
-
                 </div>
 
 
@@ -27,6 +25,8 @@
                     <livewire:projects.tasks.create-task :projectId="$project"/>
 
                     <livewire:projects.tasks.show-tasks :projectId="$project"/>
+
+                    <livewire:projects.tasks.task-more-indicator :projectId="$project"/>
                 </div>
             </x-projects.tasks.card>
 
