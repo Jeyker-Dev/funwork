@@ -19,6 +19,7 @@ new class extends Component {
     {
         return [
             'tasks' => $this->project->tasks()
+                ->limit(3)
                 ->orderBy('position')
                 ->orderByDesc('created_at')
                 ->get(),

@@ -1,6 +1,6 @@
 @props([
     'sidebar' => false,
-    'name' => 'FunWorlk',
+    'name' => 'FunWork',
 ])
 
 @if($sidebar)

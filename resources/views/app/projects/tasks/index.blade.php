@@ -18,6 +18,8 @@
                     </p>
 
                     <livewire:projects.tasks.task-count :projectId="$project"/>
+
+
                 </div>
 
 

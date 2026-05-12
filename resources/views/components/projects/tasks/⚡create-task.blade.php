@@ -2,6 +2,7 @@
 
 use Livewire\Component;
 use App\Livewire\Forms\TaskForm;
+use App\Models\Task;
 use App\Models\User;
 
 new class extends Component
@@ -24,7 +25,8 @@ new class extends Component
     public function save(): void
     {
         $this->form->projectId = $this->projectId;
-        $this->form->position = 1; // Set the position for the new task (you may want to calculate this based on existing tasks)
+        $this->form->position = Task::where('project_id', $this->projectId)->max('position');
+        $this->form->position = $this->form->position ? $this->form->position + 1 : 1;
         $this->form->store();
         $this->dispatch('task-created');
     }
