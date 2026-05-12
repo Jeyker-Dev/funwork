@@ -58,37 +58,39 @@ new class extends Component {
     x-sort="updateOrder"
 >
     @foreach($tasks as $task)
+        <flux:card
+            class="space-y-6 w-full hover:cursor-pointer hover:shadow-md transition-shadow duration-200"
+            x-sort:item="{{ $task->id }}"
+            x-on:click="window.location='{{ route('show.task', ['project' => $projectId, 'task' => $task->id]) }}'"
+        >
+            <div class="flex items-center justify-between">
+                <flux:badge size="lg" class="uppercase" color="orange">
+                    {{ $task->priority }}
+                </flux:badge>
 
-            <flux:card class="space-y-6 w-full hover:cursor-pointer hover:shadow-md transition-shadow duration-200" x-sort:item="{{ $task->id }}">
-                <div class="flex items-center justify-between">
-                    <flux:badge size="lg" class="uppercase" color="orange">
-                        {{ $task->priority }}
-                    </flux:badge>
+                <flux:icon.arrows-pointing-out x-sort:handle x-on:click.stop/>
+            </div>
 
-                    <flux:icon.arrows-pointing-out x-sort:handle/>
+            <div>
+                <flux:heading size="lg" class="font-bold!">
+                    {{ $task->title }}
+                </flux:heading>
+
+                <flux:text class="text-gray-500 mt-2">
+                    {{ $task->description }}
+                </flux:text>
+            </div>
+
+            <div class="flex items-center justify-between">
+                <flux:avatar tooltip="Caleb Porzio" src="https://unavatar.io/x/calebporzio"/>
+
+                <div class="flex items-center gap-2">
+                    <flux:icon.clock/>
+                    <p class="text-sm text-gray-500">
+                        Due: {{ $task->due_date }}
+                    </p>
                 </div>
-
-                <div>
-                    <flux:heading size="lg" class="font-bold!">
-                        {{ $task->title }}
-                    </flux:heading>
-
-                    <flux:text class="text-gray-500 mt-2">
-                        {{ $task->description }}
-                    </flux:text>
-                </div>
-
-                <div class="flex items-center justify-between">
-                    <flux:avatar tooltip="Caleb Porzio" src="https://unavatar.io/x/calebporzio"/>
-
-                    <div class="flex items-center gap-2">
-                        <flux:icon.clock/>
-                        <p class="text-sm text-gray-500">
-                            Due: {{ $task->due_date }}
-                        </p>
-                    </div>
-                </div>
-            </flux:card>
-
+            </div>
+        </flux:card>
     @endforeach
 </div>
