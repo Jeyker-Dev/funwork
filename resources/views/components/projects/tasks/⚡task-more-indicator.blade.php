@@ -33,9 +33,15 @@ new class extends Component
 ?>
 
 <div class="w-full">
-    <div class="w-full h-12 p-8 rounded-lg border border-orange-200 bg-orange-50 flex items-center justify-between hover:bg-orange-200 cursor-pointer transition-colors duration-200 group">
-        <p class="text-orange-500 text-xs uppercase font-bold">+ {{ $hiddenTaskCount }} more tasks ...</p>
+    <flux:modal.trigger name="show-more-tasks">
+        <div class="w-full h-12 p-8 rounded-lg border border-orange-200 bg-orange-50 flex items-center justify-between hover:bg-orange-200 cursor-pointer transition-colors duration-200 group">
+            <p class="text-orange-500 text-xs uppercase font-bold">+ {{ $hiddenTaskCount }} more tasks ...</p>
 
-        <flux:icon.arrow-right variant="solid" class="text-orange-500 w-5 h-5 font-bold! transform transition-transform duration-200 group-hover:translate-x-2"/>
-    </div>
+            <flux:icon.arrow-right variant="solid" class="text-orange-500 w-5 h-5 font-bold! transform transition-transform duration-200 group-hover:translate-x-2"/>
+        </div>
+    </flux:modal.trigger>
+
+    <flux:modal name="show-more-tasks" flyout>
+        <x-projects.tasks.slider :projectId="$projectId" />
+    </flux:modal>
 </div>
