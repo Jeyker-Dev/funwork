@@ -26,6 +26,7 @@ new class extends Component
         $this->form->projectId = $this->projectId;
         $this->form->position = 1; // Set the position for the new task (you may want to calculate this based on existing tasks)
         $this->form->store();
+        $this->dispatch('task-created');
     }
 };
 ?>

@@ -2,6 +2,7 @@
 
 use Livewire\Component;
 use App\Models\Project;
+use Livewire\Attributes\On;
 
 new class extends Component {
     public ?int $projectId = null;
@@ -19,13 +20,19 @@ new class extends Component {
             'tasks' => $this->project->tasks()->latest()->get(),
         ];
     }
+
+    #[On('task-created')]
+    public function refreshTasks(): void
+    {
+        $this->project->refresh();
+    }
 };
 ?>
 
-<div class="w-full">
+<div class="w-full flex flex-col gap-4">
     @foreach($tasks as $task)
         <a href="{{ route('show.task', ['project' => $project, 'task' => $task->id]) }}">
-            <flux:card class="space-y-6 w-full">
+            <flux:card class="space-y-6 w-full hover:cursor-pointer hover:shadow-md transition-shadow duration-200">
                 <div class="flex items-center justify-between">
                     <flux:badge size="lg" class="uppercase" color="orange">
                         {{ $task->priority }}
