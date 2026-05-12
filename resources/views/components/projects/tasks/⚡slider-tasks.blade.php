@@ -58,26 +58,58 @@ new class extends Component
 };
 ?>
 
-<div class="grid grid-cols-2 gap-4 max-w-lg">
+<div class="grid grid-cols-2 gap-7 max-w-lg">
     @forelse($tasks as $task)
-        <div class="bg-white rounded-lg p-6 border">
-            <div class="flex flex-col gap-4">
-                <div class="flex items-center justify-between">
-                    <flux:badge size="lg" class="uppercase" color="orange">
-                        {{ $task->priority }}
-                    </flux:badge>
+        @php
+            $accentBar = match ($task->status) {
+                'Todo' => 'bg-orange-400',
+                'Doing' => 'bg-yellow-400',
+                'Done' => 'bg-green-400',
+                default => 'bg-gray-300',
+            };
 
-                    <flux:avatar tooltip="Assigned user" src="https://unavatar.io/x/calebporzio"/>
+            $badgeColor = match ($task->status) {
+                'Todo' => 'orange',
+                'Doing' => 'yellow',
+                'Done' => 'green',
+                default => 'gray',
+            };
+
+            $hasDueDate = !empty($task->due_date);
+        @endphp
+
+        <div class="relative bg-white rounded-2xl p-7 border shadow-sm transition-shadow duration-200 hover:shadow-md">
+            <span class="absolute left-0 top-0 h-full w-1.5 rounded-l-2xl {{ $accentBar }}"></span>
+
+            <div class="pl-3">
+                <div class="flex items-start justify-between gap-4">
+                    <div class="flex items-center gap-2">
+                        <flux:badge size="xs" class="uppercase" color="{{ $badgeColor }}">
+                            {{ $task->priority }}
+                        </flux:badge>
+
+                        <flux:heading size="lg" class="font-semibold leading-snug line-clamp-1">
+                            {{ $task->title }}
+                        </flux:heading>
+                    </div>
+
+                    <flux:avatar tooltip="Assigned user" size="sm" class="shrink-0" src="https://unavatar.io/x/calebporzio"/>
                 </div>
 
-                <div>
-                    <flux:heading size="lg" class="font-bold!">
-                        {{ $task->title }}
-                    </flux:heading>
+                <flux:text class="text-gray-500 mt-3 text-sm leading-relaxed line-clamp-2">
+                    {{ $task->description }}
+                </flux:text>
 
-                    <flux:text class="text-gray-500 mt-2">
-                        {{ $task->description }}
-                    </flux:text>
+                <div class="flex items-center gap-5 text-xs text-gray-500 mt-5">
+                    <div class="flex items-center gap-2">
+                        <flux:icon.calendar-days class="w-3.5 h-3.5 {{ $hasDueDate ? '' : 'text-gray-300' }}"/>
+                        <span>{{ $hasDueDate ? $task->due_date : '—' }}</span>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <flux:icon.chat-bubble-left-right class="w-3.5 h-3.5 text-gray-300"/>
+                        <span>—</span>
+                    </div>
                 </div>
             </div>
         </div>
