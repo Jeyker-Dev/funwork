@@ -55,7 +55,7 @@ new class extends Component
         >
             <span class="inline-flex items-center gap-2">
                 <span>All</span>
-                <livewire:projects.tasks.filter-count :count="$counts['all']" :key="'count-all-'.$counts['all']" />
+                <livewire:projects.tasks.filter-count :count="$counts['all']" :active="$activeFilter === 'all'" :key="'count-all-'.$counts['all'].'-'.($activeFilter === 'all' ? '1' : '0')" />
             </span>
             <span @class([
                 'absolute left-0 -bottom-1 w-full h-0.5 bg-orange-500 transition-transform duration-200 origin-left',
@@ -75,7 +75,7 @@ new class extends Component
         >
             <span class="inline-flex items-center gap-2">
                 <span>Todo</span>
-                <livewire:projects.tasks.filter-count :count="$counts['Todo']" :key="'count-todo-'.$counts['Todo']" />
+                <livewire:projects.tasks.filter-count :count="$counts['Todo']" :active="$activeFilter === 'Todo'" :key="'count-todo-'.$counts['Todo'].'-'.($activeFilter === 'Todo' ? '1' : '0')" />
             </span>
             <span @class([
                 'absolute left-0 -bottom-1 w-full h-0.5 bg-orange-500 transition-transform duration-200 origin-left',
@@ -95,7 +95,7 @@ new class extends Component
         >
             <span class="inline-flex items-center gap-2">
                 <span>Doing</span>
-                <livewire:projects.tasks.filter-count :count="$counts['Doing']" :key="'count-doing-'.$counts['Doing']" />
+                <livewire:projects.tasks.filter-count :count="$counts['Doing']" :active="$activeFilter === 'Doing'" :key="'count-doing-'.$counts['Doing'].'-'.($activeFilter === 'Doing' ? '1' : '0')" />
             </span>
             <span @class([
                 'absolute left-0 -bottom-1 w-full h-0.5 bg-orange-500 transition-transform duration-200 origin-left',
@@ -115,7 +115,7 @@ new class extends Component
         >
             <span class="inline-flex items-center gap-2">
                 <span>Done</span>
-                <livewire:projects.tasks.filter-count :count="$counts['Done']" :key="'count-done-'.$counts['Done']" />
+                <livewire:projects.tasks.filter-count :count="$counts['Done']" :active="$activeFilter === 'Done'" :key="'count-done-'.$counts['Done'].'-'.($activeFilter === 'Done' ? '1' : '0')" />
             </span>
             <span @class([
                 'absolute left-0 -bottom-1 w-full h-0.5 bg-orange-500 transition-transform duration-200 origin-left',
