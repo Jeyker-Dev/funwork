@@ -4,8 +4,7 @@ use Livewire\Component;
 use Livewire\Attributes\On;
 use App\Models\Task;
 
-new class extends Component
-{
+new class extends Component {
     public ?int $projectId = null;
     public string $filter = 'all';
     public int $page = 1;
@@ -78,27 +77,27 @@ new class extends Component
             $hasDueDate = !empty($task->due_date);
         @endphp
 
-        <div class="relative bg-white rounded-2xl p-7 border shadow-sm transition-shadow duration-200 hover:shadow-md">
+        <div
+            class="relative bg-white rounded-2xl p-7 border shadow-sm transition-shadow duration-200 hover:shadow-md cursor-pointer"
+            x-on:click="window.location='{{ route('show.task', ['project' => $projectId, 'task' => $task->id]) }}'">
             <span class="absolute left-0 top-0 h-full w-1.5 rounded-l-2xl {{ $accentBar }}"></span>
 
             <div class="pl-3">
-                <div class="flex items-start justify-between gap-4">
-                    <div class="flex items-center gap-2">
-                        <flux:badge size="xs" class="uppercase" color="{{ $badgeColor }}">
-                            {{ $task->priority }}
-                        </flux:badge>
+                <div class="flex items-center justify-between gap-4">
 
-                        <flux:heading size="lg" class="font-semibold leading-snug line-clamp-1">
-                            {{ $task->title }}
-                        </flux:heading>
-                    </div>
+                    <flux:badge size="xs" class="uppercase" color="{{ $badgeColor }}">
+                        {{ $task->priority }}
+                    </flux:badge>
 
-                    <flux:avatar tooltip="Assigned user" size="sm" class="shrink-0" src="https://unavatar.io/x/calebporzio"/>
+                    <flux:avatar tooltip="Assigned user" size="sm" class="shrink-0"
+                                 src="https://unavatar.io/x/calebporzio"/>
                 </div>
 
-                <flux:text class="text-gray-500 mt-3 text-sm leading-relaxed line-clamp-2">
-                    {{ $task->description }}
-                </flux:text>
+                <div class="pt-4">
+                    <flux:heading size="lg" class="font-semibold leading-snug line-clamp-1 text-center w-full">
+                        {{ $task->title }}
+                    </flux:heading>
+                </div>
 
                 <div class="flex items-center gap-5 text-xs text-gray-500 mt-5">
                     <div class="flex items-center gap-2">
