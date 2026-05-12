@@ -2,6 +2,7 @@
 
 use Livewire\Component;
 use App\Models\Project;
+use App\Models\Task;
 use Livewire\Attributes\On;
 
 new class extends Component {
@@ -17,7 +18,10 @@ new class extends Component {
     public function with(): array
     {
         return [
-            'tasks' => $this->project->tasks()->latest()->get(),
+            'tasks' => $this->project->tasks()
+                ->orderBy('position')
+                ->orderByDesc('created_at')
+                ->get(),
         ];
     }
 
@@ -26,19 +30,42 @@ new class extends Component {
     {
         $this->project->refresh();
     }
+
+    public function updateTaskOrder(array $orderedIds): void
+    {
+        foreach ($orderedIds as $index => $id) {
+            Task::where('project_id', $this->projectId)
+                ->where('id', $id)
+                ->update(['position' => $index + 1]);
+        }
+
+        $this->project->refresh();
+    }
 };
 ?>
 
-<div class="w-full flex flex-col gap-4">
+<div
+    class="w-full flex flex-col gap-4"
+    x-data="{
+        updateOrder() {
+            const ids = Array.from(this.$el.querySelectorAll('[x-sort\\:item]'))
+                .map(el => el.getAttribute('x-sort:item'))
+                .filter(Boolean);
+
+            $wire.call('updateTaskOrder', ids);
+        }
+    }"
+    x-sort="updateOrder"
+>
     @foreach($tasks as $task)
-        <a href="{{ route('show.task', ['project' => $project, 'task' => $task->id]) }}">
-            <flux:card class="space-y-6 w-full hover:cursor-pointer hover:shadow-md transition-shadow duration-200">
+
+            <flux:card class="space-y-6 w-full hover:cursor-pointer hover:shadow-md transition-shadow duration-200" x-sort:item="{{ $task->id }}">
                 <div class="flex items-center justify-between">
                     <flux:badge size="lg" class="uppercase" color="orange">
                         {{ $task->priority }}
                     </flux:badge>
 
-                    <flux:icon.ellipsis-vertical/>
+                    <flux:icon.arrows-pointing-out x-sort:handle/>
                 </div>
 
                 <div>
@@ -62,6 +89,6 @@ new class extends Component {
                     </div>
                 </div>
             </flux:card>
-        </a>
+
     @endforeach
 </div>
