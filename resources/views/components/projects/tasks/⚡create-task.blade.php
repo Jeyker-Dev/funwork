@@ -9,10 +9,12 @@ new class extends Component
 {
     public TaskForm $form;
     public ?int $projectId = null;
+    public ?string $status = null;
 
-    public function mount(int $projectId): void
+    public function mount(int $projectId, ?string $status = null): void
     {
         $this->projectId = $projectId;
+        $this->status = $status;
     }
 
     public function with(): array
@@ -25,7 +27,10 @@ new class extends Component
     public function save(): void
     {
         $this->form->projectId = $this->projectId;
-        $this->form->position = Task::where('project_id', $this->projectId)->max('position');
+        $this->form->status = $this->status ?? $this->form->status;
+        $this->form->position = Task::where('project_id', $this->projectId)
+            ->when($this->status, fn ($query) => $query->where('status', $this->status))
+            ->max('position');
         $this->form->position = $this->form->position ? $this->form->position + 1 : 1;
         $this->form->store();
         $this->dispatch('task-created');
@@ -33,14 +38,31 @@ new class extends Component
 };
 ?>
 
+@php
+    $modalName = 'create-task-'.$projectId.'-'.($status ?? 'all');
+    $buttonClasses = match ($status) {
+        'Todo' => 'border-[rgba(255,128,64,0.48)] bg-[rgba(255,128,64,0.23)] hover:bg-[rgba(255,128,64,0.33)]',
+        'Doing' => 'border-[rgba(255,220,70,0.38)] bg-[rgba(255,220,70,0.17)] hover:bg-[rgba(255,220,70,0.27)]',
+        'Done' => 'border-[rgba(38,186,112,0.33)] bg-[rgba(38,186,112,0.13)] hover:bg-[rgba(38,186,112,0.23)]',
+        default => 'border-gray-200 bg-gray-50 hover:bg-gray-100',
+    };
+
+    $iconClasses = match ($status) {
+        'Todo' => 'text-orange-500',
+        'Doing' => 'text-yellow-500',
+        'Done' => 'text-green-500',
+        default => 'text-gray-500',
+    };
+@endphp
+
 <div class="w-full">
-    <flux:modal.trigger name="create-task">
-        <div class="border-2 border-dashed border-[rgba(255,128,64,0.48)] bg-[rgba(255,128,64,0.23)] hover:bg-[rgba(255,128,64,0.33)] flex items-center justify-center p-10 cursor-pointer rounded-lg">
-            <flux:icon.plus-circle class="text-orange-500"/>
+    <flux:modal.trigger name="{{ $modalName }}">
+        <div class="border-2 border-dashed {{ $buttonClasses }} flex items-center justify-center p-10 cursor-pointer rounded-lg">
+            <flux:icon.plus-circle class="{{ $iconClasses }}"/>
         </div>
     </flux:modal.trigger>
 
-    <flux:modal name="create-task" class="w-xl">
+    <flux:modal name="{{ $modalName }}" class="w-xl">
         <form wire:submit.prevent="save">
             <div class="space-y-6">
                 <div>
@@ -59,6 +81,8 @@ new class extends Component
                     <div class="w-1/2">
                         <flux:select variant="listbox" label="Status" placeholder="Choose status..." wire:model="form.status">
                             <flux:select.option>Todo</flux:select.option>
+                            <flux:select.option>Doing</flux:select.option>
+                            <flux:select.option>Done</flux:select.option>
                         </flux:select>
                     </div>
 

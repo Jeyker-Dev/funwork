@@ -8,12 +8,15 @@ new class extends Component
 {
     public ?int $projectId = null;
     public string $filter = 'all';
+    public ?string $initialFilter = null;
     public int $page = 1;
     public int $perPage = 6;
 
-    public function mount(int $projectId): void
+    public function mount(int $projectId, ?string $initialFilter = null): void
     {
         $this->projectId = $projectId;
+        $this->initialFilter = $initialFilter;
+        $this->filter = $initialFilter ?: 'all';
     }
 
     #[On('slider-filter-changed')]

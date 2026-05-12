@@ -8,39 +8,54 @@
             </p>
         </div>
 
+        @php
+            $columns = [
+                [
+                    'key' => 'Todo',
+                    'title' => 'Todo',
+                    'dot' => 'bg-orange-500',
+                    'border' => 'border-[rgba(255,128,64,0.48)]',
+                    'bg' => 'bg-[rgba(255,128,64,0.16)]',
+                ],
+                [
+                    'key' => 'Doing',
+                    'title' => 'Doing',
+                    'dot' => 'bg-yellow-500',
+                    'border' => 'border-[rgba(255,220,70,0.38)]',
+                    'bg' => 'bg-[rgba(255,220,70,0.17)]',
+                ],
+                [
+                    'key' => 'Done',
+                    'title' => 'Done',
+                    'dot' => 'bg-green-500',
+                    'border' => 'border-[rgba(38,186,112,0.33)]',
+                    'bg' => 'bg-[rgba(38,186,112,0.13)]',
+                ],
+            ];
+        @endphp
+
         <div class="grid grid-cols-3 gap-6">
-            <x-projects.tasks.card class="border-[rgba(255,128,64,0.48)] bg-[rgba(255,128,64,0.16)]">
-                <div class="flex items-center gap-2 mb-4">
-                    <div class="bg-orange-500 w-2 h-2 rounded-full"></div>
+            @foreach($columns as $column)
+                <x-projects.tasks.card class="{{ $column['border'] }} {{ $column['bg'] }}">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="{{ $column['dot'] }} w-2 h-2 rounded-full"></div>
 
-                    <p class="text-sm font-bold uppercase">
-                        Todo
-                    </p>
+                        <p class="text-sm font-bold uppercase">
+                            {{ $column['title'] }}
+                        </p>
 
-                    <livewire:projects.tasks.task-count :projectId="$project"/>
-                </div>
+                        <livewire:projects.tasks.task-count :projectId="$project" :status="$column['key']" />
+                    </div>
 
+                    <div class="flex flex-col items-center gap-4 w-full">
+                        <livewire:projects.tasks.create-task :projectId="$project" :status="$column['key']" />
 
-                <div class="flex flex-col items-center gap-4 w-full">
-                    <livewire:projects.tasks.create-task :projectId="$project"/>
+                        <livewire:projects.tasks.show-tasks :projectId="$project" :status="$column['key']" />
 
-                    <livewire:projects.tasks.show-tasks :projectId="$project"/>
-
-                    <livewire:projects.tasks.task-more-indicator :projectId="$project"/>
-                </div>
-            </x-projects.tasks.card>
-
-            <x-projects.tasks.card class="border-[rgba(255,220,70,0.38)] bg-[rgba(255,220,70,0.17)]">
-                <p>
-                    DOING
-                </p>
-            </x-projects.tasks.card>
-
-            <x-projects.tasks.card class="border-[rgba(38,186,112,0.33)] bg-[rgba(38,186,112,0.13)]">
-                <p>
-                    DONE
-                </p>
-            </x-projects.tasks.card>
+                        <livewire:projects.tasks.task-more-indicator :projectId="$project" :status="$column['key']" />
+                    </div>
+                </x-projects.tasks.card>
+            @endforeach
         </div>
     </div>
 </x-layouts::app>

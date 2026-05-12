@@ -8,10 +8,13 @@ new class extends Component
 {
     public ?int $projectId = null;
     public string $activeFilter = 'all';
+    public ?string $initialFilter = null;
 
-    public function mount(int $projectId): void
+    public function mount(int $projectId, ?string $initialFilter = null): void
     {
         $this->projectId = $projectId;
+        $this->initialFilter = $initialFilter;
+        $this->activeFilter = $initialFilter ?: 'all';
     }
 
     public function setFilter(string $filter): void

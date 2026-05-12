@@ -9,17 +9,25 @@ new class extends Component
     public ?int $projectId = null;
     public ?Project $project = null;
     public ?int $hiddenTaskCount = null;
+    public ?string $status = null;
 
-    public function mount(int $projectId): void
+    public function mount(int $projectId, ?string $status = null): void
     {
         $this->projectId = $projectId;
+        $this->status = $status;
         $this->project = Project::findOrFail($projectId);
     }
 
     public function with(): array
     {
+        $query = $this->project->tasks();
+
+        if ($this->status) {
+            $query->where('status', $this->status);
+        }
+
         return [
-            'hiddenTaskCount' => max(0, $this->project->tasks()->count() - 3),
+            'hiddenTaskCount' => max(0, $query->count() - 3),
         ];
     }
 
@@ -27,21 +35,47 @@ new class extends Component
     public function refreshHiddenCount(): void
     {
         $this->project->refresh();
-        $this->hiddenTaskCount = max(0, $this->project->tasks()->count() - 3);
+
+        $query = $this->project->tasks();
+
+        if ($this->status) {
+            $query->where('status', $this->status);
+        }
+
+        $this->hiddenTaskCount = max(0, $query->count() - 3);
+    }
+
+    #[On('tasks-reordered')]
+    public function refreshHiddenCountOnReorder(): void
+    {
+        $this->refreshHiddenCount();
     }
 };
 ?>
 
-<div class="w-full">
-    <flux:modal.trigger name="show-more-tasks">
-        <div class="w-full h-12 p-8 rounded-lg border border-orange-200 bg-orange-50 flex items-center justify-between hover:bg-orange-200 cursor-pointer transition-colors duration-200 group">
-            <p class="text-orange-500 text-xs uppercase font-bold">+ {{ $hiddenTaskCount }} more tasks ...</p>
+@php
+    $indicatorClasses = match ($status) {
+        'Todo' => 'border-orange-200 bg-orange-50 hover:bg-orange-200 text-orange-500',
+        'Doing' => 'border-yellow-200 bg-yellow-50 hover:bg-yellow-200 text-yellow-600',
+        'Done' => 'border-green-200 bg-green-50 hover:bg-green-200 text-green-600',
+        default => 'border-gray-200 bg-gray-50 hover:bg-gray-200 text-gray-500',
+    };
+@endphp
 
-            <flux:icon.arrow-right variant="solid" class="text-orange-500 w-5 h-5 font-bold! transform transition-transform duration-200 group-hover:translate-x-2"/>
+@php
+    $modalName = 'show-more-tasks-'.$projectId.'-'.($status ?? 'all');
+@endphp
+
+<div class="w-full">
+    <flux:modal.trigger name="{{ $modalName }}">
+        <div class="w-full h-12 p-8 rounded-lg border flex items-center justify-between cursor-pointer transition-colors duration-200 group {{ $indicatorClasses }}">
+            <p class="text-xs uppercase font-bold">+ {{ $hiddenTaskCount }} more tasks ...</p>
+
+            <flux:icon.arrow-right variant="solid" class="w-5 h-5 font-bold! transform transition-transform duration-200 group-hover:translate-x-2"/>
         </div>
     </flux:modal.trigger>
 
-    <flux:modal name="show-more-tasks" flyout>
-        <x-projects.tasks.slider :projectId="$projectId" />
+    <flux:modal name="{{ $modalName }}" flyout>
+        <x-projects.tasks.slider :projectId="$projectId" :status="$status" />
     </flux:modal>
 </div>
