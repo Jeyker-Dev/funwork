@@ -2,6 +2,7 @@
 
 use Livewire\Component;
 use App\Models\Project;
+use Livewire\Attributes\On;
 
 new class extends Component
 {
@@ -19,6 +20,12 @@ new class extends Component
         return [
             'count' => $this->project->tasks()->count(),
         ];
+    }
+
+    #[On('task-created')]
+    public function refreshCount(): void
+    {
+        $this->project = $this->project->fresh();
     }
 };
 ?>
