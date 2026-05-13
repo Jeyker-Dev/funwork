@@ -19,7 +19,7 @@
                 </flux:text>
             </div>
 
-            <livewire:projects.notebooks.create-notebook/>
+            <livewire:projects.notebooks.create-notebook :projectId="$project"/>
         </div>
     </div>
 </x-layouts::app>

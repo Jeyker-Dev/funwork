@@ -10,7 +10,7 @@ class Notebook extends Model
 {
     protected $fillable = [
         'project_id',
-        'title',
+        'name',
         'description',
         'created_by',
         'is_archived',
