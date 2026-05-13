@@ -1,57 +1,39 @@
 <?php
 
 use Livewire\Component;
-use App\Models\Project;
+use App\Models\Task;
 use Livewire\Attributes\On;
 
 new class extends Component
 {
     public ?int $projectId = null;
-    public ?Project $project = null;
-    public ?int $hiddenTaskCount = null;
     public ?string $status = null;
 
     public function mount(int $projectId, ?string $status = null): void
     {
         $this->projectId = $projectId;
         $this->status = $status;
-        $this->project = Project::findOrFail($projectId);
     }
 
     public function with(): array
     {
-        $query = $this->project->tasks();
-
-        if ($this->status) {
-            $query->where('status', $this->status);
-        }
+        $count = Task::where('project_id', $this->projectId)
+            ->where('status', $this->status)
+            ->count();
 
         return [
-            'hiddenTaskCount' => max(0, $query->count() - 3),
+            'hiddenTaskCount' => max(0, $count - 3),
         ];
     }
 
     #[On('task-created')]
-    public function refreshHiddenCount(): void
-    {
-        $this->project->refresh();
-
-        $query = $this->project->tasks();
-
-        if ($this->status) {
-            $query->where('status', $this->status);
-        }
-
-        $this->hiddenTaskCount = max(0, $query->count() - 3);
-    }
-
     #[On('tasks-reordered')]
-    public function refreshHiddenCountOnReorder(): void
+    public function refresh(): void
     {
-        $this->refreshHiddenCount();
+        // Empty handler — Livewire re-renders this component,
+        // with() queries DB during render (AFTER all handlers complete).
     }
-};
-?>
+}; ?>
 
 @php
     $indicatorClasses = match ($status) {

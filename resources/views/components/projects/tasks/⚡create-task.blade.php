@@ -28,11 +28,15 @@ new class extends Component
     {
         $this->form->projectId = $this->projectId;
         $this->form->status = $this->status ?? $this->form->status;
+
         $this->form->position = Task::where('project_id', $this->projectId)
             ->when($this->status, fn ($query) => $query->where('status', $this->status))
             ->max('position');
+
         $this->form->position = $this->form->position ? $this->form->position + 1 : 1;
+
         $this->form->store();
+
         $this->dispatch('task-created');
     }
 };
@@ -40,6 +44,7 @@ new class extends Component
 
 @php
     $modalName = 'create-task-'.$projectId.'-'.($status ?? 'all');
+
     $buttonClasses = match ($status) {
         'Todo' => 'border-[rgba(255,128,64,0.48)] bg-[rgba(255,128,64,0.23)] hover:bg-[rgba(255,128,64,0.33)]',
         'Doing' => 'border-[rgba(255,220,70,0.38)] bg-[rgba(255,220,70,0.17)] hover:bg-[rgba(255,220,70,0.27)]',

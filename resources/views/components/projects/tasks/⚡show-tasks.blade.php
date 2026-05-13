@@ -1,25 +1,23 @@
 <?php
 
 use Livewire\Component;
-use App\Models\Project;
+use App\Models\Task;
 use App\Livewire\Actions\ReorderTasks;
 use Livewire\Attributes\On;
 
 new class extends Component {
     public ?int $projectId = null;
-    public ?Project $project = null;
     public ?string $status = null;
 
     public function mount(int $projectId, ?string $status = null): void
     {
         $this->projectId = $projectId;
         $this->status = $status;
-        $this->project = Project::findOrFail($projectId);
     }
 
     public function with(): array
     {
-        $query = $this->project->tasks()
+        $query = Task::where('project_id', $this->projectId)
             ->orderBy('position')
             ->orderByDesc('created_at');
 
@@ -35,7 +33,7 @@ new class extends Component {
     #[On('task-created')]
     public function refreshTasks(): void
     {
-        $this->project->refresh();
+        // Livewire auto-renders — with() queries fresh data
     }
 
     #[On('tasks-reordered')]
@@ -43,7 +41,7 @@ new class extends Component {
     {
         app(ReorderTasks::class)($payload, $this->projectId);
 
-        $this->project->refresh();
+        // Livewire auto-renders — with() queries fresh data
     }
 }; ?>
 

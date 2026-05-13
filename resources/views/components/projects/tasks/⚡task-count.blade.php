@@ -1,48 +1,37 @@
 <?php
 
 use Livewire\Component;
-use App\Models\Project;
+use App\Models\Task;
 use Livewire\Attributes\On;
 
 new class extends Component
 {
     public ?int $projectId = null;
-    public Project $project;
     public ?string $status = null;
 
     public function mount(int $projectId, ?string $status = null): void
     {
         $this->projectId = $projectId;
         $this->status = $status;
-        $this->project = Project::findOrFail($projectId);
     }
 
     public function with(): array
     {
-        $query = $this->project->tasks();
-
-        if ($this->status) {
-            $query->where('status', $this->status);
-        }
-
         return [
-            'count' => $query->count(),
+            'count' => Task::where('project_id', $this->projectId)
+                ->where('status', $this->status)
+                ->count(),
         ];
     }
 
     #[On('task-created')]
-    public function refreshCount(): void
-    {
-        $this->project = $this->project->fresh();
-    }
-
     #[On('tasks-reordered')]
-    public function refreshCountOnReorder(): void
+    public function refresh(): void
     {
-        $this->project = $this->project->fresh();
+        // Empty handler — Livewire re-renders this component,
+        // with() queries DB during render (AFTER all handlers complete).
     }
-};
-?>
+}; ?>
 
 @php
     $countClasses = match ($status) {
