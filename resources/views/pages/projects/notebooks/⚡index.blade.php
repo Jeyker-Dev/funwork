@@ -1,4 +1,23 @@
-<x-layouts::app :title="__('Tasks')" :projectId="$project">
+<?php
+
+use Livewire\Component;
+use App\Models\Project;
+use Livewire\Attributes\Layout;
+use Livewire\Attributes\On;
+
+new #[Layout('layouts.app', ['title' => 'Notebooks'])]
+class extends Component
+{
+    public int $projectId;
+
+    public function mount($project): void
+    {
+        $this->projectId = $project;
+    }
+};
+?>
+
+<div>
     <div class="flex h-full w-full flex-1 flex-col gap-4 rounded-xl">
         <div>
             <h1 class="text-xl md:text-2xl font-bold mb-4">Notebooks</h1>
@@ -19,7 +38,7 @@
                 </flux:text>
             </div>
 
-            <livewire:projects.notebooks.create-notebook :projectId="$project"/>
+            <livewire:projects.notebooks.create-notebook :projectId="$projectId"/>
 
             <div class="w-3/12 border border-gray-200 rounded-lg p-4 mt-4 bg-white flex gap-2 items-center justify-center">
                 <flux:icon.light-bulb variant="solid" class="size-5 text-orange-500" />
@@ -30,4 +49,4 @@
             </div>
         </div>
     </div>
-</x-layouts::app>
+</div>
