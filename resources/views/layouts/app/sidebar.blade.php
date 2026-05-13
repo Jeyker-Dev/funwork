@@ -32,6 +32,15 @@
             >
                 {{ __('Tasks') }}
             </flux:sidebar.item>
+
+            <flux:sidebar.item
+                icon="rectangle-stack"
+                :href="route('project.notebooks', ['project' => $projectId])"
+                :current="request()->routeIs('project.notebooks' , ['project' => $projectId])"
+                wire:navigate
+            >
+                {{ __('Notebooks') }}
+            </flux:sidebar.item>
         </flux:sidebar.group>
     </flux:sidebar.nav>
 

@@ -16,6 +16,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('projects/{project}/inbox', 'app.projects.inbox')->name('project.inbox');
     Route::view('projects/{project}/tasks', 'app.projects.tasks.index')->name('project.tasks');
     Route::view('projects/{project}/tasks/{task}', 'app.projects.tasks.show')->name('show.task');
+    Route::view('projects/{project}/notebooks', 'app.projects.notebooks.index')->name('project.notebooks');
 });
 
 require __DIR__.'/settings.php';
