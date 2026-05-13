@@ -20,6 +20,14 @@
             </div>
 
             <livewire:projects.notebooks.create-notebook :projectId="$project"/>
+
+            <div class="w-3/12 border border-gray-200 rounded-lg p-4 mt-4 bg-white flex gap-2 items-center justify-center">
+                <flux:icon.light-bulb variant="solid" class="size-5 text-orange-500" />
+
+                <flux:text class="text-gray-500 text-xs mt-2 font-bold">
+                    Notebooks allow you to group and structure important information for your project.
+                </flux:text>
+            </div>
         </div>
     </div>
 </x-layouts::app>
