@@ -53,7 +53,7 @@ new class extends Component {
     #[On('task-created')]
     public function refreshBoard(): void
     {
-        // Livewire auto-renders — with() queries fresh data
+        $this->with();
     }
 
     public function reorderTasks(array $payload): void
@@ -64,23 +64,27 @@ new class extends Component {
 
 <div class="grid grid-cols-3 gap-6">
     @foreach($this->columns as $column)
+
         @php
             $status = $column['key'];
             $tasks = $tasksByStatus[$status];
             $count = $countsByStatus[$status];
             $hiddenCount = max(0, $count - 3);
+
             $countClass = match ($status) {
                 'Todo' => 'bg-orange-500',
                 'Doing' => 'bg-yellow-500',
                 'Done' => 'bg-green-500',
                 default => 'bg-gray-500',
             };
+
             $indicatorClass = match ($status) {
                 'Todo' => 'border-orange-200 bg-orange-50 hover:bg-orange-200 text-orange-500',
                 'Doing' => 'border-yellow-200 bg-yellow-50 hover:bg-yellow-200 text-yellow-600',
                 'Done' => 'border-green-200 bg-green-50 hover:bg-green-200 text-green-600',
                 default => 'border-gray-200 bg-gray-50 hover:bg-gray-200 text-gray-500',
             };
+
             $modalName = 'show-more-tasks-'.$projectId.'-'.$status;
         @endphp
 
