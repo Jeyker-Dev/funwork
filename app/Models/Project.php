@@ -28,4 +28,9 @@ class Project extends Model
     {
         return $this->hasMany(Task::class, 'project_id');
     }
+
+    public function notebooks(): HasMany
+    {
+        return $this->hasMany(Notebook::class, 'project_id');
+    }
 }
