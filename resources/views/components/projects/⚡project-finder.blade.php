@@ -45,7 +45,7 @@ new class extends Component {
 
             <flux:menu.group heading="Projects">
                 @foreach($projects as $project)
-                    <a href="{{ route('projects.show', ['project' => $project->id]) }}">
+                    <a href="{{ route('projects.show', ['project' => $project]) }}">
                         <flux:menu.item
                             class="flex items-center gap-2 hover:border-r-3 hover:border-r-orange-500 cursor-pointer">
                             <x-projects.icon-project

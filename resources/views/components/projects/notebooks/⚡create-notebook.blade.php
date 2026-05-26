@@ -9,11 +9,10 @@ new class extends Component {
     public ?Project $project = null;
     public ?int $createdBy = null;
 
-    public function mount(int $projectId): void
+    public function mount(Project $project): void
     {
-        $this->project = Project::findOrFail($projectId);
-
-        $this->form->projectId = $this->project->id;
+        $this->project = $project;
+        $this->form->projectId = $project->id;
 
         if (auth()->check()) {
             $this->createdBy = auth()->id();

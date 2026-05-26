@@ -3,17 +3,20 @@
 use Livewire\Component;
 use Livewire\Attributes\On;
 use App\Models\Task;
+use App\Models\Project;
 
 new class extends Component {
+    public Project $project;
     public ?int $projectId = null;
     public string $filter = 'all';
     public ?string $initialFilter = null;
     public int $page = 1;
     public int $perPage = 6;
 
-    public function mount(int $projectId, ?string $initialFilter = null): void
+    public function mount(Project $project, ?string $initialFilter = null): void
     {
-        $this->projectId = $projectId;
+        $this->project = $project;
+        $this->projectId = $project->id;
         $this->initialFilter = $initialFilter;
         $this->filter = $initialFilter ?: 'all';
     }
@@ -82,7 +85,7 @@ new class extends Component {
 
         <div
             class="relative bg-white rounded-2xl p-7 border shadow-sm transition-shadow duration-200 hover:shadow-md cursor-pointer"
-            x-on:click="window.location='{{ route('show.task', ['project' => $projectId, 'task' => $task->id]) }}'">
+            x-on:click="window.location='{{ route('show.task', ['project' => $project, 'task' => $task->id]) }}'">
             <span class="absolute left-0 top-0 h-full w-1.5 rounded-l-2xl {{ $accentBar }}"></span>
 
             <div class="pl-3">

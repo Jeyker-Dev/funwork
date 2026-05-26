@@ -3,18 +3,21 @@
 use Livewire\Component;
 use Livewire\Attributes\On;
 use App\Models\Task;
+use App\Models\Project;
 
 new class extends Component
 {
+    public Project $project;
     public ?int $projectId = null;
     public string $filter = 'all';
     public ?string $initialFilter = null;
     public int $page = 1;
     public int $perPage = 6;
 
-    public function mount(int $projectId, ?string $initialFilter = null): void
+    public function mount(Project $project, ?string $initialFilter = null): void
     {
-        $this->projectId = $projectId;
+        $this->project = $project;
+        $this->projectId = $project->id;
         $this->initialFilter = $initialFilter;
         $this->filter = $initialFilter ?: 'all';
     }

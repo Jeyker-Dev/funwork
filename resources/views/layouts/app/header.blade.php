@@ -1,6 +1,4 @@
 @php
-    $project = \App\Models\Project::findOrFail($projectId);
-
     $placeholder = '';
 
     if(request()->routeIs('project.tasks')) {

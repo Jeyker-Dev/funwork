@@ -8,8 +8,8 @@
         <flux:sidebar.group class="flex flex-col gap-4">
             <flux:sidebar.item
                 icon="home"
-                :href="route('projects.show', ['project' => $projectId])"
-                :current="request()->routeIs('projects.show', ['project' => $projectId])"
+                :href="route('projects.show', ['project' => $project])"
+                :current="request()->routeIs('projects.show', ['project' => $project])"
                 wire:navigate
             >
                 {{ __('Home') }}
@@ -17,8 +17,8 @@
 
             <flux:sidebar.item
                 icon="inbox"
-                :href="route('project.inbox', ['project' => $projectId])"
-                :current="request()->routeIs('project.inbox', ['project' => $projectId])"
+                :href="route('project.inbox', ['project' => $project])"
+                :current="request()->routeIs('project.inbox', ['project' => $project])"
                 wire:navigate
             >
                 {{ __('Inbox') }}
@@ -26,8 +26,8 @@
 
             <flux:sidebar.item
                 icon="rectangle-stack"
-                :href="route('project.tasks', ['project' => $projectId])"
-                :current="request()->routeIs('project.tasks' , ['project' => $projectId])"
+                :href="route('project.tasks', ['project' => $project])"
+                :current="request()->routeIs('project.tasks' , ['project' => $project])"
                 wire:navigate
             >
                 {{ __('Tasks') }}
@@ -35,8 +35,8 @@
 
             <flux:sidebar.item
                 icon="rectangle-stack"
-                :href="route('project.notebooks', ['project' => $projectId])"
-                :current="request()->routeIs('project.notebooks' , ['project' => $projectId])"
+                :href="route('project.notebooks', ['project' => $project])"
+                :current="request()->routeIs('project.notebooks' , ['project' => $project])"
                 wire:navigate
             >
                 {{ __('Notebooks') }}

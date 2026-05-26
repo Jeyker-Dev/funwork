@@ -2,16 +2,19 @@
 
 use Livewire\Component;
 use App\Models\Task;
+use App\Models\Project;
 use App\Livewire\Actions\ReorderTasks;
 use Livewire\Attributes\On;
 
 new class extends Component {
+    public Project $project;
     public ?int $projectId = null;
     public ?string $status = null;
 
-    public function mount(int $projectId, ?string $status = null): void
+    public function mount(Project $project, ?string $status = null): void
     {
-        $this->projectId = $projectId;
+        $this->project = $project;
+        $this->projectId = $project->id;
         $this->status = $status;
     }
 
@@ -80,7 +83,7 @@ new class extends Component {
         >
             <flux:card
                 class="space-y-6 w-full hover:cursor-pointer hover:shadow-md transition-shadow duration-200"
-                x-on:click="window.location='{{ route('show.task', ['project' => $projectId, 'task' => $task->id]) }}'"
+                x-on:click="window.location='{{ route('show.task', ['project' => $project, 'task' => $task->id]) }}'"
             >
                 <div class="flex items-center justify-between">
                     <flux:badge size="lg" class="uppercase" color="orange">
