@@ -7,12 +7,14 @@ use App\Livewire\Actions\ReorderTasks;
 use Livewire\Attributes\On;
 
 new class extends Component {
+    public Project $project;
     public int $projectId;
     public array $columns = [];
 
-    public function mount(int $projectId): void
+    public function mount(Project $project): void
     {
-        $this->projectId = $projectId;
+        $this->project = $project;
+        $this->projectId = $project->id;
 
         $this->columns = [
             ['key' => 'Todo', 'title' => 'Todo', 'dot' => 'bg-orange-500', 'border' => 'border-[rgba(255,128,64,0.48)]', 'bg' => 'bg-[rgba(255,128,64,0.16)]'],
@@ -23,8 +25,6 @@ new class extends Component {
 
     public function with(): array
     {
-        $project = Project::findOrFail($this->projectId);
-
         $tasksByStatus = [];
         $countsByStatus = [];
 
@@ -44,7 +44,7 @@ new class extends Component {
         }
 
         return [
-            'project' => $project,
+            'project' => $this->project,
             'tasksByStatus' => $tasksByStatus,
             'countsByStatus' => $countsByStatus,
         ];
@@ -100,7 +100,7 @@ new class extends Component {
 
             {{-- Create task button --}}
             <div class="flex flex-col items-center gap-4 w-full">
-                <livewire:projects.tasks.create-task :projectId="$projectId" :status="$status" :key="'create-task-'.$status" />
+                <livewire:projects.tasks.create-task :project="$project" :status="$status" :key="'create-task-'.$status" />
 
                 {{-- Task list with drag-and-drop --}}
                 <div
@@ -138,7 +138,7 @@ new class extends Component {
                         >
                             <flux:card
                                 class="space-y-6 w-full hover:cursor-pointer hover:shadow-md transition-shadow duration-200"
-                                x-on:click="window.location='{{ route('show.task', ['project' => $projectId, 'task' => $task->id]) }}'"
+                                x-on:click="window.location='{{ route('show.task', ['project' => $project, 'task' => $task->id]) }}'"
                             >
                                 <div class="flex items-center justify-between">
                                     <flux:badge size="lg" class="uppercase" color="orange">
@@ -184,7 +184,7 @@ new class extends Component {
                         </flux:modal.trigger>
 
                         <flux:modal name="{{ $modalName }}" flyout>
-                            <x-projects.tasks.slider :projectId="$projectId" :status="$status" />
+                            <x-projects.tasks.slider :project="$project" :status="$status" />
                         </flux:modal>
                     </div>
                 @endif

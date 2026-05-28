@@ -4,16 +4,19 @@ use Livewire\Component;
 use App\Livewire\Forms\TaskForm;
 use App\Models\Task;
 use App\Models\User;
+use App\Models\Project;
 
 new class extends Component
 {
     public TaskForm $form;
+    public Project $project;
     public ?int $projectId = null;
     public ?string $status = null;
 
-    public function mount(int $projectId, ?string $status = null): void
+    public function mount(Project $project, ?string $status = null): void
     {
-        $this->projectId = $projectId;
+        $this->project = $project;
+        $this->projectId = $project->id;
         $this->status = $status;
     }
 

@@ -1,4 +1,4 @@
-<x-layouts::app :title="__('Tasks')" :projectId="$project">
+<x-layouts::app :title="__('Tasks')" :project="$project">
     <div class="flex h-full w-full flex-1 flex-col gap-4 rounded-xl">
         <div>
             <h1 class="text-xl md:text-2xl font-bold mb-4">Tasks</h1>
@@ -8,6 +8,6 @@
             </p>
         </div>
 
-        <livewire:projects.tasks.task-board :projectId="$project" />
+        <livewire:projects.tasks.task-board :project="$project" />
     </div>
 </x-layouts::app>

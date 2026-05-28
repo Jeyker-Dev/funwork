@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Models\Project;
+use App\Models\Task;
 
 Route::get('/', static function () {
     if (Auth::check()) {
@@ -12,10 +14,24 @@ Route::get('/', static function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::livewire('/projects', 'pages::projects.index')->name('projects');
-    Route::view('projects/{project}', 'app.projects.show')->name('projects.show');
-    Route::view('projects/{project}/inbox', 'app.projects.inbox')->name('project.inbox');
-    Route::view('projects/{project}/tasks', 'app.projects.tasks.index')->name('project.tasks');
-    Route::view('projects/{project}/tasks/{task}', 'app.projects.tasks.show')->name('show.task');
+
+    Route::get('projects/{project}', static function (Project $project) {
+        return view('app.projects.show', compact('project'));
+    })->name('projects.show');
+
+    Route::get('projects/{project}/inbox', static function (Project $project) {
+        return view('app.projects.inbox', compact('project'));
+    })->name('project.inbox');
+
+    Route::get('projects/{project}/tasks', static function (Project $project) {
+        return view('app.projects.tasks.index', compact('project'));
+    })->name('project.tasks');
+
+    Route::get('projects/{project}/tasks/{task}', static function (Project $project, Task $task) {
+        return view('app.projects.tasks.show', compact('project', 'task'));
+    })->name('show.task');
+
+    Route::livewire('/projects/{project}/notebooks', 'pages::projects.notebooks.index')->name('project.notebooks');
 });
 
 require __DIR__.'/settings.php';
