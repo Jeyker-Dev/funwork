@@ -51,7 +51,7 @@
 
         <flux:button icon="bell" variant="ghost">Change Log</flux:button>
 
-        <flux:text class="mt-2">
+        <flux:text class="mt-2 text-center text-xs">
             Built with <span class="text-red-500 text-xl">♥</span> by Jeyker-Dev
         </flux:text>
     </flux:sidebar.nav>
