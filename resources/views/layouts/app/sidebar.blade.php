@@ -34,7 +34,7 @@
             </flux:sidebar.item>
 
             <flux:sidebar.item
-                icon="rectangle-stack"
+                icon="clipboard-document-list"
                 :href="route('project.notebooks', ['project' => $project])"
                 :current="request()->routeIs('project.notebooks' , ['project' => $project])"
                 wire:navigate
@@ -47,16 +47,14 @@
     <flux:spacer />
 
     <flux:sidebar.nav>
-        <flux:sidebar.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
-            {{ __('Repository') }}
-        </flux:sidebar.item>
+        <flux:separator class="mb-4"/>
 
-        <flux:sidebar.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
-            {{ __('Documentation') }}
-        </flux:sidebar.item>
+        <flux:button icon="bell" variant="ghost">Change Log</flux:button>
+
+        <flux:text class="mt-2">
+            Built with <span class="text-red-500 text-xl">♥</span> by Jeyker-Dev
+        </flux:text>
     </flux:sidebar.nav>
-
-    <x-desktop-user-menu class="hidden lg:block" :name="auth()->user()->name" />
 </flux:sidebar>
 
 <!-- Mobile User Menu -->
