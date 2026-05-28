@@ -95,7 +95,11 @@ class extends Component {
         </div>
 
         <div>
-            <flux:heading size="xl" class="mt-4 mb-2">All Notebook</flux:heading>
+            <div class="flex items-center justify-between">
+                <flux:heading size="xl" class="mt-4 mb-2">All Notebook</flux:heading>
+
+                <livewire:projects.notebooks.filters/>
+            </div>
 
             <flux:separator class="mt-6 mb-8"/>
 
