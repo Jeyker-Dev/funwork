@@ -32,6 +32,12 @@ class extends Component {
                 'project' => $this->project,
             ]);
     }
+
+    #[On('created-notebook')]
+    public function refreshNotebooks(): void
+    {
+        $this->with();
+    }
 };
 ?>
 
@@ -72,8 +78,8 @@ class extends Component {
             </div>
         </div>
     @else
-        <div class="mb-6">
-            <div class="mb-6">
+        <div class="mb-12">
+            <div class="mb-8">
                 <h1 class="text-xl md:text-4xl lg:text-5xl font-bold mb-4">
                     Your Digital<br>
                     <span class="text-orange-500 mt-4 block">Thoughts, Curated.</span>
@@ -88,8 +94,12 @@ class extends Component {
             <livewire:projects.notebooks.create-notebook :project="$project"/>
         </div>
 
+        <div>
+            <flux:heading size="xl" class="mt-4 mb-2">All Notebook</flux:heading>
 
-        <livewire:projects.notebooks.show-notebooks/>
+            <flux:separator class="mt-6 mb-8"/>
 
+            <livewire:projects.notebooks.show-notebooks/>
+        </div>
     @endif
 </div>

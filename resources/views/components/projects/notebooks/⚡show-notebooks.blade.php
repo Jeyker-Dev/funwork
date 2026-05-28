@@ -2,6 +2,7 @@
 
 use Livewire\Component;
 use App\Models\Notebook;
+use Livewire\Attributes\On;
 
 new class extends Component
 {
@@ -10,6 +11,12 @@ new class extends Component
         return [
             'notebooks' => Notebook::all(),
         ];
+    }
+
+    #[On('created-notebook')]
+    public function refreshNotebooks(): void
+    {
+        $this->with();
     }
 };
 ?>

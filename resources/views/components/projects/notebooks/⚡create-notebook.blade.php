@@ -23,6 +23,8 @@ new class extends Component {
     public function save(): void
     {
         $this->form->store();
+
+        $this->dispatch('created-notebook');
     }
 };
 ?>
