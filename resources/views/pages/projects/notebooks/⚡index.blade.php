@@ -99,7 +99,7 @@ class extends Component {
 
             <flux:separator class="mt-6 mb-8"/>
 
-            <livewire:projects.notebooks.show-notebooks/>
+            <livewire:projects.notebooks.show-notebooks :project="$project"/>
         </div>
     @endif
 </div>
