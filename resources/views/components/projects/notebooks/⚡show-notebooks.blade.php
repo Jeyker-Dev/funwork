@@ -8,6 +8,9 @@ use Livewire\WithPagination;
 
 new class extends Component
 {
+    public string $activeFilter = 'all';
+    public string $sort = 'recent';
+
     public ?Project $project = null;
 
     use WithPagination;
@@ -17,18 +20,53 @@ new class extends Component
         $this->project = $project;
     }
     public function with(): array
-    {
-        return [
-            'notebooks' => $this->project->notebooks()->paginate(6),
-        ];
+{
+    $base = $this->project->notebooks();
+
+    // Counts for filter tabs
+    $counts = [
+        'all' => $this->project->notebooks()->count(),
+        'shared' => $this->project->notebooks()->where('is_shared', true)->count(),
+        'archived' => $this->project->notebooks()->where('is_archived', true)->count(),
+    ];
+
+    // Apply filter
+    if ($this->activeFilter !== 'all') {
+        if ($this->activeFilter === 'shared') {
+            $base = $base->where('is_shared', true);
+        } elseif ($this->activeFilter === 'archived') {
+            $base = $base->where('is_archived', true);
+        }
     }
+
+    // Apply sort
+    $base = $this->sort === 'recent' ? $base->latest() : $base->oldest();
+
+    return [
+        'counts' => $counts,
+        'notebooks' => $base->paginate(6),
+    ];
+}
 
     #[On('created-notebook')]
     public function refreshNotebooks(): void
     {
         $this->with();
     }
-};
+    #[On('notebooks-filter-changed')]
+    public function updateFilter(string $filter): void
+    {
+        $this->activeFilter = $filter;
+        $this->resetPage();
+    }
+
+    #[On('notebooks-sort-changed')]
+    public function updateSort(string $sort): void
+    {
+        $this->sort = $sort;
+        $this->resetPage();
+    }
+}
 ?>
 
 <div>

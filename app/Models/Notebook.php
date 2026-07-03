@@ -26,4 +26,15 @@ class Notebook extends Model
     {
         return $this->hasMany(User::class);
     }
+
+    // Scopes for filtering
+    public function scopeShared($query)
+    {
+        return $query->where('is_shared', true);
+    }
+
+    public function scopeArchived($query)
+    {
+        return $query->where('is_archived', true);
+    }
 }
