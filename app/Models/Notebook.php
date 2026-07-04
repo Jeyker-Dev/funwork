@@ -22,6 +22,11 @@ class Notebook extends Model
         return $this->belongsTo(Project::class);
     }
 
+    public function pages(): HasMany
+    {
+        return $this->hasMany(NotebookPage::class);
+    }
+
     public function users(): HasMany
     {
         return $this->hasMany(User::class);

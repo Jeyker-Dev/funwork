@@ -16,6 +16,7 @@ class NotebookForm extends Form
 
     #[Validate('required')]
     public string $description = '';
+
     public ?int $createdBy = null;
 
     public function store(): void

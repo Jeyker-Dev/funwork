@@ -3,9 +3,9 @@
 namespace App\Livewire\Forms;
 
 use App\Models\Project;
+use Flux\Flux;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
-use Flux\Flux;
 
 class ProjectForm extends Form
 {

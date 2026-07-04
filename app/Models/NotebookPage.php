@@ -14,6 +14,10 @@ class NotebookPage extends Model
         'created_by',
     ];
 
+    protected $casts = [
+        'content' => 'array',
+    ];
+
     public function notebook(): BelongsTo
     {
         return $this->belongsTo(Notebook::class);
