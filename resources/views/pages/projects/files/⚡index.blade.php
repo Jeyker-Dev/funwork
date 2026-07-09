@@ -15,10 +15,59 @@ class extends Component {
 
     public string $newFolderName = '';
     public $uploadedFiles = [];
+    public array $selectedIds = [];
 
     public function mount(Project $project)
     {
         $this->project = $project;
+    }
+
+    public function clearSelection()
+    {
+        $this->selectedIds = [];
+    }
+
+    public function toggleSelectAllFolders()
+    {
+        $allFolderIds = $this->project->folders()->whereNull('parent_id')->pluck('id')->map(fn($id) => 'folder_'.$id)->toArray();
+        $currentlySelectedFolders = array_filter($this->selectedIds, fn($id) => str_starts_with($id, 'folder_'));
+
+        if (count($currentlySelectedFolders) === count($allFolderIds)) {
+            $this->selectedIds = array_values(array_diff($this->selectedIds, $allFolderIds));
+        } else {
+            $this->selectedIds = array_values(array_unique(array_merge($this->selectedIds, $allFolderIds)));
+        }
+    }
+
+    public function toggleSelectAllFiles()
+    {
+        $allFileIds = $this->project->files()->whereNull('folder_id')->pluck('id')->map(fn($id) => 'file_'.$id)->toArray();
+        $currentlySelectedFiles = array_filter($this->selectedIds, fn($id) => str_starts_with($id, 'file_'));
+
+        if (count($currentlySelectedFiles) === count($allFileIds)) {
+            $this->selectedIds = array_values(array_diff($this->selectedIds, $allFileIds));
+        } else {
+            $this->selectedIds = array_values(array_unique(array_merge($this->selectedIds, $allFileIds)));
+        }
+    }
+
+    public function downloadSelected(\App\Actions\Files\DownloadFilesZipAction $action)
+    {
+        if (empty($this->selectedIds)) {
+            return;
+        }
+        
+        return $action->execute($this->project, $this->selectedIds);
+    }
+    
+    public function deleteSelected()
+    {
+        // Placeholder for future delete logic
+    }
+    
+    public function moveSelected()
+    {
+        // Placeholder for future move logic
     }
 
     public function createFolder()
@@ -87,7 +136,7 @@ class extends Component {
 ?>
 
 <div>
-    <div class="bg-gray-100 min-h-screen rounded-xl">
+    <div class="bg-gray-100 min-h-screen rounded-xl pb-32">
         
         @if($folders->isNotEmpty() || $files->isNotEmpty())
             <!-- POPULATED STATE -->
@@ -125,10 +174,31 @@ class extends Component {
 
                 <!-- Folders Section -->
                 <div class="mb-8">
-                    <flux:heading size="lg" class="mb-4">Folders</flux:heading>
+                    <div class="flex items-center justify-between mb-4">
+                        <flux:heading size="lg">Folders</flux:heading>
+                        @if($folders->isNotEmpty())
+                            @php
+                                $allFoldersSelected = count(array_filter($selectedIds, fn($id) => str_starts_with($id, 'folder_'))) === $folders->count();
+                            @endphp
+                            <button wire:click="toggleSelectAllFolders" class="text-sm font-medium flex items-center gap-1.5 transition-colors {{ $allFoldersSelected ? 'text-orange-600' : 'text-gray-400 hover:text-gray-900' }}">
+                                <flux:icon.check-circle class="w-4 h-4" variant="{{ $allFoldersSelected ? 'solid' : 'outline' }}" />
+                                {{ $allFoldersSelected ? 'Deselect all' : 'Select all folders' }}
+                            </button>
+                        @endif
+                    </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         @forelse($folders as $folder)
-                            <flux:card wire:key="folder-{{ $folder->id }}" class="relative cursor-pointer hover:border-gray-300 transition-colors bg-white">
+                            <flux:card wire:key="folder-{{ $folder->id }}" 
+                                @class([
+                                    'relative cursor-pointer transition-colors group',
+                                    'border-orange-500 bg-orange-50 ring-1 ring-orange-500' => in_array('folder_' . $folder->id, $selectedIds),
+                                    'hover:border-gray-300 bg-white' => !in_array('folder_' . $folder->id, $selectedIds),
+                                ])>
+                                <div class="absolute top-2 left-2 z-20">
+                                    <input type="checkbox" wire:model.live="selectedIds" value="folder_{{ $folder->id }}" 
+                                        class="rounded border-gray-300 text-orange-600 focus:ring-orange-600 cursor-pointer w-4 h-4 
+                                        {{ in_array('folder_' . $folder->id, $selectedIds) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100' }} transition-opacity">
+                                </div>
                                 <div class="absolute top-2 right-2 z-10">
                                     <flux:button icon="ellipsis-vertical" variant="subtle" size="sm" class="text-gray-400 hover:text-gray-900" />
                                 </div>
@@ -146,16 +216,37 @@ class extends Component {
 
                 <!-- Recent Files Section -->
                 <div>
-                    <flux:heading size="lg" class="mb-4">Recent Files</flux:heading>
+                    <div class="flex items-center justify-between mb-4">
+                        <flux:heading size="lg">Recent Files</flux:heading>
+                        @if($files->isNotEmpty())
+                            @php
+                                $allFilesSelected = count(array_filter($selectedIds, fn($id) => str_starts_with($id, 'file_'))) === $files->count();
+                            @endphp
+                            <button wire:click="toggleSelectAllFiles" class="text-sm font-medium flex items-center gap-1.5 transition-colors {{ $allFilesSelected ? 'text-orange-600' : 'text-gray-400 hover:text-gray-900' }}">
+                                <flux:icon.check-circle class="w-4 h-4" variant="{{ $allFilesSelected ? 'solid' : 'outline' }}" />
+                                {{ $allFilesSelected ? 'Deselect all' : 'Select all files' }}
+                            </button>
+                        @endif
+                    </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         @forelse($files as $file)
-                            <flux:card wire:key="file-{{ $file->id }}" class="relative cursor-pointer hover:border-gray-300 transition-colors bg-white p-0 overflow-hidden flex flex-col">
+                            <flux:card wire:key="file-{{ $file->id }}" 
+                                @class([
+                                    'relative cursor-pointer transition-colors p-0 overflow-hidden flex flex-col group',
+                                    'border-orange-500 ring-1 ring-orange-500 bg-orange-50' => in_array('file_' . $file->id, $selectedIds),
+                                    'hover:border-gray-300 bg-white' => !in_array('file_' . $file->id, $selectedIds),
+                                ])>
+                                <div class="absolute top-2 left-2 z-30">
+                                    <input type="checkbox" wire:model.live="selectedIds" value="file_{{ $file->id }}" 
+                                        class="rounded border-gray-300 text-orange-600 focus:ring-orange-600 cursor-pointer w-4 h-4 
+                                        {{ in_array('file_' . $file->id, $selectedIds) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100' }} transition-opacity bg-white/80 backdrop-blur-sm">
+                                </div>
                                 <div class="absolute top-2 right-2 z-20">
                                     <flux:button icon="ellipsis-vertical" variant="subtle" size="sm" class="bg-white/80 backdrop-blur-sm shadow-sm text-gray-500 hover:text-gray-900" />
                                 </div>
                                 
                                 <!-- File Preview Area -->
-                                <div class="h-32 bg-gray-50 border-b border-gray-100 flex items-center justify-center relative overflow-hidden">
+                                <div class="h-32 border-b border-gray-100 flex items-center justify-center relative overflow-hidden {{ in_array('file_' . $file->id, $selectedIds) ? 'bg-orange-50' : 'bg-gray-50' }}">
                                     @if(str_contains($file->mime_type, 'image'))
                                         <div class="absolute inset-0 bg-gradient-to-tr from-orange-200/40 to-white z-0"></div>
                                         <flux:icon.photo class="w-12 h-12 text-orange-400 relative z-10" />
@@ -171,7 +262,7 @@ class extends Component {
                                 </div>
                                 
                                 <!-- File Metadata -->
-                                <div class="p-4 flex gap-3 items-start relative z-10 bg-white">
+                                <div class="p-4 flex gap-3 items-start relative z-10 transition-colors {{ in_array('file_' . $file->id, $selectedIds) ? 'bg-orange-50' : 'bg-white' }}">
                                     <div class="mt-1 {{ str_contains($file->mime_type, 'image') ? 'text-orange-500' : (str_contains($file->mime_type, 'pdf') ? 'text-red-500' : 'text-blue-500') }}">
                                         @if(str_contains($file->mime_type, 'image'))
                                             <flux:icon.photo class="w-5 h-5" />
@@ -192,6 +283,44 @@ class extends Component {
                         @empty
                             <div class="col-span-full text-sm text-gray-500 italic">No files uploaded yet.</div>
                         @endforelse
+                    </div>
+                </div>
+
+                <!-- Floating Action Bar -->
+                <div x-data x-show="$wire.selectedIds.length > 0" x-cloak
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0 translate-y-8"
+                     x-transition:enter-end="opacity-100 translate-y-0"
+                     x-transition:leave="transition ease-in duration-200"
+                     x-transition:leave-start="opacity-100 translate-y-0"
+                     x-transition:leave-end="opacity-0 translate-y-8"
+                     class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center bg-gray-900 text-white rounded-full shadow-xl px-4 py-2 gap-4">
+                    
+                    <div class="flex items-center gap-2 pr-4 border-r border-gray-700">
+                        <div class="bg-orange-500 rounded p-1 flex items-center justify-center h-5 w-5">
+                            <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                        <span class="text-sm font-medium" x-text="$wire.selectedIds.length + ' item(s) seleccionado(s)'"></span>
+                    </div>
+
+                    <div class="flex items-center gap-1">
+                        <button wire:click="moveSelected" class="flex items-center gap-2 px-3 py-1.5 text-sm font-medium hover:bg-gray-800 rounded-full transition-colors">
+                            <flux:icon.arrows-right-left class="w-4 h-4" /> Mover
+                        </button>
+                        <button wire:click="downloadSelected" class="flex items-center gap-2 px-3 py-1.5 text-sm font-medium hover:bg-gray-800 rounded-full transition-colors">
+                            <flux:icon.arrow-down-tray class="w-4 h-4" /> Descargar
+                        </button>
+                        <button wire:click="deleteSelected" class="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-red-400 hover:bg-gray-800 rounded-full transition-colors">
+                            <flux:icon.trash class="w-4 h-4" /> Eliminar
+                        </button>
+                    </div>
+
+                    <div class="pl-2">
+                        <button wire:click="clearSelection" class="p-1.5 text-gray-400 hover:text-white hover:bg-gray-800 rounded-full transition-colors">
+                            <flux:icon.x-mark class="w-5 h-5" />
+                        </button>
                     </div>
                 </div>
             </div>
