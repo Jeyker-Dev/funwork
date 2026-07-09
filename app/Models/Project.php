@@ -33,4 +33,14 @@ class Project extends Model
     {
         return $this->hasMany(Notebook::class, 'project_id');
     }
+
+    public function folders(): HasMany
+    {
+        return $this->hasMany(Folder::class, 'project_id');
+    }
+
+    public function files(): HasMany
+    {
+        return $this->hasMany(ProjectFile::class, 'project_id');
+    }
 }

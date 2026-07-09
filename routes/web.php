@@ -32,6 +32,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('show.task');
 
     Route::livewire('/projects/{project}/notebooks', 'pages::projects.notebooks.index')->name('project.notebooks');
+    Route::livewire('/projects/{project}/files', 'pages::projects.files.index')->name('project.files');
     Route::livewire('/projects/{project}/notebooks/{notebook}/pages/{page}/edit', 'pages::projects.notebooks.pages.editor')->name('project.notebooks.pages.edit');
 });
 

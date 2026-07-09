@@ -41,6 +41,15 @@
             >
                 {{ __('Notebooks') }}
             </flux:sidebar.item>
+
+            <flux:sidebar.item
+                icon="folder"
+                :href="route('project.files', ['project' => $project])"
+                :current="request()->routeIs('project.files' , ['project' => $project])"
+                wire:navigate
+            >
+                {{ __('Files') }}
+            </flux:sidebar.item>
         </flux:sidebar.group>
     </flux:sidebar.nav>
 
