@@ -1,11 +1,10 @@
 <?php
 
-use App\Models\User;
-use App\Models\Project;
 use App\Models\Notebook;
 use App\Models\NotebookPage;
+use App\Models\Project;
+use App\Models\User;
 use Livewire\Livewire;
-use Illuminate\Support\Facades\Log;
 
 test('it binds notebook page and allows autosaving content', function () {
     $user = User::factory()->create();
@@ -25,9 +24,9 @@ test('it binds notebook page and allows autosaving content', function () {
         'notebook' => $notebook,
         'page' => $page,
     ])
-    ->assertSet('content', 'Initial content')
-    ->set('content', 'Updated content')
-    ->assertHasNoErrors();
+        ->assertSet('content', 'Initial content')
+        ->set('content', 'Updated content')
+        ->assertHasNoErrors();
 
     $this->assertEquals('Updated content', $page->refresh()->content);
 });
@@ -57,7 +56,7 @@ test('it recovers from save failures', function () {
         ->assertSet('hasError', true)
         ->assertSee('Failed to save changes.')
         ->assertSee('Retry');
-        
+
     // Now call retrySave
     $component->call('retrySave')
         ->assertSet('hasError', false)
@@ -82,9 +81,9 @@ test('it prevents silent deletion and protects empty pages', function () {
         'notebook' => $notebook,
         'page' => $page,
     ])
-    ->set('content', '')
-    ->assertSet('hasError', true)
-    ->assertSet('errorMessage', 'Page content cannot be empty. Delete explicitly if needed.');
+        ->set('content', '')
+        ->assertSet('hasError', true)
+        ->assertSet('errorMessage', 'Page content cannot be empty. Delete explicitly if needed.');
 
     $this->assertNotNull(NotebookPage::find($page->id));
 });
@@ -107,8 +106,8 @@ test('it creates the next page seamlessly', function () {
         'notebook' => $notebook,
         'page' => $page,
     ])
-    ->call('createNextPage')
-    ->assertRedirect();
+        ->call('createNextPage')
+        ->assertRedirect();
 
     $this->assertCount(2, $notebook->pages);
     $this->assertEquals(2, $notebook->pages()->max('order'));

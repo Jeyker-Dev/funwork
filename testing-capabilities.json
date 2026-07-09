@@ -1,0 +1,16 @@
+{
+  "project": "funwork",
+  "stack": {
+    "framework": "Laravel 13",
+    "language": "PHP 8.3",
+    "frontend": "Vite + TailwindCSS + Livewire v4 + Flux Pro"
+  },
+  "testing": {
+    "runner": "./vendor/bin/pest",
+    "layers": ["Unit", "Feature"],
+    "linter": "composer lint",
+    "formatter": "laravel pint",
+    "strict_tdd": true
+  },
+  "persistence_mode": "none"
+}

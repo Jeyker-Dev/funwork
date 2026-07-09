@@ -3,6 +3,7 @@
 use Livewire\Component;
 use App\Models\Project;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Url;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Auth;
 use Flux\Flux;
@@ -17,6 +18,9 @@ class extends Component {
     public $uploadedFiles = [];
     public array $selectedIds = [];
 
+    #[Url(history: true)]
+    public ?int $currentFolderId = null;
+
     public function mount(Project $project)
     {
         $this->project = $project;
@@ -29,7 +33,7 @@ class extends Component {
 
     public function toggleSelectAllFolders()
     {
-        $allFolderIds = $this->project->folders()->whereNull('parent_id')->pluck('id')->map(fn($id) => 'folder_'.$id)->toArray();
+        $allFolderIds = $this->project->folders()->where('parent_id', $this->currentFolderId)->pluck('id')->map(fn($id) => 'folder_'.$id)->toArray();
         $currentlySelectedFolders = array_filter($this->selectedIds, fn($id) => str_starts_with($id, 'folder_'));
 
         if (count($currentlySelectedFolders) === count($allFolderIds)) {
@@ -41,7 +45,7 @@ class extends Component {
 
     public function toggleSelectAllFiles()
     {
-        $allFileIds = $this->project->files()->whereNull('folder_id')->pluck('id')->map(fn($id) => 'file_'.$id)->toArray();
+        $allFileIds = $this->project->files()->where('folder_id', $this->currentFolderId)->pluck('id')->map(fn($id) => 'file_'.$id)->toArray();
         $currentlySelectedFiles = array_filter($this->selectedIds, fn($id) => str_starts_with($id, 'file_'));
 
         if (count($currentlySelectedFiles) === count($allFileIds)) {
@@ -56,18 +60,30 @@ class extends Component {
         if (empty($this->selectedIds)) {
             return;
         }
-        
+
         return $action->execute($this->project, $this->selectedIds);
     }
-    
+
     public function deleteSelected()
     {
         // Placeholder for future delete logic
     }
-    
+
     public function moveSelected()
     {
         // Placeholder for future move logic
+    }
+
+    public function navigateToFolder($folderId)
+    {
+        $this->currentFolderId = $folderId;
+        $this->clearSelection();
+    }
+
+    public function navigateToRoot()
+    {
+        $this->currentFolderId = null;
+        $this->clearSelection();
     }
 
     public function createFolder()
@@ -79,7 +95,7 @@ class extends Component {
         $this->project->folders()->create([
             'name' => $this->newFolderName,
             'created_by' => Auth::id(),
-            // parent_id remains null for root
+            'parent_id' => $this->currentFolderId,
         ]);
 
         $this->reset('newFolderName');
@@ -107,7 +123,7 @@ class extends Component {
                 'mime_type' => $mime,
                 'size' => $size,
                 'created_by' => Auth::id(),
-                // folder_id remains null for root files
+                'folder_id' => $this->currentFolderId,
             ]);
         }
 
@@ -118,9 +134,21 @@ class extends Component {
     // Los datos reales se inyectan a la vista usando el método with()
     public function with(): array
     {
+        $breadcrumbs = [];
+        if ($this->currentFolderId) {
+            $folder = \App\Models\Folder::find($this->currentFolderId);
+            $path = [];
+            while($folder) {
+                array_unshift($path, $folder);
+                $folder = $folder->parent;
+            }
+            $breadcrumbs = $path;
+        }
+
         return [
-            'folders' => $this->project->folders()->whereNull('parent_id')->get(),
-            'files' => $this->project->files()->whereNull('folder_id')->get(),
+            'folders' => $this->project->folders()->where('parent_id', $this->currentFolderId)->get(),
+            'files' => $this->project->files()->where('folder_id', $this->currentFolderId)->get(),
+            'breadcrumbs' => $breadcrumbs,
         ];
     }
 
@@ -137,20 +165,40 @@ class extends Component {
 
 <div>
     <div class="bg-gray-100 min-h-screen rounded-xl pb-32">
-        
-        @if($folders->isNotEmpty() || $files->isNotEmpty())
-            <!-- POPULATED STATE -->
-            <div>
-                <!-- Contextual Action Bar -->
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-                    <!-- Breadcrumbs -->
-                    <div class="flex items-center space-x-2 text-sm text-gray-500 font-medium">
-                        <span>Files</span>
-                        <flux:icon.chevron-right class="w-4 h-4 text-gray-400" />
-                        <span class="text-gray-900 font-semibold">Root</span>
-                    </div>
 
-                    <!-- Actions -->
+        <div wire:loading.remove.delay wire:target="navigateToFolder, navigateToRoot">
+            <!-- Contextual Action Bar -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                <!-- Breadcrumbs -->
+                <div class="flex items-center space-x-2 text-sm text-gray-500 font-medium">
+                    <button wire:click="navigateToRoot" class="hover:text-gray-900 transition-colors {{ empty($breadcrumbs) ? 'text-gray-900 font-semibold' : '' }}">Files</button>
+
+                    @if(!empty($breadcrumbs))
+                        <flux:icon.chevron-right class="w-4 h-4 text-gray-400" />
+
+                        @if(count($breadcrumbs) > 3)
+                            <button wire:click="navigateToFolder({{ $breadcrumbs[0]->id }})" class="hover:text-gray-900 transition-colors">{{ $breadcrumbs[0]->name }}</button>
+                            <flux:icon.chevron-right class="w-4 h-4 text-gray-400" />
+                            <span class="text-gray-400">...</span>
+                            <flux:icon.chevron-right class="w-4 h-4 text-gray-400" />
+                            <button wire:click="navigateToFolder({{ $breadcrumbs[count($breadcrumbs)-2]->id }})" class="hover:text-gray-900 transition-colors">{{ $breadcrumbs[count($breadcrumbs)-2]->name }}</button>
+                            <flux:icon.chevron-right class="w-4 h-4 text-gray-400" />
+                            <span class="text-gray-900 font-semibold">{{ $breadcrumbs[count($breadcrumbs)-1]->name }}</span>
+                        @else
+                            @foreach($breadcrumbs as $index => $crumb)
+                                @if($index === count($breadcrumbs) - 1)
+                                    <span class="text-gray-900 font-semibold">{{ $crumb->name }}</span>
+                                @else
+                                    <button wire:click="navigateToFolder({{ $crumb->id }})" class="hover:text-gray-900 transition-colors">{{ $crumb->name }}</button>
+                                    <flux:icon.chevron-right class="w-4 h-4 text-gray-400" />
+                                @endif
+                            @endforeach
+                        @endif
+                    @endif
+                </div>
+
+                <!-- Actions -->
+                @if($folders->isNotEmpty() || $files->isNotEmpty())
                     <div class="flex items-center gap-3">
                         <div class="w-full md:w-64">
                             <flux:input icon="magnifying-glass" placeholder="Search files..." />
@@ -170,7 +218,12 @@ class extends Component {
                             <flux:button icon="document-plus" variant="primary">New File</flux:button>
                         </flux:modal.trigger>
                     </div>
-                </div>
+                @endif
+            </div>
+
+            @if($folders->isNotEmpty() || $files->isNotEmpty())
+                <!-- POPULATED STATE -->
+                <div>
 
                 <!-- Folders Section -->
                 <div class="mb-8">
@@ -188,19 +241,19 @@ class extends Component {
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         @forelse($folders as $folder)
-                            <flux:card wire:key="folder-{{ $folder->id }}" 
+                            <flux:card wire:key="folder-{{ $folder->id }}" wire:click="navigateToFolder({{ $folder->id }})"
                                 @class([
                                     'relative cursor-pointer transition-colors group',
                                     'border-orange-500 bg-orange-50 ring-1 ring-orange-500' => in_array('folder_' . $folder->id, $selectedIds),
                                     'hover:border-gray-300 bg-white' => !in_array('folder_' . $folder->id, $selectedIds),
                                 ])>
                                 <div class="absolute top-2 left-2 z-20">
-                                    <input type="checkbox" wire:model.live="selectedIds" value="folder_{{ $folder->id }}" 
-                                        class="rounded border-gray-300 text-orange-600 focus:ring-orange-600 cursor-pointer w-4 h-4 
+                                    <input type="checkbox" wire:click.stop wire:model.live="selectedIds" value="folder_{{ $folder->id }}"
+                                        class="rounded border-gray-300 text-orange-600 focus:ring-orange-600 cursor-pointer w-4 h-4
                                         {{ in_array('folder_' . $folder->id, $selectedIds) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100' }} transition-opacity">
                                 </div>
                                 <div class="absolute top-2 right-2 z-10">
-                                    <flux:button icon="ellipsis-vertical" variant="subtle" size="sm" class="text-gray-400 hover:text-gray-900" />
+                                    <flux:button wire:click.stop icon="ellipsis-vertical" variant="subtle" size="sm" class="text-gray-400 hover:text-gray-900" />
                                 </div>
                                 <div class="mb-4 text-orange-600 bg-orange-50 w-10 h-10 rounded-lg flex items-center justify-center">
                                     <flux:icon.folder variant="solid" class="w-6 h-6" />
@@ -230,21 +283,21 @@ class extends Component {
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         @forelse($files as $file)
-                            <flux:card wire:key="file-{{ $file->id }}" 
+                            <flux:card wire:key="file-{{ $file->id }}"
                                 @class([
                                     'relative cursor-pointer transition-colors p-0 overflow-hidden flex flex-col group',
                                     'border-orange-500 ring-1 ring-orange-500 bg-orange-50' => in_array('file_' . $file->id, $selectedIds),
                                     'hover:border-gray-300 bg-white' => !in_array('file_' . $file->id, $selectedIds),
                                 ])>
                                 <div class="absolute top-2 left-2 z-30">
-                                    <input type="checkbox" wire:model.live="selectedIds" value="file_{{ $file->id }}" 
-                                        class="rounded border-gray-300 text-orange-600 focus:ring-orange-600 cursor-pointer w-4 h-4 
+                                    <input type="checkbox" wire:model.live="selectedIds" value="file_{{ $file->id }}"
+                                        class="rounded border-gray-300 text-orange-600 focus:ring-orange-600 cursor-pointer w-4 h-4
                                         {{ in_array('file_' . $file->id, $selectedIds) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100' }} transition-opacity bg-white/80 backdrop-blur-sm">
                                 </div>
                                 <div class="absolute top-2 right-2 z-20">
                                     <flux:button icon="ellipsis-vertical" variant="subtle" size="sm" class="bg-white/80 backdrop-blur-sm shadow-sm text-gray-500 hover:text-gray-900" />
                                 </div>
-                                
+
                                 <!-- File Preview Area -->
                                 <div class="h-32 border-b border-gray-100 flex items-center justify-center relative overflow-hidden {{ in_array('file_' . $file->id, $selectedIds) ? 'bg-orange-50' : 'bg-gray-50' }}">
                                     @if(str_contains($file->mime_type, 'image'))
@@ -260,7 +313,7 @@ class extends Component {
                                         </div>
                                     @endif
                                 </div>
-                                
+
                                 <!-- File Metadata -->
                                 <div class="p-4 flex gap-3 items-start relative z-10 transition-colors {{ in_array('file_' . $file->id, $selectedIds) ? 'bg-orange-50' : 'bg-white' }}">
                                     <div class="mt-1 {{ str_contains($file->mime_type, 'image') ? 'text-orange-500' : (str_contains($file->mime_type, 'pdf') ? 'text-red-500' : 'text-blue-500') }}">
@@ -295,7 +348,7 @@ class extends Component {
                      x-transition:leave-start="opacity-100 translate-y-0"
                      x-transition:leave-end="opacity-0 translate-y-8"
                      class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center bg-gray-900 text-white rounded-full shadow-xl px-4 py-2 gap-4">
-                    
+
                     <div class="flex items-center gap-2 pr-4 border-r border-gray-700">
                         <div class="bg-orange-500 rounded p-1 flex items-center justify-center h-5 w-5">
                             <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
@@ -323,41 +376,82 @@ class extends Component {
                         </button>
                     </div>
                 </div>
-            </div>
-        @else
-            <!-- EMPTY STATE -->
-            <div class="flex flex-col items-center justify-center py-20 px-4 h-[70vh]">
+                </div>
+            @else
+                <!-- EMPTY STATE -->
+                <div class="flex flex-col items-center justify-center py-10 px-4 h-[50vh]">
                 <!-- Large Gray SVG Folder Wrapper -->
                 <div class="bg-gray-100 w-32 h-32 rounded-3xl flex items-center justify-center mb-8 shadow-inner">
                     <flux:icon.folder variant="outline" class="w-16 h-16 text-gray-400 stroke-[1.5]" />
                 </div>
-                
+
                 <flux:heading size="xl" class="mb-3 text-gray-900 font-bold">No files or folders yet</flux:heading>
-                
+
                 <p class="text-gray-500 text-center max-w-sm mb-8 text-sm md:text-base">
                     Your workspace is a blank canvas. Start organizing your projects by creating a folder or uploading your first file.
                 </p>
-                
+
                 <div class="flex gap-4">
                     <flux:modal.trigger name="upload-file">
                         <flux:button variant="primary" icon="arrow-up-tray">Upload File</flux:button>
                     </flux:modal.trigger>
-                    
+
                     <flux:modal.trigger name="create-folder">
                         <flux:button variant="outline" icon="folder-plus">Create Folder</flux:button>
                     </flux:modal.trigger>
                 </div>
+            @endif
+        </div>
+
+        <!-- SKELETON LOADER -->
+        <div wire:loading.delay wire:target="navigateToFolder, navigateToRoot" class="w-full" style="display: none;">
+            <div class="flex flex-col w-full">
+                <!-- Contextual Action Bar Skeleton -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                <div class="h-6 bg-gray-200 rounded w-48 animate-pulse"></div>
+                <div class="flex gap-3">
+                    <div class="h-10 bg-gray-200 rounded w-64 animate-pulse"></div>
+                    <div class="h-10 bg-gray-200 rounded w-24 animate-pulse"></div>
+                    <div class="h-10 bg-gray-200 rounded w-32 animate-pulse"></div>
+                    <div class="h-10 bg-gray-200 rounded w-32 animate-pulse"></div>
+                </div>
             </div>
-        @endif
+
+            <!-- Folders Skeleton -->
+            <div class="mb-8">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="h-7 bg-gray-200 rounded w-24 animate-pulse"></div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    @for($i=0; $i<4; $i++)
+                        <div class="h-32 bg-gray-200 border border-gray-100 rounded-xl animate-pulse"></div>
+                    @endfor
+                </div>
+            </div>
+
+            <!-- Files Skeleton -->
+            <div>
+                <div class="flex items-center justify-between mb-4">
+                    <div class="h-7 bg-gray-200 rounded w-32 animate-pulse"></div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    @for($i=0; $i<8; $i++)
+                        <div class="h-48 bg-gray-200 border border-gray-100 rounded-xl animate-pulse"></div>
+                    @endfor
+                </div>
+            </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Modal Crear Carpeta -->
         <flux:modal name="create-folder" class="min-w-[22rem]">
             <form wire:submit="createFolder">
                 <flux:heading size="lg" class="mb-4">Create New Folder</flux:heading>
-                
+
                 <flux:input wire:model="newFolderName" label="Folder Name" placeholder="e.g. Assets" class="mb-2" />
                 <flux:error name="newFolderName" class="mb-4" />
-                
+
                 <div class="flex gap-2 justify-end mt-4">
                     <flux:modal.close>
                         <flux:button variant="ghost">Cancel</flux:button>
@@ -371,7 +465,7 @@ class extends Component {
         <flux:modal name="upload-file" class="min-w-[22rem]">
             <form wire:submit="uploadFiles">
                 <flux:heading size="lg" class="mb-4">Upload Files</flux:heading>
-                
+
                 <div class="mb-2">
                     <flux:label>Select files</flux:label>
                     <input type="file" multiple wire:model="uploadedFiles" class="block w-full text-sm text-gray-500 mt-2
@@ -383,7 +477,7 @@ class extends Component {
                 </div>
                 <flux:error name="uploadedFiles" />
                 <flux:error name="uploadedFiles.*" />
-                
+
                 <div class="flex gap-2 justify-end mt-6">
                     <flux:modal.close>
                         <flux:button variant="ghost">Cancel</flux:button>

@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Models\Project;
 use App\Models\Task;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', static function () {
     if (Auth::check()) {
