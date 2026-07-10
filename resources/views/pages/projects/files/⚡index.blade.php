@@ -378,11 +378,12 @@ class extends Component {
                     <flux:icon.folder variant="outline" class="w-16 h-16 text-gray-400 stroke-[1.5]" />
                 </div>
 
-                <flux:heading size="xl" class="mb-3 text-gray-900 font-bold">No files or folders yet</flux:heading>
-
-                <p class="text-gray-500 text-center max-w-sm mb-8 text-sm md:text-base">
-                    Your workspace is a blank canvas. Start organizing your projects by creating a folder or uploading your first file.
-                </p>
+                <x-title-text 
+                    title="No Files or Folders," 
+                    highlight="Yet."
+                    description="Your workspace is a blank canvas. Start organizing your projects by creating a folder or uploading your first file." 
+                    class="text-center flex flex-col items-center mb-8" 
+                />
 
                 <div class="flex gap-4">
                     <flux:modal.trigger name="upload-file">

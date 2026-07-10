@@ -37,26 +37,21 @@ class extends Component {
 <div>
     @if($notebooks->isEmpty())
         <div class="flex h-full w-full flex-1 flex-col gap-4 rounded-xl">
-            <div>
-                <h1 class="text-xl md:text-2xl font-bold mb-4">
-                    Notebooks
-                </h1>
-
-                <p class="text-gray-500 font-normal text-sm md:text-base max-w-96 md:max-w-lg">
-                    Manage and track your project notebooks with your team in one place.
-                </p>
-            </div>
+            <x-title-text 
+                title="Notebooks" 
+                description="Manage and track your project notebooks with your team in one place." 
+                class="mb-0" 
+            />
 
             <div class="flex items-center justify-center flex-col gap-4 mt-8">
                 <flux:icon.book-open class="w-32 h-32 text-gray-400"/>
 
-                <div class="text-center">
-                    <flux:heading size="xl" class="mt-4 mb-2">No notebooks yet</flux:heading>
-
-                    <flux:text>
-                        Create your first notebook to start capturing your project’s ideas and information.
-                    </flux:text>
-                </div>
+                <x-title-text 
+                    title="No Notebooks," 
+                    highlight="Yet."
+                    description="Create your first notebook to start capturing your project’s ideas and information." 
+                    class="text-center flex flex-col items-center mb-0" 
+                />
 
                 <livewire:projects.notebooks.create-notebook :project="$project"/>
 
@@ -72,16 +67,11 @@ class extends Component {
         </div>
     @else
         <div class="mb-12">
-            <div class="mb-8">
-                <h1 class="text-xl md:text-4xl lg:text-5xl font-bold mb-4">
-                    Your Digital<br>
-                    <span class="text-orange-500 mt-4 block">Thoughts, Curated.</span>
-                </h1>
-
-                <p class="text-gray-500 font-normal text-sm md:text-base max-w-96 md:max-w-lg">
-                    Organize your creative vision with precision and style. Every insight matters in your journey.
-                </p>
-            </div>
+            <x-title-text 
+                title="Your Digital" 
+                highlight="Thoughts, Curated." 
+                description="Organize your creative vision with precision and style. Every insight matters in your journey." 
+            />
 
 
             <livewire:projects.notebooks.create-notebook :project="$project"/>
