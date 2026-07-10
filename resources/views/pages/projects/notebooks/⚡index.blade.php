@@ -3,9 +3,11 @@
 use Livewire\Component;
 use App\Models\Project;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
 use Livewire\Attributes\On;
 
 new #[Layout('layouts.app')]
+#[Title('Notebooks')]
 class extends Component {
     public Project $project;
     public int $projectId;
@@ -22,15 +24,6 @@ class extends Component {
             'project' => $this->project,
             'notebooks' => $this->project->notebooks,
         ];
-    }
-
-    public function render()
-    {
-        return view('pages.projects.notebooks.⚡index')
-            ->layout('layouts.app', [
-                'title' => 'Notebooks',
-                'project' => $this->project,
-            ]);
     }
 
     #[On('created-notebook')]

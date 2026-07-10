@@ -3,19 +3,21 @@
 use Livewire\Component;
 use App\Models\Project;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Auth;
 use Flux\Flux;
 
 new #[Layout('layouts.app')]
+#[Title('Files')]
 class extends Component {
     use WithFileUploads;
 
-    public Project $project;
+    public ?Project $project = null;
 
     public string $newFolderName = '';
-    public $uploadedFiles = [];
+    public array $uploadedFiles = [];
     public array $selectedIds = [];
 
     #[Url(history: true)]
@@ -150,15 +152,6 @@ class extends Component {
             'files' => $this->project->files()->where('folder_id', $this->currentFolderId)->get(),
             'breadcrumbs' => $breadcrumbs,
         ];
-    }
-
-    public function render()
-    {
-        return view('pages.projects.files.⚡index')
-            ->layout('layouts.app', [
-                'title' => 'Files',
-                'project' => $this->project,
-            ]);
     }
 };
 ?>

@@ -1,4 +1,4 @@
-<x-layouts::app.body :title="$title ?? null" :project="$project ?? null">
+<x-layouts::app.body :title="$title ?? null" :project="$project ?? request()->route('project')">
     <flux:main>
         {{ $slot }}
     </flux:main>
