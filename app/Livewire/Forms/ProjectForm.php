@@ -42,7 +42,7 @@ class ProjectForm extends Form
             'description' => $this->description,
             'icon' => $this->icon,
             'type' => $this->type,
-            'archive_at' => $this->archiveDate,
+            'archived_at' => $this->archiveDate,
             'status' => $this->status,
             'due_at' => $this->dueDate,
             'owner_id' => $this->ownerId,

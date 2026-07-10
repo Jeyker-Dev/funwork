@@ -1,0 +1,21 @@
+version: 1
+project: funwork
+stack:
+  language: "PHP 8.3"
+  framework: "Laravel 13"
+  frontend: "Livewire 4, Flux Pro, TailwindCSS, Alpine v3"
+  testing: "Pest 4"
+  linting: "Laravel Pint"
+testing:
+  strict_tdd: true
+  runner: "./vendor/bin/pest"
+  linter: "composer lint"
+  capabilities:
+    - "Feature Tests (Pest)"
+    - "Unit Tests (Pest)"
+    - "Livewire component testing"
+    - "Browser testing (if Laravel Dusk is configured, though not detected currently)"
+settings:
+  mode: openspec
+  execution_mode: interactive
+  delivery_strategy: ask-on-risk
