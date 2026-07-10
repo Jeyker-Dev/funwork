@@ -10,7 +10,9 @@ new class extends Component {
     public function with(): array
     {
         return [
-            'projects' => Project::where('name', 'like', '%' . $this->search . '%')->get(),
+            'projects' => Project::where('owner_id', auth()->id())
+                ->where('name', 'like', '%' . $this->search . '%')
+                ->get(),
         ];
     }
 

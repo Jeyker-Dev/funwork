@@ -9,7 +9,7 @@ new class extends Component
     public function with(): array
     {
         return [
-            'projects' => Project::all(),
+            'projects' => Project::where('owner_id', auth()->id())->get(),
             'elementName' => 'header',
         ];
     }

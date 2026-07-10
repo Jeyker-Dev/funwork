@@ -15,7 +15,8 @@ new class extends Component {
     public function with(): array
     {
         return [
-            'projects' => Project::where('name', 'like', '%' . $this->search . '%')
+            'projects' => Project::where('owner_id', auth()->id())
+                ->where('name', 'like', '%' . $this->search . '%')
                 ->where('id', '!=', $this->project->id)
                 ->limit(3)
                 ->get(),
