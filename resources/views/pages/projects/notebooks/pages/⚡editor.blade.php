@@ -121,7 +121,7 @@ class extends Component {
         return redirect()->route('project.notebooks', ['project' => $this->project]);
     }
 
-    public function createNextPage(): \Illuminate\Http\RedirectResponse
+    public function createNextPage()
     {
         $nextOrder = $this->notebook->pages()->max('order') + 1;
         $newPage = $this->notebook->pages()->create([
@@ -130,7 +130,7 @@ class extends Component {
             'created_by' => Auth::id(),
         ]);
 
-        return redirect()->route('project.notebooks.pages.edit', [
+        $this->redirectRoute('project.notebooks.pages.edit', [
             'project' => $this->project,
             'notebook' => $this->notebook,
             'page' => $newPage,
@@ -174,6 +174,7 @@ class extends Component {
                 @if($hasError)
                     <flux:icon.exclamation-circle class="size-4 text-red-500"/>
                     <span class="text-red-600">{{ $errorMessage }}</span>
+                    <button wire:click="retrySave" class="text-red-700 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 font-bold underline ml-1">Retry</button>
                 @else
                     <flux:icon.cloud class="size-4 text-orange-600 dark:text-orange-500"/>
                     <span>Autosaved</span>
