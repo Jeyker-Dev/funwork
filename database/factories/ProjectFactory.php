@@ -2,10 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Models\Project;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Project>
+ * @extends Factory<Project>
  */
 class ProjectFactory extends Factory
 {
@@ -22,7 +24,7 @@ class ProjectFactory extends Factory
             'icon' => fake()->randomElement(['folder', 'document', 'home', 'cog', 'user']),
             'type' => 'personal',
             'status' => 'active',
-            'owner_id' => \App\Models\User::factory(),
+            'owner_id' => User::factory(),
         ];
     }
 }

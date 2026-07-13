@@ -24,8 +24,8 @@ class TaskForm extends Form
     #[Validate('nullable|date_format:Y-m-d')]
     public string $dueDate = '';
 
-    #[Validate('required|integer')]
-    public ?int $assignedUserId = null;
+    #[Validate('nullable|array')]
+    public array $assignedUserIds = [];
 
     #[Validate('nullable|integer')]
     public ?int $projectId = null;
@@ -37,16 +37,19 @@ class TaskForm extends Form
     {
         $this->validate();
 
-        Task::create([
+        $task = Task::create([
             'title' => $this->title,
             'description' => $this->description,
             'status' => $this->status,
             'priority' => $this->priority,
             'due_date' => $this->dueDate,
-            'assigned_user_id' => $this->assignedUserId,
             'project_id' => $this->projectId,
             'position' => $this->position,
         ]);
+
+        if (! empty($this->assignedUserIds)) {
+            $task->users()->sync($this->assignedUserIds);
+        }
 
         $this->reset();
 

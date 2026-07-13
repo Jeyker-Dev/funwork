@@ -2,9 +2,9 @@
 
 use App\Models\Project;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
-use Carbon\Carbon;
 
 uses(RefreshDatabase::class);
 
@@ -30,7 +30,7 @@ test('renders a list of projects with correct information', function () {
 
 test('filters projects by search property', function () {
     $user = User::factory()->create();
-    
+
     Project::factory()->create(['name' => 'Alpha Project', 'owner_id' => $user->id]);
     Project::factory()->create(['name' => 'Beta Project', 'owner_id' => $user->id]);
 
@@ -44,7 +44,7 @@ test('filters projects by search property', function () {
 
 test('reacts to search-updated event', function () {
     $user = User::factory()->create();
-    
+
     Project::factory()->create(['name' => 'Alpha Project', 'owner_id' => $user->id]);
     Project::factory()->create(['name' => 'Beta Project', 'owner_id' => $user->id]);
 

@@ -21,7 +21,7 @@ test('empty state rendering shows text and create-project component', function (
 
 test('populated state rendering shows prompt and show-projects component', function () {
     $user = User::factory()->create();
-    
+
     Project::factory()->create([
         'owner_id' => $user->id,
     ]);

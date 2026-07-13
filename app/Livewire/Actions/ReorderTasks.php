@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Actions;
 
+use App\Models\Project;
 use App\Models\Task;
 use Illuminate\Support\Facades\DB;
 
@@ -15,6 +16,11 @@ class ReorderTasks
 {
     public function __invoke(array $payload, int $projectId): void
     {
+        $project = Project::findOrFail($projectId);
+        if ($project->owner_id !== auth()->id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
         DB::transaction(function () use ($payload, $projectId) {
             foreach ($payload as $status => $orderedIds) {
                 foreach ($orderedIds as $index => $id) {
