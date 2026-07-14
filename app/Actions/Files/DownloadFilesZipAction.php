@@ -13,7 +13,7 @@ class DownloadFilesZipAction
         $zip = new ZipArchive;
 
         $zipFileName = 'download_'.time().'.zip';
-        $zipPath = storage_path('app/temp/'.$zipFileName);
+        $zipPath = Storage::disk('local')->path('temp/'.$zipFileName);
 
         // Ensure temp directory exists
         if (! Storage::disk('local')->exists('temp')) {
@@ -22,25 +22,36 @@ class DownloadFilesZipAction
 
         if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true) {
 
-            foreach ($selectedIds as $item) {
-                if (str_starts_with($item, 'file_')) {
-                    $fileId = str_replace('file_', '', $item);
-                    $file = $project->files()->find($fileId);
+            try {
+                foreach ($selectedIds as $item) {
+                    if (str_starts_with($item, 'file_')) {
+                        $fileId = str_replace('file_', '', $item);
+                        $file = $project->files()->find($fileId);
 
-                    if ($file && Storage::disk($file->disk)->exists($file->file_path)) {
-                        $absolutePath = Storage::disk($file->disk)->path($file->file_path);
-                        $zip->addFile($absolutePath, $file->name);
+                        if ($file) {
+                            if (!Storage::disk($file->disk)->exists($file->file_path)) {
+                                throw \Illuminate\Validation\ValidationException::withMessages([
+                                    'files' => 'One or more requested files are unavailable.'
+                                ]);
+                            }
+                            $absolutePath = Storage::disk($file->disk)->path($file->file_path);
+                            $zip->addFile($absolutePath, $file->name);
+                        }
+                    }
+
+                    if (str_starts_with($item, 'folder_')) {
+                        $folderId = str_replace('folder_', '', $item);
+                        $folder = $project->folders()->find($folderId);
+
+                        if ($folder) {
+                            $this->addFolderToZip($zip, $folder, $folder->name.'/');
+                        }
                     }
                 }
-
-                if (str_starts_with($item, 'folder_')) {
-                    $folderId = str_replace('folder_', '', $item);
-                    $folder = $project->folders()->find($folderId);
-
-                    if ($folder) {
-                        $this->addFolderToZip($zip, $folder, $folder->name.'/');
-                    }
-                }
+            } catch (\Exception $e) {
+                $zip->close();
+                Storage::disk('local')->delete('temp/'.$zipFileName);
+                throw $e;
             }
 
             $zip->close();
@@ -54,10 +65,13 @@ class DownloadFilesZipAction
         $zip->addEmptyDir($currentPath);
 
         foreach ($folder->files as $file) {
-            if (Storage::disk($file->disk)->exists($file->file_path)) {
-                $absolutePath = Storage::disk($file->disk)->path($file->file_path);
-                $zip->addFile($absolutePath, $currentPath.$file->name);
+            if (!Storage::disk($file->disk)->exists($file->file_path)) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'files' => 'One or more requested files are unavailable.'
+                ]);
             }
+            $absolutePath = Storage::disk($file->disk)->path($file->file_path);
+            $zip->addFile($absolutePath, $currentPath.$file->name);
         }
 
         foreach ($folder->children as $childFolder) {

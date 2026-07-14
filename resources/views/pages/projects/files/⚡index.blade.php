@@ -16,8 +16,9 @@ class extends Component {
 
     public ?Project $project = null;
 
-    public string $newFolderName = '';
-    public array $uploadedFiles = [];
+    public \App\Livewire\Forms\FolderForm $folderForm;
+    public \App\Livewire\Forms\UploadFileForm $uploadForm;
+
     public array $selectedIds = [];
 
     #[Url(history: true)]
@@ -66,9 +67,33 @@ class extends Component {
         return $action->execute($this->project, $this->selectedIds);
     }
 
-    public function deleteSelected()
+    public function deleteSelected(\App\Actions\Files\DeleteSelectionAction $action)
     {
-        // Placeholder for future delete logic
+        if (empty($this->selectedIds)) {
+            return;
+        }
+
+        try {
+            $action->execute($this->project, $this->selectedIds);
+            
+            $this->clearSelection();
+            
+            Flux::toast(
+                heading: 'Items Deleted',
+                text: 'The selected items have been deleted successfully.',
+                variant: 'success',
+                duration: 3000,
+            );
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Flux::toast(
+                heading: 'Action failed',
+                text: $e->getMessage(),
+                variant: 'error',
+                duration: 5000,
+            );
+        }
+
+        Flux::modals()->close();
     }
 
     public function moveSelected()
@@ -90,47 +115,14 @@ class extends Component {
 
     public function createFolder()
     {
-        $this->validate([
-            'newFolderName' => 'required|string|max:255',
-        ]);
-
-        $this->project->folders()->create([
-            'name' => $this->newFolderName,
-            'created_by' => Auth::id(),
-            'parent_id' => $this->currentFolderId,
-        ]);
-
-        $this->reset('newFolderName');
-        Flux::modal('create-folder')->close();
+        $this->folderForm->setContext($this->project, $this->currentFolderId);
+        $this->folderForm->store();
     }
 
     public function uploadFiles()
     {
-        $this->validate([
-            'uploadedFiles.*' => 'required|file|max:10240', // 10MB max per file
-        ]);
-
-        foreach ($this->uploadedFiles as $file) {
-            // Extraer metadata ANTES de mover el archivo (porque store() elimina el temporal)
-            $name = $file->getClientOriginalName();
-            $mime = $file->getMimeType();
-            $size = $file->getSize();
-
-            $path = $file->store('projects/'.$this->project->id, 'local');
-
-            $this->project->files()->create([
-                'name' => $name,
-                'file_path' => $path,
-                'disk' => 'local',
-                'mime_type' => $mime,
-                'size' => $size,
-                'created_by' => Auth::id(),
-                'folder_id' => $this->currentFolderId,
-            ]);
-        }
-
-        $this->reset('uploadedFiles');
-        Flux::modal('upload-file')->close();
+        $this->uploadForm->setContext($this->project, $this->currentFolderId);
+        $this->uploadForm->store();
     }
 
     // Los datos reales se inyectan a la vista usando el método with()
@@ -360,9 +352,11 @@ class extends Component {
                         <button wire:click="downloadSelected" class="flex items-center gap-2 px-3 py-1.5 text-sm font-medium hover:bg-gray-800 rounded-full transition-colors">
                             <flux:icon.arrow-down-tray class="w-4 h-4" /> Descargar
                         </button>
-                        <button wire:click="deleteSelected" class="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-red-400 hover:bg-gray-800 rounded-full transition-colors">
-                            <flux:icon.trash class="w-4 h-4" /> Eliminar
-                        </button>
+                        <flux:modal.trigger name="delete-confirmation">
+                            <button class="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-red-400 hover:bg-gray-800 rounded-full transition-colors">
+                                <flux:icon.trash class="w-4 h-4" /> Eliminar
+                            </button>
+                        </flux:modal.trigger>
                     </div>
 
                     <div class="pl-2">
@@ -445,8 +439,8 @@ class extends Component {
             <form wire:submit="createFolder">
                 <flux:heading size="lg" class="mb-4">Create New Folder</flux:heading>
 
-                <flux:input wire:model="newFolderName" label="Folder Name" placeholder="e.g. Assets" class="mb-2" />
-                <flux:error name="newFolderName" class="mb-4" />
+                <flux:input wire:model="folderForm.name" label="Folder Name" placeholder="e.g. Assets" class="mb-2" />
+                <flux:error name="folderForm.name" class="mb-4" />
 
                 <div class="flex gap-2 justify-end mt-4">
                     <flux:modal.close>
