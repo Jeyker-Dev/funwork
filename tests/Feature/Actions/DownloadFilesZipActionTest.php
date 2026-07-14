@@ -65,4 +65,4 @@ test('throws exception if a requested file is missing', function () {
 
     $action = new DownloadFilesZipAction();
     $action->execute($project, ['file_' . $file1->id]);
-})->throws(ValidationException::class, 'One or more requested files are unavailable.');
+})->throws(ValidationException::class, 'The requested file is unavailable.');

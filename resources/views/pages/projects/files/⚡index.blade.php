@@ -64,7 +64,12 @@ class extends Component {
             return;
         }
 
-        return $action->execute($this->project, $this->selectedIds);
+        $response = $action->execute($this->project, $this->selectedIds);
+        
+        $this->clearSelection();
+        $this->dispatch('download-completed');
+        
+        return $response;
     }
 
     public function deleteSelected(\App\Actions\Files\DeleteSelectionAction $action)
@@ -240,7 +245,9 @@ class extends Component {
                                         {{ in_array('folder_' . $folder->id, $selectedIds) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100' }} transition-opacity">
                                 </div>
                                 <div class="absolute top-2 right-2 z-10">
-                                    <flux:button wire:click.stop icon="ellipsis-vertical" variant="subtle" size="sm" class="text-gray-400 hover:text-gray-900" />
+                                    <button wire:click.stop class="p-1.5 rounded-md text-gray-400 hover:text-gray-900 hover:bg-white/50 transition-colors">
+                                        <flux:icon.ellipsis-vertical class="w-5 h-5" />
+                                    </button>
                                 </div>
                                 <div class="mb-4 text-orange-600 bg-orange-50 w-10 h-10 rounded-lg flex items-center justify-center">
                                     <flux:icon.folder variant="solid" class="w-6 h-6" />
@@ -282,7 +289,9 @@ class extends Component {
                                         {{ in_array('file_' . $file->id, $selectedIds) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100' }} transition-opacity bg-white/80 backdrop-blur-sm">
                                 </div>
                                 <div class="absolute top-2 right-2 z-20">
-                                    <flux:button icon="ellipsis-vertical" variant="subtle" size="sm" class="bg-white/80 backdrop-blur-sm shadow-sm text-gray-500 hover:text-gray-900" />
+                                    <button class="p-1.5 rounded-md text-gray-500 hover:text-gray-900 bg-white/80 backdrop-blur-sm shadow-sm hover:bg-white transition-colors">
+                                        <flux:icon.ellipsis-vertical class="w-5 h-5" />
+                                    </button>
                                 </div>
 
                                 <!-- File Preview Area -->
@@ -328,6 +337,7 @@ class extends Component {
 
                 <!-- Floating Action Bar -->
                 <div x-data x-show="$wire.selectedIds.length > 0" x-cloak
+                     @download-completed.window="window.Flux && Flux.toast({ heading: '¡Descarga completada!', variant: 'success' })"
                      x-transition:enter="transition ease-out duration-300"
                      x-transition:enter-start="opacity-0 translate-y-8"
                      x-transition:enter-end="opacity-100 translate-y-0"
@@ -349,8 +359,17 @@ class extends Component {
                         <button wire:click="moveSelected" class="flex items-center gap-2 px-3 py-1.5 text-sm font-medium hover:bg-gray-800 rounded-full transition-colors">
                             <flux:icon.arrows-right-left class="w-4 h-4" /> Mover
                         </button>
-                        <button wire:click="downloadSelected" class="flex items-center gap-2 px-3 py-1.5 text-sm font-medium hover:bg-gray-800 rounded-full transition-colors">
-                            <flux:icon.arrow-down-tray class="w-4 h-4" /> Descargar
+                        <button 
+                            x-on:click="if(! $el.disabled) { window.Flux && Flux.toast({ heading: 'Preparando descarga...', variant: 'info' }) }"
+                            wire:click="downloadSelected" 
+                            wire:loading.attr="disabled"
+                            wire:target="downloadSelected"
+                            class="flex items-center gap-2 px-3 py-1.5 text-sm font-medium hover:bg-gray-800 rounded-full transition-colors disabled:opacity-50 disabled:cursor-wait"
+                        >
+                            <flux:icon.arrow-down-tray wire:loading.remove wire:target="downloadSelected" class="w-4 h-4" />
+                            <flux:icon.loading wire:loading wire:target="downloadSelected" class="w-4 h-4 animate-spin" />
+                            <span wire:loading.remove wire:target="downloadSelected">Descargar</span>
+                            <span wire:loading wire:target="downloadSelected">Procesando...</span>
                         </button>
                         <flux:modal.trigger name="delete-confirmation">
                             <button class="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-red-400 hover:bg-gray-800 rounded-full transition-colors">
@@ -458,15 +477,15 @@ class extends Component {
 
                 <div class="mb-2">
                     <flux:label>Select files</flux:label>
-                    <input type="file" multiple wire:model="uploadedFiles" class="block w-full text-sm text-gray-500 mt-2
+                    <input type="file" multiple wire:model="uploadForm.files" class="block w-full text-sm text-gray-500 mt-2
                         file:mr-4 file:py-2 file:px-4
                         file:rounded-md file:border-0
                         file:text-sm file:font-semibold
                         file:bg-orange-50 file:text-orange-700
                         hover:file:bg-orange-100" />
                 </div>
-                <flux:error name="uploadedFiles" />
-                <flux:error name="uploadedFiles.*" />
+                <flux:error name="uploadForm.files" />
+                <flux:error name="uploadForm.files.*" />
 
                 <div class="flex gap-2 justify-end mt-6">
                     <flux:modal.close>

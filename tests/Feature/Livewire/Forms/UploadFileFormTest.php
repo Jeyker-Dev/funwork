@@ -49,7 +49,7 @@ test('it validates required files', function () {
 });
 
 test('it successfully uploads files and resets form', function () {
-    Storage::fake('local');
+    Storage::fake('s3');
 
     $user = User::factory()->create();
     $this->actingAs($user);
@@ -81,12 +81,12 @@ test('it successfully uploads files and resets form', function () {
         ->and($files[1]->mime_type)->toBe('image/png')
         ->and($files[1]->project_id)->toBe($project->id);
 
-    Storage::disk('local')->assertExists($files[0]->file_path);
-    Storage::disk('local')->assertExists($files[1]->file_path);
+    Storage::disk('s3')->assertExists($files[0]->file_path);
+    Storage::disk('s3')->assertExists($files[1]->file_path);
 });
 
 test('it successfully uploads files to a specific folder', function () {
-    Storage::fake('local');
+    Storage::fake('s3');
 
     $user = User::factory()->create();
     $this->actingAs($user);

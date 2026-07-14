@@ -36,7 +36,7 @@ test('it can create a folder', function () {
 
 test('it can upload files', function () {
     $this->actingAs($this->user);
-    Storage::fake('local');
+    Storage::fake('s3');
 
     $file = UploadedFile::fake()->image('test.jpg');
 
@@ -48,26 +48,28 @@ test('it can upload files', function () {
     expect(ProjectFile::where('name', 'test.jpg')->where('project_id', $this->project->id)->exists())->toBeTrue();
     
     $uploadedFile = ProjectFile::where('name', 'test.jpg')->first();
-    Storage::disk('local')->assertExists($uploadedFile->file_path);
+    Storage::disk('s3')->assertExists($uploadedFile->file_path);
 });
 
 test('it can download selected items', function () {
     $this->actingAs($this->user);
-    Storage::fake('local');
+    Storage::fake('s3');
+    Storage::fake('local'); // needed for zip if applicable
 
     $file = ProjectFile::factory()->create([
         'project_id' => $this->project->id,
         'created_by' => $this->user->id,
-        'disk' => 'local',
+        'disk' => 's3',
         'file_path' => 'projects/' . $this->project->id . '/test.txt',
     ]);
     
-    Storage::disk('local')->put($file->file_path, 'test content');
+    Storage::disk('s3')->put($file->file_path, 'test content');
 
     $response = Livewire::test('pages::projects.files.index', ['project' => $this->project])
         ->set('selectedIds', ['file_' . $file->id])
         ->call('downloadSelected');
 
+    $response->assertHasNoErrors();
     $response->assertFileDownloaded();
 });
 

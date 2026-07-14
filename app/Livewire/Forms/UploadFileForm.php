@@ -15,7 +15,7 @@ class UploadFileForm extends Form
 
     #[Validate([
         'files' => 'required|array|min:1',
-        'files.*' => 'required|file|max:10240'
+        'files.*' => 'required|file|max:102400'
     ])]
     public array $files = [];
 
@@ -34,12 +34,12 @@ class UploadFileForm extends Form
             $mime = $file->getMimeType();
             $size = $file->getSize();
 
-            $path = $file->store('projects/'.$this->project->id, 'local');
+            $path = $file->store('projects/'.$this->project->id, 's3');
 
             $this->project->files()->create([
                 'name' => $name,
                 'file_path' => $path,
-                'disk' => 'local',
+                'disk' => 's3',
                 'mime_type' => $mime,
                 'size' => $size,
                 'created_by' => Auth::id(),
