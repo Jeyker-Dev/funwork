@@ -2,12 +2,17 @@
 
 namespace App\Models;
 
+use Database\Factories\NotebookFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Notebook extends Model
 {
+    /** @use HasFactory<NotebookFactory> */
+    use HasFactory;
+
     protected $fillable = [
         'project_id',
         'name',
@@ -27,9 +32,9 @@ class Notebook extends Model
         return $this->hasMany(NotebookPage::class);
     }
 
-    public function users(): HasMany
+    public function creator(): BelongsTo
     {
-        return $this->hasMany(User::class);
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     // Scopes for filtering

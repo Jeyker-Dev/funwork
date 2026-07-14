@@ -9,6 +9,7 @@ use Livewire\Form;
 
 class NotebookForm extends Form
 {
+    #[Validate('required|integer')]
     public ?int $projectId = null;
 
     #[Validate('required')]
@@ -17,6 +18,7 @@ class NotebookForm extends Form
     #[Validate('required')]
     public string $description = '';
 
+    #[Validate('required|integer')]
     public ?int $createdBy = null;
 
     public function store(): void
