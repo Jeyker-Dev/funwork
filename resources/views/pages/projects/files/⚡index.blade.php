@@ -160,8 +160,9 @@ class extends Component {
     <div class="bg-gray-100 min-h-screen rounded-xl pb-32">
 
         <div wire:loading.remove.delay wire:target="navigateToFolder, navigateToRoot">
-            <!-- Contextual Action Bar -->
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+            @if($currentFolderId !== null || $folders->isNotEmpty() || $files->isNotEmpty())
+                <!-- Contextual Action Bar -->
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                 <!-- Breadcrumbs -->
                 <div class="flex items-center space-x-2 text-sm text-gray-500 font-medium">
                     <button wire:click="navigateToRoot" class="hover:text-gray-900 transition-colors {{ empty($breadcrumbs) ? 'text-gray-900 font-semibold' : '' }}">Files</button>
@@ -213,6 +214,7 @@ class extends Component {
                     </div>
                 @endif
             </div>
+            @endif
 
             @if($folders->isNotEmpty() || $files->isNotEmpty())
                 <!-- POPULATED STATE -->
