@@ -59,11 +59,11 @@ test('it can download selected items', function () {
     $file = ProjectFile::factory()->create([
         'project_id' => $this->project->id,
         'created_by' => $this->user->id,
-        'disk' => 's3',
+        'disk' => 'local',
         'file_path' => 'projects/' . $this->project->id . '/test.txt',
     ]);
     
-    Storage::disk('s3')->put($file->file_path, 'test content');
+    Storage::disk('local')->put($file->file_path, 'test content');
 
     $response = Livewire::test('pages::projects.files.index', ['project' => $this->project])
         ->set('selectedIds', ['file_' . $file->id])

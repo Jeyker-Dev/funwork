@@ -5,14 +5,16 @@ use App\Models\Project;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
+use Livewire\Attributes\Computed;
 use Livewire\WithFileUploads;
+use Livewire\WithPagination;
 use Illuminate\Support\Facades\Auth;
 use Flux\Flux;
 
 new #[Layout('layouts.app')]
 #[Title('Files')]
 class extends Component {
-    use WithFileUploads;
+    use WithFileUploads, WithPagination;
 
     public ?Project $project = null;
 
@@ -58,6 +60,18 @@ class extends Component {
         }
     }
 
+    #[Computed]
+    public function selectedFoldersCount()
+    {
+        return count(array_filter($this->selectedIds, fn($id) => str_starts_with($id, 'folder_')));
+    }
+
+    #[Computed]
+    public function selectedFilesCount()
+    {
+        return count(array_filter($this->selectedIds, fn($id) => str_starts_with($id, 'file_')));
+    }
+
     public function downloadSelected(\App\Actions\Files\DownloadFilesZipAction $action)
     {
         if (empty($this->selectedIds)) {
@@ -83,6 +97,8 @@ class extends Component {
             
             $this->clearSelection();
             
+            Flux::modal('delete-confirmation')->close();
+
             Flux::toast(
                 heading: 'Items Deleted',
                 text: 'The selected items have been deleted successfully.',
@@ -146,18 +162,18 @@ class extends Component {
 
         return [
             'folders' => $this->project->folders()->where('parent_id', $this->currentFolderId)->get(),
-            'files' => $this->project->files()->where('folder_id', $this->currentFolderId)->get(),
+            'files' => $this->project->files()->where('folder_id', $this->currentFolderId)->latest()->paginate(30),
             'breadcrumbs' => $breadcrumbs,
         ];
     }
 };
 ?>
 
-<div>
-    <div class="bg-gray-100 min-h-screen rounded-xl pb-32">
-
-        <div wire:loading.remove.delay wire:target="navigateToFolder, navigateToRoot">
-            @if($currentFolderId !== null || $folders->isNotEmpty() || $files->isNotEmpty())
+<div class="h-[calc(100vh-120px)] flex flex-col">
+    <div class="bg-gray-100 rounded-xl flex-1 flex flex-col overflow-hidden">
+        <div @class(['flex-1 overflow-y-auto', 'pb-32' => count($selectedIds) > 0, 'pb-2' => empty($selectedIds)])>
+            <div wire:loading.remove.delay wire:target="navigateToFolder, navigateToRoot">
+                @if($currentFolderId !== null || $folders->isNotEmpty() || $files->isNotEmpty())
                 <!-- Contextual Action Bar -->
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                 <!-- Breadcrumbs -->
@@ -231,7 +247,7 @@ class extends Component {
                             </button>
                         @endif
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <div class="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4">
                         @forelse($folders as $folder)
                             <flux:card wire:key="folder-{{ $folder->id }}" wire:click="navigateToFolder({{ $folder->id }})"
                                 @class([
@@ -261,10 +277,10 @@ class extends Component {
                     </div>
                 </div>
 
-                <!-- Recent Files Section -->
+                <!-- Files Section -->
                 <div>
                     <div class="flex items-center justify-between mb-4">
-                        <flux:heading size="lg">Recent Files</flux:heading>
+                        <flux:heading size="lg">Files in this location</flux:heading>
                         @if($files->isNotEmpty())
                             @php
                                 $allFilesSelected = count(array_filter($selectedIds, fn($id) => str_starts_with($id, 'file_'))) === $files->count();
@@ -275,7 +291,7 @@ class extends Component {
                             </button>
                         @endif
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <div class="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4">
                         @forelse($files as $file)
                             <flux:card wire:key="file-{{ $file->id }}"
                                 @class([
@@ -333,6 +349,12 @@ class extends Component {
                             <div class="col-span-full text-sm text-gray-500 italic">No files uploaded yet.</div>
                         @endforelse
                     </div>
+
+                    @if($files->hasPages())
+                        <div class="mt-6">
+                            {{ $files->links() }}
+                        </div>
+                    @endif
                 </div>
 
                 <!-- Floating Action Bar -->
@@ -431,7 +453,7 @@ class extends Component {
                 <div class="flex items-center justify-between mb-4">
                     <div class="h-7 bg-gray-200 rounded w-24 animate-pulse"></div>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <div class="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4">
                     @for($i=0; $i<4; $i++)
                         <div class="h-32 bg-gray-200 border border-gray-100 rounded-xl animate-pulse"></div>
                     @endfor
@@ -443,7 +465,7 @@ class extends Component {
                 <div class="flex items-center justify-between mb-4">
                     <div class="h-7 bg-gray-200 rounded w-32 animate-pulse"></div>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <div class="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4">
                     @for($i=0; $i<8; $i++)
                         <div class="h-48 bg-gray-200 border border-gray-100 rounded-xl animate-pulse"></div>
                     @endfor
@@ -452,6 +474,7 @@ class extends Component {
                 </div>
             </div>
         </div>
+    </div>
 
         <!-- Modal Crear Carpeta -->
         <flux:modal name="create-folder" class="min-w-[22rem]">
@@ -498,6 +521,35 @@ class extends Component {
                     </flux:button>
                 </div>
             </form>
+        </flux:modal>
+
+        <!-- Modal Confirmar Eliminación -->
+        <flux:modal name="delete-confirmation" class="min-w-[22rem]">
+            <flux:heading size="lg" class="mb-4">Confirmar Eliminación</flux:heading>
+            
+            <div class="mb-6 text-gray-600 dark:text-gray-400">
+                ¿Estás seguro de que deseas eliminar 
+                @if($this->selectedFoldersCount > 0)
+                    <strong>{{ $this->selectedFoldersCount }} carpeta(s)</strong>
+                @endif
+                @if($this->selectedFoldersCount > 0 && $this->selectedFilesCount > 0)
+                    y 
+                @endif
+                @if($this->selectedFilesCount > 0)
+                    <strong>{{ $this->selectedFilesCount }} archivo(s)</strong>
+                @endif
+                ? Esta acción no se puede deshacer.
+            </div>
+
+            <div class="flex gap-2 justify-end mt-4">
+                <flux:modal.close>
+                    <flux:button variant="ghost" wire:loading.attr="disabled" wire:target="deleteSelected">Cancelar</flux:button>
+                </flux:modal.close>
+                <flux:button variant="danger" wire:click="deleteSelected" wire:loading.attr="disabled" wire:target="deleteSelected">
+                    <span wire:loading.remove wire:target="deleteSelected">Eliminar</span>
+                    <span wire:loading wire:target="deleteSelected">Procesando...</span>
+                </flux:button>
+            </div>
         </flux:modal>
 
     </div>

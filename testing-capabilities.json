@@ -1,5 +1,5 @@
 {
-  "project": "funwork",
+  "project": "Phoenix",
   "stack": {
     "framework": "Laravel 13",
     "language": "PHP 8.3",
@@ -12,5 +12,5 @@
     "formatter": "laravel pint",
     "strict_tdd": true
   },
-  "persistence_mode": "none"
+  "persistence_mode": "engram"
 }
