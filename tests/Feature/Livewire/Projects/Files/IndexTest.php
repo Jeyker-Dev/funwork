@@ -93,3 +93,31 @@ test('it can delete selected items', function () {
     // Verify it was soft deleted
     expect(Folder::withTrashed()->find($folder->id)->trashed())->toBeTrue();
 });
+
+test('it triggers move modal with selected items', function () {
+    $this->actingAs($this->user);
+    $folder = Folder::factory()->create([
+        'project_id' => $this->project->id,
+        'created_by' => $this->user->id,
+        'name' => 'Folder to move',
+    ]);
+
+    Livewire::test('pages::projects.files.index', ['project' => $this->project])
+        ->set('selectedIds', ['folder_'.$folder->id])
+        ->call('moveSelected')
+        ->assertDispatched('open-move-modal', selectedIds: ['folder_'.$folder->id]);
+});
+
+test('it clears selection on items moved event', function () {
+    $this->actingAs($this->user);
+    $folder = Folder::factory()->create([
+        'project_id' => $this->project->id,
+        'created_by' => $this->user->id,
+        'name' => 'Folder to clear',
+    ]);
+
+    Livewire::test('pages::projects.files.index', ['project' => $this->project])
+        ->set('selectedIds', ['folder_'.$folder->id])
+        ->dispatch('items-moved')
+        ->assertSet('selectedIds', []);
+});

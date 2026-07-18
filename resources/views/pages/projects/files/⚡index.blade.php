@@ -136,6 +136,21 @@ class extends Component {
     #[On('file-uploaded')]
     public function refresh(): void {}
 
+    public function moveSelected(): void
+    {
+        if (empty($this->selectedIds)) {
+            return;
+        }
+
+        $this->dispatch('open-move-modal', selectedIds: $this->selectedIds);
+    }
+
+    #[On('items-moved')]
+    public function onItemsMoved(): void
+    {
+        $this->clearSelection();
+    }
+
     public function with(): array
     {
         $breadcrumbs = [];
@@ -243,4 +258,5 @@ class extends Component {
         :selectedFoldersCount="$this->selectedFoldersCount"
         :selectedFilesCount="$this->selectedFilesCount"
     />
+    <livewire:projects.files.move-items-modal :project="$project" />
 </div>
