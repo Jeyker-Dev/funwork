@@ -4,13 +4,14 @@ namespace App\Livewire\Forms;
 
 use App\Models\Project;
 use Flux\Flux;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
-use Illuminate\Support\Facades\Auth;
 
 class FolderForm extends Form
 {
     public ?Project $project = null;
+
     public ?int $currentFolderId = null;
 
     #[Validate('required|string|max:255')]

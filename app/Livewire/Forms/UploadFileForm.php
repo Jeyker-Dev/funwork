@@ -4,18 +4,19 @@ namespace App\Livewire\Forms;
 
 use App\Models\Project;
 use Flux\Flux;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
-use Illuminate\Support\Facades\Auth;
 
 class UploadFileForm extends Form
 {
     public ?Project $project = null;
+
     public ?int $currentFolderId = null;
 
     #[Validate([
         'files' => 'required|array|min:1',
-        'files.*' => 'required|file|max:102400'
+        'files.*' => 'required|file|max:102400',
     ])]
     public array $files = [];
 

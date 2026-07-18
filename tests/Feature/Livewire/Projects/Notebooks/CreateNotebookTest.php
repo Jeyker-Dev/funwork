@@ -13,5 +13,5 @@ test('create notebook component renders correctly', function () {
     $component = Livewire::test('projects.notebooks.⚡create-notebook', ['project' => $project]);
 
     $component->assertSee('Create Notebook')
-              ->assertSee('Fill out the details below');
+        ->assertSee('Fill out the details below');
 });

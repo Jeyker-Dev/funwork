@@ -1,21 +1,22 @@
 <?php
 
-use App\Models\Project;
-use App\Models\User;
+use App\Livewire\Forms\UploadFileForm;
 use App\Models\Folder;
+use App\Models\Project;
 use App\Models\ProjectFile;
-use Livewire\Livewire;
-use Livewire\Component;
-use Livewire\WithFileUploads;
+use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use App\Livewire\Forms\UploadFileForm;
+use Livewire\Component;
+use Livewire\Livewire;
+use Livewire\WithFileUploads;
 
 class UploadFileFormTestComponent extends Component
 {
     use WithFileUploads;
 
     public UploadFileForm $form;
+
     public ?Project $project = null;
 
     public function mount(Project $project, ?int $currentFolderId = null)

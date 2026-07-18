@@ -5,8 +5,8 @@ use App\Models\Folder;
 use App\Models\Project;
 use App\Models\ProjectFile;
 use Illuminate\Support\Facades\Storage;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 test('generates zip with selected files and folders', function () {
     Storage::fake('local');
@@ -33,16 +33,16 @@ test('generates zip with selected files and folders', function () {
     ]);
     Storage::disk('local')->put('files/file2.txt', 'file 2 content');
 
-    $action = new DownloadFilesZipAction();
+    $action = new DownloadFilesZipAction;
 
-    $response = $action->execute($project, ['file_' . $file1->id, 'folder_' . $folder->id]);
+    $response = $action->execute($project, ['file_'.$file1->id, 'folder_'.$folder->id]);
 
     expect($response)->toBeInstanceOf(BinaryFileResponse::class);
-    
+
     $zipPath = $response->getFile()->getPathname();
     expect(file_exists($zipPath))->toBeTrue();
 
-    $zip = new ZipArchive();
+    $zip = new ZipArchive;
     $zip->open($zipPath);
 
     expect($zip->numFiles)->toBe(3)
@@ -63,6 +63,6 @@ test('throws exception if a requested file is missing', function () {
         'file_path' => 'files/missing.txt',
     ]);
 
-    $action = new DownloadFilesZipAction();
-    $action->execute($project, ['file_' . $file1->id]);
+    $action = new DownloadFilesZipAction;
+    $action->execute($project, ['file_'.$file1->id]);
 })->throws(ValidationException::class, 'The requested file is unavailable.');

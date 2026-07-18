@@ -1,8 +1,8 @@
 <?php
 
+use App\Models\Notebook;
 use App\Models\Project;
 use App\Models\User;
-use App\Models\Notebook;
 use Livewire\Livewire;
 
 test('it validates required project_id', function () {
@@ -50,9 +50,9 @@ test('it successfully persists notebook, dispatches event and resets form', func
         ->assertDispatched('created-notebook')
         ->assertSet('form.name', '')
         ->assertSet('form.description', '');
-        
+
     expect(Notebook::count())->toBe(1);
-    
+
     $notebook = Notebook::first();
     expect($notebook->name)->toBe('My Notebook')
         ->and($notebook->project_id)->toBe($project->id)

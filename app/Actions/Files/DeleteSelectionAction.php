@@ -5,7 +5,6 @@ namespace App\Actions\Files;
 use App\Models\Folder;
 use App\Models\Project;
 use App\Models\ProjectFile;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 
 class DeleteSelectionAction
@@ -38,7 +37,7 @@ class DeleteSelectionAction
     private function deleteFile(ProjectFile $file): void
     {
         // We only soft delete in the DB as per the SoftDeletes trait.
-        // We could also delete the physical file if it's a hard delete, 
+        // We could also delete the physical file if it's a hard delete,
         // but typically with SoftDeletes we keep the file or handle it differently.
         // For this action, we'll just soft delete the record.
         $file->delete();

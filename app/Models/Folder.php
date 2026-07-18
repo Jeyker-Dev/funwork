@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Folder extends Model
 {
@@ -42,5 +42,17 @@ class Folder extends Model
     public function files(): HasMany
     {
         return $this->hasMany(ProjectFile::class, 'folder_id');
+    }
+
+    public function getBreadcrumbsAttribute(): array
+    {
+        $breadcrumbs = [];
+        $folder = $this;
+        while ($folder) {
+            array_unshift($breadcrumbs, $folder);
+            $folder = $folder->parent;
+        }
+
+        return $breadcrumbs;
     }
 }

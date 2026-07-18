@@ -1,8 +1,8 @@
 <?php
 
+use App\Models\Notebook;
 use App\Models\Project;
 use App\Models\User;
-use App\Models\Notebook;
 use Livewire\Livewire;
 
 test('index component mounts successfully and shows empty state', function () {
@@ -14,7 +14,7 @@ test('index component mounts successfully and shows empty state', function () {
     $component = Livewire::test('pages::projects.notebooks.index', ['project' => $project]);
 
     $component->assertSee('No Notebooks,')
-              ->assertSee('Yet.');
+        ->assertSee('Yet.');
 });
 
 test('index component shows populated state when notebooks exist', function () {
@@ -32,5 +32,5 @@ test('index component shows populated state when notebooks exist', function () {
     $component = Livewire::test('pages::projects.notebooks.index', ['project' => $project]);
 
     $component->assertSee('All Notebook')
-              ->assertSeeLivewire('projects.notebooks.show-notebooks');
+        ->assertSeeLivewire('projects.notebooks.show-notebooks');
 });

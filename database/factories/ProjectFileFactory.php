@@ -2,7 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Models\Project;
 use App\Models\ProjectFile;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,13 +20,13 @@ class ProjectFileFactory extends Factory
     public function definition(): array
     {
         return [
-            'project_id' => \App\Models\Project::factory(),
-            'name' => fake()->word() . '.txt',
-            'file_path' => 'files/' . fake()->uuid() . '.txt',
+            'project_id' => Project::factory(),
+            'name' => fake()->word().'.txt',
+            'file_path' => 'files/'.fake()->uuid().'.txt',
             'disk' => 'local',
             'mime_type' => 'text/plain',
             'size' => fake()->randomNumber(4),
-            'created_by' => \App\Models\User::factory(),
+            'created_by' => User::factory(),
         ];
     }
 }

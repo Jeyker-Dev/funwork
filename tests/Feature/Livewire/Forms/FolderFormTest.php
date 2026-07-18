@@ -1,15 +1,16 @@
 <?php
 
+use App\Livewire\Forms\FolderForm;
+use App\Models\Folder;
 use App\Models\Project;
 use App\Models\User;
-use App\Models\Folder;
-use Livewire\Livewire;
 use Livewire\Component;
-use App\Livewire\Forms\FolderForm;
+use Livewire\Livewire;
 
 class FolderFormTestComponent extends Component
 {
     public FolderForm $form;
+
     public ?Project $project = null;
 
     public function mount(Project $project, ?int $currentFolderId = null)

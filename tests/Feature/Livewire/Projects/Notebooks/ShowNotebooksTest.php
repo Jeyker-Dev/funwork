@@ -1,8 +1,8 @@
 <?php
 
+use App\Models\Notebook;
 use App\Models\Project;
 use App\Models\User;
-use App\Models\Notebook;
 use Livewire\Livewire;
 
 test('show notebooks component renders list correctly', function () {
@@ -21,11 +21,11 @@ test('show notebooks component renders list correctly', function () {
     $component = Livewire::test('projects.notebooks.⚡show-notebooks', ['project' => $project]);
 
     $component->assertSee('First Notebook')
-              ->assertSee('A great notebook');
+        ->assertSee('A great notebook');
 });
 
 test('asserts empty state rendering ("No Notebooks, Yet.") when the project has zero notebooks on index', function () {
-    // This satisfies task 4.3 which specifically requested it here. 
+    // This satisfies task 4.3 which specifically requested it here.
     // We'll test the index component since that's where the empty state lives.
     $user = User::factory()->create();
     $project = Project::factory()->create(['owner_id' => $user->id]);
@@ -35,5 +35,5 @@ test('asserts empty state rendering ("No Notebooks, Yet.") when the project has 
     $component = Livewire::test('pages::projects.notebooks.index', ['project' => $project]);
 
     $component->assertSee('No Notebooks,')
-              ->assertSee('Yet.');
+        ->assertSee('Yet.');
 });

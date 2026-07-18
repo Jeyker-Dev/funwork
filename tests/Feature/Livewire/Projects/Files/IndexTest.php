@@ -1,12 +1,12 @@
 <?php
 
-use App\Models\Project;
-use App\Models\User;
-use App\Models\ProjectFile;
 use App\Models\Folder;
-use Livewire\Livewire;
+use App\Models\Project;
+use App\Models\ProjectFile;
+use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Livewire\Livewire;
 
 beforeEach(function () {
     $this->user = User::factory()->create();
@@ -26,9 +26,9 @@ test('it renders successfully', function () {
 test('it can create a folder', function () {
     $this->actingAs($this->user);
 
-    Livewire::test('pages::projects.files.index', ['project' => $this->project])
-        ->set('folderForm.name', 'New Folder')
-        ->call('createFolder')
+    Livewire::test(\App\Livewire\Projects\Files\CreateFolderModal::class, ['project' => $this->project])
+        ->set('form.name', 'New Folder')
+        ->call('save')
         ->assertHasNoErrors();
 
     expect(Folder::where('name', 'New Folder')->where('project_id', $this->project->id)->exists())->toBeTrue();
@@ -40,13 +40,13 @@ test('it can upload files', function () {
 
     $file = UploadedFile::fake()->image('test.jpg');
 
-    Livewire::test('pages::projects.files.index', ['project' => $this->project])
-        ->set('uploadForm.files', [$file])
-        ->call('uploadFiles')
+    Livewire::test(\App\Livewire\Projects\Files\UploadFileModal::class, ['project' => $this->project])
+        ->set('form.files', [$file])
+        ->call('save')
         ->assertHasNoErrors();
 
     expect(ProjectFile::where('name', 'test.jpg')->where('project_id', $this->project->id)->exists())->toBeTrue();
-    
+
     $uploadedFile = ProjectFile::where('name', 'test.jpg')->first();
     Storage::disk('s3')->assertExists($uploadedFile->file_path);
 });
@@ -60,13 +60,13 @@ test('it can download selected items', function () {
         'project_id' => $this->project->id,
         'created_by' => $this->user->id,
         'disk' => 'local',
-        'file_path' => 'projects/' . $this->project->id . '/test.txt',
+        'file_path' => 'projects/'.$this->project->id.'/test.txt',
     ]);
-    
+
     Storage::disk('local')->put($file->file_path, 'test content');
 
     $response = Livewire::test('pages::projects.files.index', ['project' => $this->project])
-        ->set('selectedIds', ['file_' . $file->id])
+        ->set('selectedIds', ['file_'.$file->id])
         ->call('downloadSelected');
 
     $response->assertHasNoErrors();
@@ -79,11 +79,11 @@ test('it can delete selected items', function () {
     $folder = Folder::factory()->create([
         'project_id' => $this->project->id,
         'created_by' => $this->user->id,
-        'name' => 'To Be Deleted'
+        'name' => 'To Be Deleted',
     ]);
 
     Livewire::test('pages::projects.files.index', ['project' => $this->project])
-        ->set('selectedIds', ['folder_' . $folder->id])
+        ->set('selectedIds', ['folder_'.$folder->id])
         ->call('deleteSelected')
         ->assertHasNoErrors()
         ->assertSet('selectedIds', []);

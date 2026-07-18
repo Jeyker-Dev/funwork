@@ -4,6 +4,7 @@ namespace App\Actions\Files;
 
 use App\Models\Project;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use ZipArchive;
 
 class DownloadFilesZipAction
@@ -15,21 +16,23 @@ class DownloadFilesZipAction
             $file = $project->files()->find($fileId);
 
             if ($file) {
-                if (!Storage::disk($file->disk)->exists($file->file_path)) {
-                    throw \Illuminate\Validation\ValidationException::withMessages([
-                        'files' => 'The requested file is unavailable.'
+                if (! Storage::disk($file->disk)->exists($file->file_path)) {
+                    throw ValidationException::withMessages([
+                        'files' => 'The requested file is unavailable.',
                     ]);
                 }
-                
+
                 if ($file->disk === 'local') {
                     $absolutePath = Storage::disk($file->disk)->path($file->file_path);
+
                     return response()->download($absolutePath, $file->name);
                 } else {
                     $url = Storage::disk($file->disk)->temporaryUrl(
-                        $file->file_path, 
+                        $file->file_path,
                         now()->addMinutes(60),
                         ['ResponseContentDisposition' => 'attachment; filename="'.$file->name.'"']
                     );
+
                     return redirect()->to($url);
                 }
             }
@@ -56,12 +59,12 @@ class DownloadFilesZipAction
                         $file = $project->files()->find($fileId);
 
                         if ($file) {
-                            if (!Storage::disk($file->disk)->exists($file->file_path)) {
-                                throw \Illuminate\Validation\ValidationException::withMessages([
-                                    'files' => 'One or more requested files are unavailable.'
+                            if (! Storage::disk($file->disk)->exists($file->file_path)) {
+                                throw ValidationException::withMessages([
+                                    'files' => 'One or more requested files are unavailable.',
                                 ]);
                             }
-                            
+
                             if ($file->disk === 'local') {
                                 $absolutePath = Storage::disk($file->disk)->path($file->file_path);
                                 $zip->addFile($absolutePath, $file->name);
@@ -94,7 +97,7 @@ class DownloadFilesZipAction
             }
 
             $zip->close();
-            
+
             // Clean up temporary S3 files after zip is closed
             foreach ($tempFilesToClean as $tempFile) {
                 Storage::disk('local')->delete($tempFile);
@@ -109,12 +112,12 @@ class DownloadFilesZipAction
         $zip->addEmptyDir($currentPath);
 
         foreach ($folder->files as $file) {
-            if (!Storage::disk($file->disk)->exists($file->file_path)) {
-                throw \Illuminate\Validation\ValidationException::withMessages([
-                    'files' => 'One or more requested files are unavailable.'
+            if (! Storage::disk($file->disk)->exists($file->file_path)) {
+                throw ValidationException::withMessages([
+                    'files' => 'One or more requested files are unavailable.',
                 ]);
             }
-            
+
             if ($file->disk === 'local') {
                 $absolutePath = Storage::disk($file->disk)->path($file->file_path);
                 $zip->addFile($absolutePath, $currentPath.$file->name);
