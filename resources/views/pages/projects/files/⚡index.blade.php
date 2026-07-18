@@ -2,6 +2,9 @@
 
 use Livewire\Component;
 use App\Models\Project;
+use App\Models\Folder;
+use App\Actions\Files\DeleteSelectionAction;
+use App\Actions\Files\DownloadFilesZipAction;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
@@ -9,7 +12,8 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Flux\Flux;
 
 new #[Layout('layouts.app')]
@@ -24,17 +28,17 @@ class extends Component {
     #[Url(history: true)]
     public ?int $currentFolderId = null;
 
-    public function mount(Project $project)
+    public function mount(Project $project): void
     {
         $this->project = $project;
     }
 
-    public function clearSelection()
+    public function clearSelection(): void
     {
         $this->selectedIds = [];
     }
 
-    public function toggleSelectAllFolders()
+    public function toggleSelectAllFolders(): void
     {
         $allFolderIds = $this->project->folders()->where('parent_id', $this->currentFolderId)->pluck('id')->map(fn($id) => 'folder_'.$id)->toArray();
         $currentlySelectedFolders = array_filter($this->selectedIds, fn($id) => str_starts_with($id, 'folder_'));
@@ -46,7 +50,7 @@ class extends Component {
         }
     }
 
-    public function toggleSelectAllFiles()
+    public function toggleSelectAllFiles(): void
     {
         $allFileIds = $this->project->files()->where('folder_id', $this->currentFolderId)->pluck('id')->map(fn($id) => 'file_'.$id)->toArray();
         $currentlySelectedFiles = array_filter($this->selectedIds, fn($id) => str_starts_with($id, 'file_'));
@@ -59,33 +63,33 @@ class extends Component {
     }
 
     #[Computed]
-    public function selectedFoldersCount()
+    public function selectedFoldersCount(): int
     {
         return count(array_filter($this->selectedIds, fn($id) => str_starts_with($id, 'folder_')));
     }
 
     #[Computed]
-    public function selectedFilesCount()
+    public function selectedFilesCount(): int
     {
         return count(array_filter($this->selectedIds, fn($id) => str_starts_with($id, 'file_')));
     }
 
-    public function downloadSelected(\App\Actions\Files\DownloadFilesZipAction $action)
+    public function downloadSelected(DownloadFilesZipAction $action): ?BinaryFileResponse
     {
         if (empty($this->selectedIds)) {
-            return;
+            return null;
         }
 
         $response = $action->execute($this->project, $this->selectedIds);
-        
+
         $this->clearSelection();
         $this->dispatch('download-completed');
-        
+
         return $response;
     }
 
     #[On('delete-confirmed')]
-    public function deleteSelected(\App\Actions\Files\DeleteSelectionAction $action)
+    public function deleteSelected(DeleteSelectionAction $action): void
     {
         if (empty($this->selectedIds)) {
             return;
@@ -93,9 +97,9 @@ class extends Component {
 
         try {
             $action->execute($this->project, $this->selectedIds);
-            
+
             $this->clearSelection();
-            
+
             Flux::modal('delete-confirmation')->close();
 
             Flux::toast(
@@ -104,7 +108,7 @@ class extends Component {
                 variant: 'success',
                 duration: 3000,
             );
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
             Flux::toast(
                 heading: 'Action failed',
                 text: $e->getMessage(),
@@ -116,18 +120,13 @@ class extends Component {
         Flux::modals()->close();
     }
 
-    public function moveSelected()
-    {
-        // Placeholder for future move logic
-    }
-
-    public function navigateToFolder($folderId)
+    public function navigateToFolder(int $folderId): void
     {
         $this->currentFolderId = $folderId;
         $this->clearSelection();
     }
 
-    public function navigateToRoot()
+    public function navigateToRoot(): void
     {
         $this->currentFolderId = null;
         $this->clearSelection();
@@ -135,17 +134,13 @@ class extends Component {
 
     #[On('folder-created')]
     #[On('file-uploaded')]
-    public function refreshData()
-    {
-        // Livewire will automatically re-render the component
-    }
+    public function refresh(): void {}
 
-    // Los datos reales se inyectan a la vista usando el método with()
     public function with(): array
     {
         $breadcrumbs = [];
         if ($this->currentFolderId) {
-            $folder = \App\Models\Folder::find($this->currentFolderId);
+            $folder = Folder::find($this->currentFolderId);
             $breadcrumbs = $folder ? $folder->breadcrumbs : [];
         }
 
@@ -164,9 +159,9 @@ class extends Component {
             <div wire:loading.remove.delay wire:target="navigateToFolder, navigateToRoot">
                 @if($currentFolderId !== null || $folders->isNotEmpty() || $files->isNotEmpty())
                     <!-- Contextual Action Bar -->
-                    <x-projects.files.action-bar 
-                        :breadcrumbs="$breadcrumbs" 
-                        :hasItems="$folders->isNotEmpty() || $files->isNotEmpty()" 
+                    <x-projects.files.action-bar
+                        :breadcrumbs="$breadcrumbs"
+                        :hasItems="$folders->isNotEmpty() || $files->isNotEmpty()"
                     />
                 @endif
             </div>
@@ -237,50 +232,15 @@ class extends Component {
 
         <!-- SKELETON LOADER -->
         <div wire:loading.delay wire:target="navigateToFolder, navigateToRoot" class="w-full" style="display: none;">
-            <div class="flex flex-col w-full">
-                <!-- Contextual Action Bar Skeleton -->
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-                <div class="h-6 bg-gray-200 rounded w-48 animate-pulse"></div>
-                <div class="flex gap-3">
-                    <div class="h-10 bg-gray-200 rounded w-64 animate-pulse"></div>
-                    <div class="h-10 bg-gray-200 rounded w-24 animate-pulse"></div>
-                    <div class="h-10 bg-gray-200 rounded w-32 animate-pulse"></div>
-                    <div class="h-10 bg-gray-200 rounded w-32 animate-pulse"></div>
-                </div>
-            </div>
-
-            <!-- Folders Skeleton -->
-            <div class="mb-8">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="h-7 bg-gray-200 rounded w-24 animate-pulse"></div>
-                </div>
-                <div class="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4">
-                    @for($i=0; $i<4; $i++)
-                        <div class="h-32 bg-gray-200 border border-gray-100 rounded-xl animate-pulse"></div>
-                    @endfor
-                </div>
-            </div>
-
-            <!-- Files Skeleton -->
-            <div>
-                <div class="flex items-center justify-between mb-4">
-                    <div class="h-7 bg-gray-200 rounded w-32 animate-pulse"></div>
-                </div>
-                <div class="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4">
-                    @for($i=0; $i<8; $i++)
-                        <div class="h-48 bg-gray-200 border border-gray-100 rounded-xl animate-pulse"></div>
-                    @endfor
-                </div>
-            </div>
-                </div>
-            </div>
+            <x-projects.files.skeleton />
         </div>
-    
+        </div>
+
     <!-- Modals -->
     <livewire:projects.files.create-folder-modal :project="$project" :currentFolderId="$currentFolderId" />
     <livewire:projects.files.upload-file-modal :project="$project" :currentFolderId="$currentFolderId" />
-    <livewire:projects.files.delete-confirmation-modal 
-        :selectedFoldersCount="$this->selectedFoldersCount" 
-        :selectedFilesCount="$this->selectedFilesCount" 
+    <livewire:projects.files.delete-confirmation-modal
+        :selectedFoldersCount="$this->selectedFoldersCount"
+        :selectedFilesCount="$this->selectedFilesCount"
     />
 </div>

@@ -1,5 +1,7 @@
 <?php
 
+use App\Livewire\Projects\Files\CreateFolderModal;
+use App\Livewire\Projects\Files\UploadFileModal;
 use App\Models\Folder;
 use App\Models\Project;
 use App\Models\ProjectFile;
@@ -26,7 +28,7 @@ test('it renders successfully', function () {
 test('it can create a folder', function () {
     $this->actingAs($this->user);
 
-    Livewire::test(\App\Livewire\Projects\Files\CreateFolderModal::class, ['project' => $this->project])
+    Livewire::test(CreateFolderModal::class, ['project' => $this->project])
         ->set('form.name', 'New Folder')
         ->call('save')
         ->assertHasNoErrors();
@@ -40,7 +42,7 @@ test('it can upload files', function () {
 
     $file = UploadedFile::fake()->image('test.jpg');
 
-    Livewire::test(\App\Livewire\Projects\Files\UploadFileModal::class, ['project' => $this->project])
+    Livewire::test(UploadFileModal::class, ['project' => $this->project])
         ->set('form.files', [$file])
         ->call('save')
         ->assertHasNoErrors();
