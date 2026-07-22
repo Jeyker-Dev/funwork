@@ -74,7 +74,31 @@ class extends Component {
         return count(array_filter($this->selectedIds, fn($id) => str_starts_with($id, 'file_')));
     }
 
-    public function downloadSelected(DownloadFilesZipAction $action): ?BinaryFileResponse
+    public function setSingleSelectionAndMove(string $id): void
+    {
+        $this->selectedIds = [$id];
+        $this->moveSelected();
+    }
+
+    public function setSingleSelectionAndDelete(string $id): void
+    {
+        $this->selectedIds = [$id];
+        Flux::modal('delete-confirmation')->show();
+    }
+
+    public function downloadFolderAsync(int $folderId, DownloadFilesZipAction $action)
+    {
+        $this->selectedIds = ['folder_' . $folderId];
+        return $this->downloadSelected($action);
+    }
+
+    public function downloadSingleFile(int $fileId, DownloadFilesZipAction $action)
+    {
+        $this->selectedIds = ['file_' . $fileId];
+        return $this->downloadSelected($action);
+    }
+
+    public function downloadSelected(DownloadFilesZipAction $action)
     {
         if (empty($this->selectedIds)) {
             return null;
@@ -249,7 +273,7 @@ class extends Component {
         <div wire:loading.delay wire:target="navigateToFolder, navigateToRoot" class="w-full" style="display: none;">
             <x-projects.files.skeleton />
         </div>
-        </div>
+    </div>
 
     <!-- Modals -->
     <livewire:projects.files.create-folder-modal :project="$project" :currentFolderId="$currentFolderId" />

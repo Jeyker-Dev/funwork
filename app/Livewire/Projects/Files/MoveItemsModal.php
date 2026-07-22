@@ -2,22 +2,24 @@
 
 namespace App\Livewire\Projects\Files;
 
+use App\Actions\Files\MoveSelectionAction;
 use App\Models\Folder;
 use App\Models\Project;
-use App\Actions\Files\MoveSelectionAction;
+use Flux\Flux;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\On;
 use Livewire\Component;
-use Flux\Flux;
 
 class MoveItemsModal extends Component
 {
     public Project $project;
-    
+
     public array $selectedIds = [];
+
     public ?int $targetFolderId = null;
-    
+
     public string $newFolderName = '';
+
     public bool $isCreatingFolder = false;
 
     public function mount(Project $project)
@@ -32,7 +34,7 @@ class MoveItemsModal extends Component
         $this->targetFolderId = null;
         $this->isCreatingFolder = false;
         $this->newFolderName = '';
-        
+
         Flux::modal('move-items-modal')->show();
     }
 
@@ -50,17 +52,17 @@ class MoveItemsModal extends Component
         }
         $this->isCreatingFolder = false;
     }
-    
+
     public function toggleCreateFolder()
     {
-        $this->isCreatingFolder = !$this->isCreatingFolder;
+        $this->isCreatingFolder = ! $this->isCreatingFolder;
         $this->newFolderName = '';
     }
 
     public function createFolder()
     {
         $this->validate([
-            'newFolderName' => 'required|string|max:255'
+            'newFolderName' => 'required|string|max:255',
         ], [], ['newFolderName' => 'Folder name']);
 
         $folder = Folder::create([
@@ -93,7 +95,7 @@ class MoveItemsModal extends Component
             ->where('parent_id', $this->targetFolderId)
             ->orderBy('name')
             ->get();
-            
+
         // Get breadcrumbs
         $breadcrumbs = [];
         if ($this->targetFolderId) {

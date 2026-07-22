@@ -31,7 +31,7 @@ it('moves files and folders to a target folder', function () {
         'name' => 'Subfolder',
     ]);
 
-    $action = new MoveSelectionAction();
+    $action = new MoveSelectionAction;
     $action->execute($project, ['file_'.$file->id, 'folder_'.$folder->id], $targetFolder->id);
 
     expect($file->fresh()->folder_id)->toBe($targetFolder->id);
@@ -49,7 +49,7 @@ it('prevents moving to the same directory', function () {
         'created_by' => $user->id,
     ]);
 
-    $action = new MoveSelectionAction();
+    $action = new MoveSelectionAction;
 
     expect(fn () => $action->execute($project, ['file_'.$file->id], $folder->id))
         ->toThrow(ValidationException::class);
@@ -58,12 +58,12 @@ it('prevents moving to the same directory', function () {
 it('prevents inception paradox (moving folder into itself or descendant)', function () {
     $user = User::factory()->create();
     $project = Project::factory()->create(['owner_id' => $user->id]);
-    
+
     $parent = Folder::factory()->create(['project_id' => $project->id, 'created_by' => $user->id]);
     $child = Folder::factory()->create(['project_id' => $project->id, 'parent_id' => $parent->id, 'created_by' => $user->id]);
     $grandchild = Folder::factory()->create(['project_id' => $project->id, 'parent_id' => $child->id, 'created_by' => $user->id]);
 
-    $action = new MoveSelectionAction();
+    $action = new MoveSelectionAction;
 
     // Move into itself
     expect(fn () => $action->execute($project, ['folder_'.$parent->id], $parent->id))
@@ -81,7 +81,7 @@ it('prevents inception paradox (moving folder into itself or descendant)', funct
 it('auto-renames items on collision', function () {
     $user = User::factory()->create();
     $project = Project::factory()->create(['owner_id' => $user->id]);
-    
+
     $sourceFolder = Folder::factory()->create(['project_id' => $project->id, 'created_by' => $user->id]);
     $targetFolder = Folder::factory()->create(['project_id' => $project->id, 'created_by' => $user->id]);
 
@@ -113,7 +113,7 @@ it('auto-renames items on collision', function () {
         'name' => 'Subfolder',
     ]);
 
-    $action = new MoveSelectionAction();
+    $action = new MoveSelectionAction;
     $action->execute($project, ['file_'.$movingFile->id, 'folder_'.$movingFolder->id], $targetFolder->id);
 
     expect($movingFile->fresh()->name)->toBe('document (1).txt');

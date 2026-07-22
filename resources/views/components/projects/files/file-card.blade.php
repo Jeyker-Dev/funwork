@@ -11,10 +11,35 @@
             class="rounded border-gray-300 text-orange-600 focus:ring-orange-600 cursor-pointer w-4 h-4
             {{ $isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100' }} transition-opacity bg-white/80 backdrop-blur-sm">
     </div>
-    <div class="absolute top-2 right-2 z-20">
-        <button class="p-1.5 rounded-md text-gray-500 hover:text-gray-900 bg-white/80 backdrop-blur-sm shadow-sm hover:bg-white transition-colors">
-            <flux:icon.ellipsis-vertical class="w-5 h-5" />
-        </button>
+    <div class="absolute top-2 right-2 z-20" x-on:click.stop>
+        <flux:dropdown position="bottom" align="end">
+            <flux:button variant="ghost" size="sm" icon="ellipsis-vertical" class="text-gray-500 hover:text-gray-900 bg-white/80 backdrop-blur-sm shadow-sm hover:bg-white transition-colors" />
+            <flux:menu>
+                <flux:menu.item wire:click="downloadSingleFile({{ $file->id }})" icon="arrow-down-tray">Download</flux:menu.item>
+                <flux:menu.item 
+                    x-data="{
+                        copy() {
+                            const text = '{{ route('project.files', ['project' => $file->project_id, 'currentFolderId' => $file->folder_id]) }}';
+                            if (navigator.clipboard && window.isSecureContext) {
+                                navigator.clipboard.writeText(text);
+                            } else {
+                                let ta = document.createElement('textarea');
+                                ta.value = text;
+                                document.body.appendChild(ta);
+                                ta.select();
+                                document.execCommand('copy');
+                                ta.remove();
+                            }
+                            window.Flux && Flux.toast({ heading: '¡Enlace copiado!', variant: 'success' });
+                        }
+                    }" 
+                    x-on:click="copy" 
+                    icon="link">Copy Link</flux:menu.item>
+                <flux:menu.separator />
+                <flux:menu.item wire:click="setSingleSelectionAndMove('file_{{ $file->id }}')" icon="arrows-right-left">Move</flux:menu.item>
+                <flux:menu.item wire:click="setSingleSelectionAndDelete('file_{{ $file->id }}')" variant="danger" icon="trash">Delete</flux:menu.item>
+            </flux:menu>
+        </flux:dropdown>
     </div>
 
     <!-- File Preview Area -->

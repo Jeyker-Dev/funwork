@@ -5,15 +5,16 @@ namespace App\Actions\Files;
 use App\Models\Folder;
 use App\Models\Project;
 use App\Models\ProjectFile;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class MoveSelectionAction
 {
     /**
-     * @param Project $project The active project
-     * @param array $selectedIds Format: ['file_1', 'folder_2']
-     * @param int|null $targetFolderId Destination folder ID (null for root)
+     * @param  Project  $project  The active project
+     * @param  array  $selectedIds  Format: ['file_1', 'folder_2']
+     * @param  int|null  $targetFolderId  Destination folder ID (null for root)
+     *
      * @throws ValidationException
      */
     public function execute(Project $project, array $selectedIds, ?int $targetFolderId): void
@@ -72,6 +73,7 @@ class MoveSelectionAction
             $newName = $extension ? "{$filename} ({$counter}).{$extension}" : "{$filename} ({$counter})";
             $counter++;
         }
+
         return $newName;
     }
 
@@ -83,6 +85,7 @@ class MoveSelectionAction
             $newName = "{$originalName} ({$counter})";
             $counter++;
         }
+
         return $newName;
     }
 }

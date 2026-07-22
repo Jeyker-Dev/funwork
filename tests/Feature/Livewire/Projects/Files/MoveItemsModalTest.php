@@ -55,7 +55,7 @@ test('it can create a folder inline and automatically navigates into it', functi
 
 test('it dispatches move action successfully', function () {
     $this->actingAs($this->user);
-    
+
     $file = ProjectFile::factory()->create(['project_id' => $this->project->id, 'name' => 'test.txt', 'folder_id' => null]);
     $targetFolder = Folder::factory()->create(['project_id' => $this->project->id, 'name' => 'Target']);
 

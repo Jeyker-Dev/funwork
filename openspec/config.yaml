@@ -1,21 +1,27 @@
 version: 1
 project: funwork
-stack:
-  language: "PHP 8.3"
-  framework: "Laravel 13"
-  frontend: "Livewire 4, Flux Pro, TailwindCSS, Alpine v3"
-  testing: "Pest 4"
-  linting: "Laravel Pint"
+context: |
+  Laravel 13 Livewire starter kit with Flux Pro UI components.
+  PHP 8.3+, Vite + TailwindCSS.
+  Pest used for testing, Laravel Pint for linting/formatting.
+strict_tdd: true
 testing:
-  strict_tdd: true
   runner: "./vendor/bin/pest"
-  linter: "composer lint"
-  capabilities:
-    - "Feature Tests (Pest)"
-    - "Unit Tests (Pest)"
-    - "Livewire component testing"
-    - "Browser testing (if Laravel Dusk is configured, though not detected currently)"
-settings:
-  mode: openspec
-  execution_mode: interactive
-  delivery_strategy: ask-on-risk
+  framework: "Pest v4"
+  layers:
+    unit: "Pest"
+    integration: "Pest (pest-plugin-laravel)"
+    e2e: false
+  coverage: "--coverage"
+  quality:
+    linter: "composer lint (laravel/pint)"
+    type_checker: false
+    formatter: "laravel/pint"
+phases:
+  proposal: "Focus on feature outcomes and business rules."
+  spec: "Detail exact endpoints, models, and UI states."
+  design: "Define internal boundaries and component responsibilities."
+  tasks: "Break down into implementable slices using chained PRs if needed."
+  apply: "Use standard Laravel + Livewire + Flux patterns."
+  verify: "Run Pest tests and check Pint formatting."
+  archive: "Store final state."
