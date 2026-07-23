@@ -158,6 +158,7 @@ class extends Component {
 
     #[On('folder-created')]
     #[On('file-uploaded')]
+    #[On('item-renamed')]
     public function refresh(): void {}
 
     public function moveSelected(): void
@@ -283,4 +284,5 @@ class extends Component {
         :selectedFilesCount="$this->selectedFilesCount"
     />
     <livewire:projects.files.move-items-modal :project="$project" />
+    <livewire:projects.files.rename-item-modal />
 </div>

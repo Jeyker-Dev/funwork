@@ -37,6 +37,7 @@
                     icon="link">Copy Link</flux:menu.item>
                 <flux:menu.separator />
                 <flux:menu.item wire:click="setSingleSelectionAndMove('folder_{{ $folder->id }}')" icon="arrows-right-left">Move</flux:menu.item>
+                <flux:menu.item x-on:click="$dispatch('open-rename-folder', { folderId: {{ $folder->id }} })" icon="pencil">Rename</flux:menu.item>
                 <flux:menu.item wire:click="setSingleSelectionAndDelete('folder_{{ $folder->id }}')" variant="danger" icon="trash">Delete</flux:menu.item>
             </flux:menu>
         </flux:dropdown>
