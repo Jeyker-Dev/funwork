@@ -1,6 +1,5 @@
 <?php
 
-use App\Livewire\Projects\Files\RenameItemModal;
 use App\Models\Folder;
 use App\Models\Project;
 use App\Models\ProjectFile;
@@ -25,7 +24,7 @@ it('splits the extension on mount and saves correctly while preserving the exten
     ]);
 
     Livewire::actingAs($this->user)
-        ->test(RenameItemModal::class)
+        ->test('projects.files.⚡rename-item-modal')
         ->call('mountFile', $file->id)
         ->assertSet('form.name', 'document')
         ->assertSet('form.extension', '.pdf')
@@ -44,7 +43,7 @@ it('operates correctly without extensions for a folder', function () {
     ]);
 
     Livewire::actingAs($this->user)
-        ->test(RenameItemModal::class)
+        ->test('projects.files.⚡rename-item-modal')
         ->call('mountFolder', $folder->id)
         ->assertSet('form.name', 'old_folder')
         ->assertSet('form.extension', '')
@@ -78,7 +77,7 @@ it('fails uniqueness validation if a file or folder with the target name already
     ]);
 
     Livewire::actingAs($this->user)
-        ->test(RenameItemModal::class)
+        ->test('projects.files.⚡rename-item-modal')
         ->call('mountFile', $file2->id)
         ->set('form.name', 'report') // With .pdf extension, it will be report.pdf
         ->call('save')
@@ -98,7 +97,7 @@ it('fails uniqueness validation if a file or folder with the target name already
     ]);
 
     Livewire::actingAs($this->user)
-        ->test(RenameItemModal::class)
+        ->test('projects.files.⚡rename-item-modal')
         ->call('mountFolder', $folder2->id)
         ->set('form.name', 'existing_folder')
         ->call('save')
@@ -116,7 +115,7 @@ it('returns 403 when an unauthorized user attempts to mount or submit', function
     ]);
 
     Livewire::actingAs($otherUser)
-        ->test(RenameItemModal::class)
+        ->test('projects.files.⚡rename-item-modal')
         ->call('mountFile', $file->id)
         ->assertForbidden();
 });

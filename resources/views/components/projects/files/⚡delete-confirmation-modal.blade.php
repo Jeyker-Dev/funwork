@@ -1,3 +1,21 @@
+<?php
+
+use App\Models\Project;
+use Livewire\Component;
+
+new class extends Component {
+    public Project $project;
+
+    public int $selectedFoldersCount = 0;
+
+    public int $selectedFilesCount = 0;
+
+    public function delete()
+    {
+        $this->dispatch('delete-confirmed');
+    }
+}; ?>
+
 <flux:modal name="delete-confirmation" class="min-w-[22rem]">
     <flux:heading size="lg" class="mb-4">Confirmar Eliminación</flux:heading>
     

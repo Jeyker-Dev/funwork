@@ -1,3 +1,33 @@
+<?php
+
+use App\Livewire\Forms\UploadFileForm;
+use App\Models\Project;
+use Livewire\Component;
+use Livewire\WithFileUploads;
+
+new class extends Component {
+    use WithFileUploads;
+
+    public Project $project;
+
+    public ?int $currentFolderId = null;
+
+    public UploadFileForm $form;
+
+    public function mount(Project $project, ?int $currentFolderId = null)
+    {
+        $this->project = $project;
+        $this->currentFolderId = $currentFolderId;
+    }
+
+    public function save()
+    {
+        $this->form->setContext($this->project, $this->currentFolderId);
+        $this->form->store();
+        $this->dispatch('file-uploaded');
+    }
+}; ?>
+
 <flux:modal name="upload-file" class="min-w-[22rem]">
     <form wire:submit="save">
         <flux:heading size="lg" class="mb-4">Upload Files</flux:heading>

@@ -1,6 +1,5 @@
 <?php
 
-use App\Livewire\Projects\Files\MoveItemsModal;
 use App\Models\Folder;
 use App\Models\Project;
 use App\Models\ProjectFile;
@@ -18,7 +17,7 @@ beforeEach(function () {
 test('it opens modal and sets selected ids', function () {
     $this->actingAs($this->user);
 
-    Livewire::test(MoveItemsModal::class, ['project' => $this->project])
+    Livewire::test('projects.files.⚡move-items-modal', ['project' => $this->project])
         ->dispatch('open-move-modal', ['file_1', 'folder_2'])
         ->assertSet('selectedIds', ['file_1', 'folder_2']);
 });
@@ -28,7 +27,7 @@ test('it can navigate through folders', function () {
     $parentFolder = Folder::factory()->create(['project_id' => $this->project->id, 'name' => 'Parent']);
     $childFolder = Folder::factory()->create(['project_id' => $this->project->id, 'parent_id' => $parentFolder->id, 'name' => 'Child']);
 
-    Livewire::test(MoveItemsModal::class, ['project' => $this->project])
+    Livewire::test('projects.files.⚡move-items-modal', ['project' => $this->project])
         ->assertSet('targetFolderId', null)
         ->call('navigateTo', $parentFolder->id)
         ->assertSet('targetFolderId', $parentFolder->id)
@@ -41,7 +40,7 @@ test('it can navigate through folders', function () {
 test('it can create a folder inline and automatically navigates into it', function () {
     $this->actingAs($this->user);
 
-    Livewire::test(MoveItemsModal::class, ['project' => $this->project])
+    Livewire::test('projects.files.⚡move-items-modal', ['project' => $this->project])
         ->set('newFolderName', 'New Inline Folder')
         ->call('createFolder')
         ->assertHasNoErrors()
@@ -59,7 +58,7 @@ test('it dispatches move action successfully', function () {
     $file = ProjectFile::factory()->create(['project_id' => $this->project->id, 'name' => 'test.txt', 'folder_id' => null]);
     $targetFolder = Folder::factory()->create(['project_id' => $this->project->id, 'name' => 'Target']);
 
-    Livewire::test(MoveItemsModal::class, ['project' => $this->project])
+    Livewire::test('projects.files.⚡move-items-modal', ['project' => $this->project])
         ->dispatch('open-move-modal', ["file_{$file->id}"])
         ->call('navigateTo', $targetFolder->id)
         ->call('move')
