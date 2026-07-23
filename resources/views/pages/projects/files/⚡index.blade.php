@@ -195,7 +195,7 @@ class extends Component {
 
 <div class="h-[calc(100vh-120px)] flex flex-col">
     <div class="bg-gray-100 rounded-xl flex-1 flex flex-col overflow-hidden">
-        <div @class(['flex-1 overflow-y-auto', 'pb-32' => count($selectedIds) > 0, 'pb-2' => empty($selectedIds)])>
+        <div @class(['flex-1 overflow-y-auto px-6 pt-6', 'pb-32' => count($selectedIds) > 0, 'pb-6' => empty($selectedIds)])>
             <div wire:loading.remove.delay wire:target="navigateToFolder, navigateToRoot">
                 @if($currentFolderId !== null || $folders->isNotEmpty() || $files->isNotEmpty())
                     <!-- Contextual Action Bar -->
