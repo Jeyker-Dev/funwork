@@ -92,6 +92,7 @@ class extends Component {
         return $this->downloadSelected($action);
     }
 
+    #[On('download-single-file')]
     public function downloadSingleFile(int $fileId, DownloadFilesZipAction $action)
     {
         $this->selectedIds = ['file_' . $fileId];
@@ -184,9 +185,22 @@ class extends Component {
             $breadcrumbs = $folder ? $folder->breadcrumbs : [];
         }
 
+        $paginatedFiles = $this->project->files()->where('folder_id', $this->currentFolderId)->latest()->paginate(30);
+        
+        $filesArray = collect($paginatedFiles->items())->map(function($file) {
+            return [
+                'id' => $file->id,
+                'name' => $file->name,
+                'mime_type' => $file->mime_type,
+                'size' => $file->size,
+                'preview_url' => route('project.files.preview', [$this->project, $file]),
+            ];
+        })->toArray();
+
         return [
             'folders' => $this->project->folders()->where('parent_id', $this->currentFolderId)->get(),
-            'files' => $this->project->files()->where('folder_id', $this->currentFolderId)->latest()->paginate(30),
+            'files' => $paginatedFiles,
+            'filesArray' => $filesArray,
             'breadcrumbs' => $breadcrumbs,
         ];
     }
@@ -285,4 +299,5 @@ class extends Component {
     />
     <livewire:projects.files.move-items-modal :project="$project" />
     <livewire:projects.files.rename-item-modal />
+    <livewire:projects.files.file-preview-lightbox :files="$filesArray" />
 </div>

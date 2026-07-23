@@ -33,6 +33,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::livewire('/projects/{project}/notebooks', 'pages::projects.notebooks.index')->name('project.notebooks');
     Route::livewire('/projects/{project}/files', 'pages::projects.files.index')->name('project.files');
+    Route::get('/projects/{project}/files/{projectFile}/preview', \App\Http\Controllers\ProjectFilePreviewController::class)->name('project.files.preview');
     Route::livewire('/projects/{project}/notebooks/{notebook}/pages/{page}/edit', 'pages::projects.notebooks.pages.editor')->name('project.notebooks.pages.edit');
 });
 

@@ -9,8 +9,8 @@ use Livewire\Attributes\On;
 new #[Layout('layouts.app')]
 #[Title('Notebooks')]
 class extends Component {
-    public Project $project;
-    public int $projectId;
+    public ?Project $project = null;
+    public ?int $projectId = null;
 
     public function mount(Project $project): void
     {
@@ -37,20 +37,20 @@ class extends Component {
 <div>
     @if($notebooks->isEmpty())
         <div class="flex h-full w-full flex-1 flex-col gap-4 rounded-xl">
-            <x-title-text 
-                title="Notebooks" 
-                description="Manage and track your project notebooks with your team in one place." 
-                class="mb-0" 
+            <x-title-text
+                title="Notebooks"
+                description="Manage and track your project notebooks with your team in one place."
+                class="mb-0"
             />
 
             <div class="flex items-center justify-center flex-col gap-4 mt-8">
                 <flux:icon.book-open class="w-32 h-32 text-gray-400"/>
 
-                <x-title-text 
-                    title="No Notebooks," 
+                <x-title-text
+                    title="No Notebooks,"
                     highlight="Yet."
-                    description="Create your first notebook to start capturing your project’s ideas and information." 
-                    class="text-center flex flex-col items-center mb-0" 
+                    description="Create your first notebook to start capturing your project’s ideas and information."
+                    class="text-center flex flex-col items-center mb-0"
                 />
 
                 <livewire:projects.notebooks.create-notebook :project="$project"/>
@@ -67,10 +67,10 @@ class extends Component {
         </div>
     @else
         <div class="mb-12">
-            <x-title-text 
-                title="Your Digital" 
-                highlight="Thoughts, Curated." 
-                description="Organize your creative vision with precision and style. Every insight matters in your journey." 
+            <x-title-text
+                title="Your Digital"
+                highlight="Thoughts, Curated."
+                description="Organize your creative vision with precision and style. Every insight matters in your journey."
             />
 
 
