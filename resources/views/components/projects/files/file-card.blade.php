@@ -6,7 +6,7 @@
         'border-orange-500 ring-1 ring-orange-500 bg-orange-50' => $isSelected,
         'hover:border-gray-300 bg-white' => !$isSelected,
     ])
-    x-on:click="$dispatch('open-lightbox', { id: {{ $file->id }} })">
+    x-on:click.prevent="$dispatch('open-lightbox', { id: {{ $file->id }} })">
     <div class="absolute top-2 left-2 z-30">
         <input type="checkbox" wire:model.live="selectedIds" value="file_{{ $file->id }}" x-on:click.stop
             class="rounded border-gray-300 text-orange-600 focus:ring-orange-600 cursor-pointer w-4 h-4

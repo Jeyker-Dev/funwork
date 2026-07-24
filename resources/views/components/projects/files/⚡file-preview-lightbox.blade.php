@@ -79,9 +79,9 @@ new class extends Component {
 x-on:open-lightbox.window="open($event.detail.id)"
 @keydown.window="if(Flux.modal('file-preview-lightbox')) handleKeydown($event)">
 
-    <flux:modal name="file-preview-lightbox" class="w-full max-w-7xl h-[90vh] p-0 overflow-hidden flex flex-col bg-white/60 backdrop-blur-xl">
+    <flux:modal name="file-preview-lightbox" class="w-full max-w-7xl p-0 bg-white/60 backdrop-blur-xl">
         <template x-if="currentFile">
-            <div class="flex flex-col h-full w-full relative">
+            <div class="flex flex-col h-[90vh] w-full overflow-hidden relative">
                 <!-- Header -->
                 <div class="flex items-center justify-between p-4 bg-black/10 backdrop-blur-sm shadow-sm z-50">
                     <div class="flex items-center gap-3 min-w-0">
