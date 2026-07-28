@@ -4,8 +4,6 @@ use App\Models\Folder;
 use App\Models\Project;
 use App\Models\ProjectFile;
 use App\Models\User;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 
 beforeEach(function () {
@@ -57,7 +55,7 @@ it('operates correctly without extensions for a folder', function () {
 
 it('fails uniqueness validation if a file or folder with the target name already exists in the same directory', function () {
     $folder = Folder::factory()->create(['project_id' => $this->project->id]);
-    
+
     $file1 = ProjectFile::factory()->create([
         'project_id' => $this->project->id,
         'folder_id' => $folder->id,
@@ -82,14 +80,14 @@ it('fails uniqueness validation if a file or folder with the target name already
         ->set('form.name', 'report') // With .pdf extension, it will be report.pdf
         ->call('save')
         ->assertHasErrors(['form.name' => 'The name has already been taken.']);
-        
+
     // Also test renaming to a folder name
     $folder2 = Folder::factory()->create([
         'project_id' => $this->project->id,
         'parent_id' => $folder->id,
         'name' => 'other_folder',
     ]);
-    
+
     Folder::factory()->create([
         'project_id' => $this->project->id,
         'parent_id' => $folder->id,
@@ -119,4 +117,3 @@ it('returns 403 when an unauthorized user attempts to mount or submit', function
         ->call('mountFile', $file->id)
         ->assertForbidden();
 });
-

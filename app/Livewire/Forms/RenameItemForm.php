@@ -4,26 +4,26 @@ namespace App\Livewire\Forms;
 
 use App\Models\Folder;
 use App\Models\ProjectFile;
-use Illuminate\Validation\Validator;
 use Livewire\Form;
-use Livewire\Attributes\Validate;
 
 class RenameItemForm extends Form
 {
     public ?ProjectFile $file = null;
+
     public ?Folder $folder = null;
 
     public string $name = '';
+
     public string $extension = '';
 
     public function setContextForFile(ProjectFile $file)
     {
         $this->file = $file;
-        
+
         $parts = pathinfo($file->name);
         if (isset($parts['extension']) && $parts['extension'] !== '') {
             $this->name = $parts['filename'];
-            $this->extension = '.' . $parts['extension'];
+            $this->extension = '.'.$parts['extension'];
         } else {
             $this->name = $file->name;
             $this->extension = '';
@@ -45,7 +45,7 @@ class RenameItemForm extends Form
 
         $projectId = $this->file ? $this->file->project_id : $this->folder->project_id;
         $parentId = $this->file ? $this->file->folder_id : $this->folder->parent_id;
-        $fullName = $this->name . $this->extension;
+        $fullName = $this->name.$this->extension;
 
         // Custom validation: Uniqueness across both tables
         $existsAsFile = ProjectFile::where('project_id', $projectId)
@@ -66,6 +66,7 @@ class RenameItemForm extends Form
 
         if ($existsAsFile || $existsAsFolder) {
             $this->addError('name', 'The name has already been taken.');
+
             return false;
         }
 

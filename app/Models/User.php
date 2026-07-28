@@ -65,4 +65,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(ProjectFile::class, 'created_by');
     }
+
+    public function inboxItems(): HasMany
+    {
+        return $this->hasMany(InboxItem::class);
+    }
 }
