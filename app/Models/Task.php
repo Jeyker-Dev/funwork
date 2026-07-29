@@ -21,6 +21,13 @@ class Task extends Model
         'priority',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'due_date' => 'datetime',
+        ];
+    }
+
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);

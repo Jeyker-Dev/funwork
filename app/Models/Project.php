@@ -46,4 +46,17 @@ class Project extends Model
     {
         return $this->hasMany(ProjectFile::class, 'project_id');
     }
+
+    public function getRecentActivities()
+    {
+        $notebooks = $this->notebooks()
+            ->select('id', 'name', 'created_by', 'updated_at', \Illuminate\Support\Facades\DB::raw("'notebook' as type"));
+
+        $files = $this->files()
+            ->select('id', 'name', 'created_by', 'updated_at', \Illuminate\Support\Facades\DB::raw("'file' as type"));
+
+        return $notebooks->unionAll($files)
+            ->orderBy('updated_at', 'desc')
+            ->get();
+    }
 }
