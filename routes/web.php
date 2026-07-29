@@ -16,9 +16,7 @@ Route::get('/', static function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::livewire('/projects', 'pages::projects.index')->name('projects');
 
-    Route::get('projects/{project}', static function (Project $project) {
-        return view('app.projects.show', compact('project'));
-    })->name('projects.show');
+    Route::livewire('projects/{project}', 'pages::projects.show')->name('projects.show');
 
     Route::livewire('/projects/{project}/inbox', 'pages::projects.inbox')->name('project.inbox');
 
