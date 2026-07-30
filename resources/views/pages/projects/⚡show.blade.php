@@ -6,7 +6,7 @@ use Livewire\Attributes\Layout;
 use App\Livewire\Forms\QuickCaptureForm;
 use Flux\Flux;
 
-new #[Layout('layouts.app', ['title' => 'Home', 'project' => '$project'])]
+new #[Layout('layouts.app', ['title' => 'Home'])]
 class extends Component {
     public Project $project;
     
