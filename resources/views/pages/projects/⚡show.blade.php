@@ -37,7 +37,7 @@ class extends Component {
             'stats' => [
                 'tasks_count' => $this->project->tasks()->where('status', '!=', 'completed')->count(),
                 'today_tasks_count' => $this->project->tasks()->where('status', '!=', 'completed')->whereDate('due_date', now()->toDateString())->count(),
-                'inbox_count' => \App\Models\InboxItem::where('project_id', $this->project->id)->whereNull('completed_at')->count(), // Or just count() if completed_at doesn't exist
+                'inbox_count' => \App\Models\InboxItem::where('project_id', $this->project->id)->count(),
             ]
         ];
     }
