@@ -44,13 +44,18 @@ class extends Component {
 };
 ?>
 
-<div class="flex h-full w-full flex-1 flex-col gap-4 rounded-xl">
-    <div class="grid auto-rows-min gap-4 md:grid-cols-3">
-        <x-projects.dashboard.stats-cards :stats="$stats" />
-        <x-projects.dashboard.quick-capture :project="$project" />
-        <x-projects.dashboard.urgent-tasks :tasks="$urgentTasks" :project="$project" />
-    </div>
-    <div class="relative h-full flex-1 overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700 p-4">
-        <x-projects.dashboard.recent-activity :activities="$recentActivities" :project="$project" />
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-8">
+    <div class="grid grid-cols-12 gap-6">
+        <!-- Left Column -->
+        <div class="col-span-12 lg:col-span-7 flex flex-col gap-6">
+            <x-projects.dashboard.quick-capture :project="$project" />
+            <x-projects.dashboard.stats-cards :stats="$stats" />
+            <x-projects.dashboard.urgent-tasks :tasks="$urgentTasks" :project="$project" />
+        </div>
+        
+        <!-- Right Column -->
+        <div class="col-span-12 lg:col-span-5 flex flex-col gap-6 h-full">
+            <x-projects.dashboard.recent-activity :activities="$recentActivities" :project="$project" />
+        </div>
     </div>
 </div>

@@ -1,9 +1,9 @@
 @props(['stats'])
 
-<div class="flex flex-col gap-4 rounded-xl border border-neutral-200 dark:border-neutral-700 p-4">
+<div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm p-6 flex flex-col gap-4">
     <flux:heading size="lg">Overview</flux:heading>
     
-    <div class="grid grid-cols-2 gap-4 mt-2">
+    <div class="grid grid-cols-3 gap-4 mt-2">
         <div class="flex flex-col">
             <flux:text class="text-sm">Pending Tasks</flux:text>
             <flux:heading size="xl">{{ $stats['tasks_count'] }}</flux:heading>
