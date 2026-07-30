@@ -29,9 +29,9 @@ class extends Component {
         return [
             'recentActivities' => $this->project->getRecentActivities()->take(5),
             'urgentTasks' => $this->project->tasks()
-                ->where('due_at', '<=', now())
+                ->where('due_date', '<=', now())
                 ->where('status', '!=', 'completed')
-                ->orderBy('due_at', 'asc')
+                ->orderBy('due_date', 'asc')
                 ->take(5)
                 ->get(),
             'stats' => [

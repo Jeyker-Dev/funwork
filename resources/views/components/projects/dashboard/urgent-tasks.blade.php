@@ -11,7 +11,7 @@
             <div class="flex items-center justify-between p-2 rounded-lg border border-neutral-100 dark:border-neutral-800 bg-white dark:bg-neutral-900">
                 <div class="flex flex-col truncate">
                     <span class="text-sm font-medium truncate">{{ $task->name }}</span>
-                    <span class="text-xs text-red-500 font-medium">Overdue ({{ $task->due_at->diffForHumans() }})</span>
+                    <span class="text-xs text-red-500 font-medium">Overdue ({{ $task->due_date->diffForHumans() }})</span>
                 </div>
             </div>
         @empty
