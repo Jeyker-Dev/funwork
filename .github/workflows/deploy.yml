@@ -3,7 +3,7 @@ name: Desplegar a Producción
 on:
   push:
     branches:
-      - main # Cambia esto a 'master' si ese es el nombre de tu rama principal
+      - master
 
 jobs:
   deploy:
