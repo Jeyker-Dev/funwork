@@ -22,7 +22,7 @@ class TaskForm extends Form
     public string $priority = '';
 
     #[Validate('nullable|date_format:Y-m-d')]
-    public string $dueDate = '';
+    public ?string $dueDate = null;
 
     #[Validate('nullable|array')]
     public array $assignedUserIds = [];
@@ -42,7 +42,7 @@ class TaskForm extends Form
             'description' => $this->description,
             'status' => $this->status,
             'priority' => $this->priority,
-            'due_date' => $this->dueDate,
+            'due_date' => $this->dueDate ?: null,
             'project_id' => $this->projectId,
             'position' => $this->position,
         ]);
