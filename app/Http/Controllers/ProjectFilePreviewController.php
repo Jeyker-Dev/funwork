@@ -21,7 +21,9 @@ class ProjectFilePreviewController extends Controller
             abort(404);
         }
 
-        if ($projectFile->disk === 's3') {
+        $driver = config("filesystems.disks.{$projectFile->disk}.driver");
+
+        if ($driver === 's3') {
             return redirect($disk->temporaryUrl(
                 $projectFile->file_path,
                 now()->addMinutes(15),

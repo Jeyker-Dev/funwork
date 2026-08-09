@@ -35,12 +35,13 @@ class UploadFileForm extends Form
             $mime = $file->getMimeType();
             $size = $file->getSize();
 
-            $path = $file->store('projects/'.$this->project->id, 's3');
+            $disk = config('filesystems.default');
+            $path = $file->store('projects/'.$this->project->id, $disk);
 
             $this->project->files()->create([
                 'name' => $name,
                 'file_path' => $path,
-                'disk' => 's3',
+                'disk' => $disk,
                 'mime_type' => $mime,
                 'size' => $size,
                 'created_by' => Auth::id(),
