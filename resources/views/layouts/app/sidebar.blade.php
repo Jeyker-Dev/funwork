@@ -86,7 +86,7 @@
                         <flux:avatar
                             :name="auth()->user()->display_name"
                             :initials="auth()->user()->initials()"
-                            src="{{ auth()->user()->avatar_url }}"
+                            :src="auth()->user()->avatar_url"
                         />
 
                         <div class="grid flex-1 text-start text-sm leading-tight">

@@ -56,7 +56,7 @@ new class extends Component {
                 <div>
                     <div class="flex flex-col items-start justify-start gap-3">
                         <div class="mt-6 flex items-center gap-4 overflow-hidden">
-                            <flux:avatar size="lg" src="{{ $project->owner->avatar_url }}" />
+                            <flux:avatar size="lg" :src="$project->owner->avatar_url" />
 
                             <div class="overflow-hidden">
                                 <flux:heading size="lg" class="truncate" title="{{ $project->owner->display_name }}">{{ $project->owner->display_name }}</flux:heading>

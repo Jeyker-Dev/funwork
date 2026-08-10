@@ -102,7 +102,7 @@ new #[Title('Profile settings')] class extends Component {
                 @if ($photo)
                     <flux:avatar size="xl" src="{{ $photo->temporaryUrl() }}" />
                 @else
-                    <flux:avatar size="xl" src="{{ auth()->user()->avatar_url }}" />
+                    <flux:avatar size="xl" :src="auth()->user()->avatar_url" />
                 @endif
                 <div class="flex flex-col gap-2">
                     <label class="text-sm font-medium">{{ __('Profile Photo') }}</label>
