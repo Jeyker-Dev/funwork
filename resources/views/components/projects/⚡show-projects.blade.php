@@ -59,7 +59,7 @@ new class extends Component {
                             <flux:avatar size="lg" src="https://unavatar.io/x/taylorotwell"/>
 
                             <div>
-                                <flux:heading size="lg">{{ $project->owner->display_name }}</flux:heading>
+                                <flux:heading size="lg" class="truncate" title="{{ $project->owner->display_name }}">{{ $project->owner->display_name }}</flux:heading>
                                 <flux:text>Creator of Laravel</flux:text>
                             </div>
                         </div>
