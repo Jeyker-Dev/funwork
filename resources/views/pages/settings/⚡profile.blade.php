@@ -44,7 +44,7 @@ new #[Title('Profile settings')] class extends Component {
 
         if ($this->photo) {
             $disk = config('filesystems.default');
-            $validated['profile_photo_path'] = Storage::disk($disk)->putFile('profile-photos', $this->photo, 'public');
+            $validated['profile_photo_path'] = Storage::disk($disk)->putFile('profile-photos', $this->photo);
             $this->photo = null;
         }
 
