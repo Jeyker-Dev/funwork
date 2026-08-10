@@ -43,6 +43,7 @@ new #[Title('Profile settings')] class extends Component {
 
         if ($this->photo) {
             $validated['profile_photo_path'] = $this->photo->store('profile-photos', 'public');
+            $this->photo = null;
         }
 
         $user->fill($validated);
