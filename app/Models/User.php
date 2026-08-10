@@ -49,7 +49,18 @@ class User extends Authenticatable
     public function getAvatarUrlAttribute(): string
     {
         if ($this->profile_photo_path) {
-            return Storage::url($this->profile_photo_path);
+            $disk = config('filesystems.default');
+            
+            // If the disk is s3, generate a temporary signed URL valid for 1 hour
+            if ($disk === 's3') {
+                return Storage::disk($disk)->temporaryUrl(
+                    $this->profile_photo_path,
+                    now()->addMinutes(60)
+                );
+            }
+            
+            // Otherwise, for local disk, use standard Storage::url()
+            return Storage::disk($disk)->url($this->profile_photo_path);
         }
 
         return 'https://unavatar.io/'.urlencode($this->email).'?fallback='.urlencode('https://ui-avatars.com/api/?name='.$this->name.'&color=7F9CF5&background=EBF4FF');
