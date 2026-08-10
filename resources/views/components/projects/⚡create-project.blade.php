@@ -116,7 +116,7 @@ new class extends Component {
 
                     <div class="md:w-5/12">
                         <flux:select variant="listbox" placeholder="Choose Owner..." label="Project Owner" wire:model="form.ownerId">
-                            <flux:select.option value="{{ $user->id }}">{{ $user->name }}</flux:select.option>
+                            <flux:select.option value="{{ $user->id }}">{{ $user->display_name }}</flux:select.option>
                         </flux:select>
                     </div>
                 </div>

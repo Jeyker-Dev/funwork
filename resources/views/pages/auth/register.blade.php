@@ -24,6 +24,22 @@
                 <flux:error name="name"/>
             </flux:field>
 
+            <!-- Username -->
+            <flux:field>
+                <flux:label class="uppercase text-xs font-semibold!">{{ __('Username') }}</flux:label>
+
+                <flux:input
+                    name="username"
+                    :value="old('username')"
+                    type="text"
+                    required
+                    autocomplete="username"
+                    :placeholder="__('@johndoe')"
+                />
+
+                <flux:error name="username"/>
+            </flux:field>
+
             <!-- Email Address -->
             <!-- Email Address -->
             <flux:field>

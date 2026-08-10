@@ -48,7 +48,7 @@ class extends Component {
     
     <!-- Greeting & Top Metrics -->
     <div class="mb-8">
-        <h1 class="text-3xl font-bold text-orange-500">¡Buenos días, {{ auth()->user()->name ?? 'Alex' }}!</h1>
+        <h1 class="text-3xl font-bold text-orange-500">¡Buenos días, {{ auth()->user()->display_name ?? 'Alex' }}!</h1>
         <p class="text-gray-500 dark:text-zinc-400 mt-1">Aquí tienes un resumen de tu espacio de trabajo.</p>
         
         <div class="grid grid-cols-2 gap-4 sm:max-w-md my-6">

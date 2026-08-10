@@ -109,7 +109,7 @@ new class extends Component
                     <div class="w-1/2">
                         <flux:select variant="listbox" multiple label="Assigned Users" placeholder="Choose users..." wire:model="form.assignedUserIds">
                             @foreach($users as $user)
-                                <flux:select.option value="{{ $user->id }}">{{ $user->name }}</flux:select.option>
+                                <flux:select.option value="{{ $user->id }}">{{ $user->display_name }}</flux:select.option>
                             @endforeach
                         </flux:select>
                     </div>
