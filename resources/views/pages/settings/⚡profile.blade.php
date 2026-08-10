@@ -4,6 +4,7 @@ use App\Concerns\ProfileValidationRules;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -43,7 +44,7 @@ new #[Title('Profile settings')] class extends Component {
 
         if ($this->photo) {
             $disk = config('filesystems.default');
-            $validated['profile_photo_path'] = $this->photo->store('profile-photos', $disk);
+            $validated['profile_photo_path'] = Storage::disk($disk)->putFile('profile-photos', $this->photo);
             $this->photo = null;
         }
 

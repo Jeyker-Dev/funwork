@@ -5,6 +5,7 @@ namespace App\Livewire\Forms;
 use App\Models\Project;
 use Flux\Flux;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 
@@ -36,7 +37,7 @@ class UploadFileForm extends Form
             $size = $file->getSize();
 
             $disk = config('filesystems.default');
-            $path = $file->store('projects/'.$this->project->id, $disk);
+            $path = Storage::disk($disk)->putFile('projects/'.$this->project->id, $file);
 
             $this->project->files()->create([
                 'name' => $name,
