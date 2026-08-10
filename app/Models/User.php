@@ -50,7 +50,7 @@ class User extends Authenticatable
     {
         if ($this->profile_photo_path) {
             $disk = config('filesystems.default');
-            
+
             // If the disk is s3, generate a temporary signed URL valid for 1 hour
             if ($disk === 's3') {
                 return Storage::disk($disk)->temporaryUrl(
@@ -58,7 +58,7 @@ class User extends Authenticatable
                     now()->addMinutes(60)
                 );
             }
-            
+
             // Otherwise, for local disk, use standard Storage::url()
             return Storage::disk($disk)->url($this->profile_photo_path);
         }

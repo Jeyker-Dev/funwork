@@ -1,4 +1,4 @@
-@props(['file', 'isSelected' => false])
+@props(['file', 'isSelected' => false, 'isSearching' => false])
 
 <flux:card wire:key="file-{{ $file->id }}"
     @class([
@@ -72,7 +72,13 @@
             @endif
         </div>
         <div class="min-w-0 flex-1">
-            <div class="font-semibold text-gray-900 truncate">{{ $file->name }}</div>
+            <div class="font-semibold text-gray-900 truncate" title="{{ $file->name }}">{{ $file->name }}</div>
+            @if($isSearching && $file->folder)
+                @php
+                    $path = collect($file->folder->breadcrumbs)->pluck('name')->join(' / ');
+                @endphp
+                <div class="text-xs text-gray-400 truncate mt-0.5" title="{{ $path }}">{{ $path }}</div>
+            @endif
             <div class="text-xs text-gray-500 mt-1 uppercase tracking-wide">
                 {{ explode('/', $file->mime_type)[1] ?? 'File' }} • {{ number_format($file->size / 1024 / 1024, 2) }} MB
             </div>

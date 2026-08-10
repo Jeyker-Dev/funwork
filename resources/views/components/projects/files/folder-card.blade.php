@@ -1,4 +1,4 @@
-@props(['folder', 'isSelected' => false])
+@props(['folder', 'isSelected' => false, 'isSearching' => false])
 
 <flux:card wire:key="folder-{{ $folder->id }}" wire:click="navigateToFolder({{ $folder->id }})"
     @class([
@@ -45,6 +45,14 @@
     <div class="mb-4 text-orange-600 bg-orange-50 w-10 h-10 rounded-lg flex items-center justify-center">
         <flux:icon.folder variant="solid" class="w-6 h-6" />
     </div>
-    <div class="font-semibold text-gray-900">{{ $folder->name }}</div>
+    <div class="font-semibold text-gray-900 truncate" title="{{ $folder->name }}">{{ $folder->name }}</div>
+    
+    @if($isSearching && $folder->parent_id)
+        @php
+            $path = collect($folder->breadcrumbs)->pluck('name')->join(' / ');
+        @endphp
+        <div class="text-xs text-gray-400 truncate mt-0.5" title="{{ $path }}">{{ $path }}</div>
+    @endif
+    
     <div class="text-sm text-gray-500 mt-1">{{ $folder->files()->count() }} items</div>
 </flux:card>

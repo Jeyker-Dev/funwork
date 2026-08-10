@@ -36,7 +36,7 @@
     @if($hasItems)
         <div class="flex items-center gap-3">
             <div class="w-full md:w-64">
-                <flux:input icon="magnifying-glass" placeholder="Search files..." />
+                <flux:input wire:model.live.debounce.300ms="searchQuery" icon="magnifying-glass" placeholder="Search files..." />
             </div>
             <div class="flex gap-2 bg-white rounded-lg shadow-sm p-1 border border-gray-200">
                 <button class="p-1.5 rounded-md hover:bg-gray-100 text-gray-600">

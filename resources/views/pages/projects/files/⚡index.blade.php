@@ -28,6 +28,9 @@ class extends Component {
     #[Url(history: true)]
     public ?int $currentFolderId = null;
 
+    #[Url(history: true)]
+    public string $searchQuery = '';
+
     public function mount(Project $project): void
     {
         $this->project = $project;
@@ -36,6 +39,11 @@ class extends Component {
     public function clearSelection(): void
     {
         $this->selectedIds = [];
+    }
+
+    public function updatedSearchQuery(): void
+    {
+        $this->clearSelection();
     }
 
     public function toggleSelectAllFolders(): void
@@ -185,7 +193,17 @@ class extends Component {
             $breadcrumbs = $folder ? $folder->breadcrumbs : [];
         }
 
-        $paginatedFiles = $this->project->files()->where('folder_id', $this->currentFolderId)->latest()->paginate(30);
+        $isSearching = !empty($this->searchQuery);
+
+        if ($isSearching) {
+            $foldersQuery = $this->project->folders()->where('name', 'like', '%' . $this->searchQuery . '%');
+            $filesQuery = $this->project->files()->where('name', 'like', '%' . $this->searchQuery . '%')->latest();
+        } else {
+            $foldersQuery = $this->project->folders()->where('parent_id', $this->currentFolderId);
+            $filesQuery = $this->project->files()->where('folder_id', $this->currentFolderId)->latest();
+        }
+
+        $paginatedFiles = $filesQuery->paginate(30);
 
         $filesArray = collect($paginatedFiles->items())->map(function($file) {
             return [
@@ -198,10 +216,11 @@ class extends Component {
         })->toArray();
 
         return [
-            'folders' => $this->project->folders()->where('parent_id', $this->currentFolderId)->get(),
+            'folders' => $foldersQuery->get(),
             'files' => $paginatedFiles,
             'filesArray' => $filesArray,
             'breadcrumbs' => $breadcrumbs,
+            'isSearching' => $isSearching,
         ];
     }
 };
@@ -212,11 +231,11 @@ class extends Component {
         <div class="bg-gray-100 rounded-xl flex-1 flex flex-col overflow-hidden">
             <div @class(['flex-1 overflow-y-auto px-6 pt-6', 'pb-32' => count($selectedIds) > 0, 'pb-6' => empty($selectedIds)])>
                 <div wire:loading.remove.delay wire:target="navigateToFolder, navigateToRoot">
-                    @if($currentFolderId !== null || $folders->isNotEmpty() || $files->isNotEmpty())
+                    @if($currentFolderId !== null || $folders->isNotEmpty() || $files->isNotEmpty() || $isSearching)
                         <!-- Contextual Action Bar -->
                         <x-projects.files.action-bar
                             :breadcrumbs="$breadcrumbs"
-                            :hasItems="$folders->isNotEmpty() || $files->isNotEmpty()"
+                            :hasItems="$folders->isNotEmpty() || $files->isNotEmpty() || $isSearching"
                         />
                     @endif
                 </div>
@@ -227,7 +246,7 @@ class extends Component {
                         <!-- Folders Section -->
                         <div class="mb-8">
                             <div class="flex items-center justify-between mb-4">
-                                <flux:heading size="lg">Folders</flux:heading>
+                                <flux:heading size="lg">{{ $isSearching ? 'Folders found' : 'Folders' }}</flux:heading>
                                 @if($folders->isNotEmpty())
                                     @php
                                         $allFoldersSelected = count(array_filter($selectedIds, fn($id) => str_starts_with($id, 'folder_'))) === $folders->count();
@@ -240,9 +259,9 @@ class extends Component {
                             </div>
                             <div class="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4">
                                 @forelse($folders as $folder)
-                                    <x-projects.files.folder-card :folder="$folder" :isSelected="in_array('folder_' . $folder->id, $selectedIds)" />
+                                    <x-projects.files.folder-card :folder="$folder" :isSelected="in_array('folder_' . $folder->id, $selectedIds)" :isSearching="$isSearching" />
                                 @empty
-                                    <div class="col-span-full text-sm text-gray-500 italic">No folders created yet.</div>
+                                    <div class="col-span-full text-sm text-gray-500 italic">{{ $isSearching ? 'No folders found.' : 'No folders created yet.' }}</div>
                                 @endforelse
                             </div>
                         </div>
@@ -250,7 +269,7 @@ class extends Component {
                         <!-- Files Section -->
                         <div>
                             <div class="flex items-center justify-between mb-4">
-                                <flux:heading size="lg">Files in this location</flux:heading>
+                                <flux:heading size="lg">{{ $isSearching ? 'Files found' : 'Files in this location' }}</flux:heading>
                                 @if($files->isNotEmpty())
                                     @php
                                         $allFilesSelected = count(array_filter($selectedIds, fn($id) => str_starts_with($id, 'file_'))) === $files->count();
@@ -263,9 +282,9 @@ class extends Component {
                             </div>
                             <div class="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4">
                                 @forelse($files as $file)
-                                    <x-projects.files.file-card :file="$file" :isSelected="in_array('file_' . $file->id, $selectedIds)" />
+                                    <x-projects.files.file-card :file="$file" :isSelected="in_array('file_' . $file->id, $selectedIds)" :isSearching="$isSearching" />
                                 @empty
-                                    <div class="col-span-full text-sm text-gray-500 italic">No files uploaded yet.</div>
+                                    <div class="col-span-full text-sm text-gray-500 italic">{{ $isSearching ? 'No files found.' : 'No files uploaded yet.' }}</div>
                                 @endforelse
                             </div>
 
