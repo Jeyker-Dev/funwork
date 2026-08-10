@@ -75,6 +75,7 @@
     <flux:dropdown position="top" align="end">
         <flux:profile
             :initials="auth()->user()->initials()"
+            :avatar="auth()->user()->avatar_url"
             icon-trailing="chevron-down"
         />
 
@@ -85,6 +86,7 @@
                         <flux:avatar
                             :name="auth()->user()->display_name"
                             :initials="auth()->user()->initials()"
+                            src="{{ auth()->user()->avatar_url }}"
                         />
 
                         <div class="grid flex-1 text-start text-sm leading-tight">
