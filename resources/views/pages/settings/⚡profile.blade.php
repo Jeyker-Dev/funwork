@@ -42,7 +42,7 @@ new #[Title('Profile settings')] class extends Component {
         ]);
 
         if ($this->photo) {
-            $validated['profile_photo_path'] = $this->photo->store('profile-photos');
+            $validated['profile_photo_path'] = $this->photo->storePublicly('profile-photos');
             $this->photo = null;
         }
 
