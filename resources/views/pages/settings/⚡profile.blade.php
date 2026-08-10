@@ -7,10 +7,13 @@ use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 new #[Title('Profile settings')] class extends Component {
     use ProfileValidationRules;
+    use WithFileUploads;
 
+    public $photo;
     public string $name = '';
     public string $username = '';
     public string $email = '';
@@ -33,6 +36,14 @@ new #[Title('Profile settings')] class extends Component {
         $user = Auth::user();
 
         $validated = $this->validate($this->profileRules($user->id));
+
+        $this->validate([
+            'photo' => ['nullable', 'image'],
+        ]);
+
+        if ($this->photo) {
+            $validated['profile_photo_path'] = $this->photo->store('profile-photos', 'public');
+        }
 
         $user->fill($validated);
 
@@ -84,6 +95,19 @@ new #[Title('Profile settings')] class extends Component {
 
     <x-pages::settings.layout :heading="__('Profile')" :subheading="__('Update your name and email address')">
         <form wire:submit="updateProfileInformation" class="my-6 w-full space-y-6">
+            <div class="flex items-center gap-6 mb-6">
+                @if ($photo)
+                    <flux:avatar size="xl" src="{{ $photo->temporaryUrl() }}" />
+                @else
+                    <flux:avatar size="xl" src="{{ auth()->user()->avatar_url }}" />
+                @endif
+                <div class="flex flex-col gap-2">
+                    <label class="text-sm font-medium">{{ __('Profile Photo') }}</label>
+                    <input type="file" wire:model="photo" accept="image/*" class="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100" />
+                    @error('photo') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                </div>
+            </div>
+
             <flux:input wire:model="name" :label="__('Name')" type="text" required autofocus autocomplete="name" />
 
             <flux:input wire:model="username" :label="__('Username')" type="text" required autocomplete="username" />

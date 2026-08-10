@@ -11,10 +11,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 
-#[Fillable(['name', 'username', 'email', 'password', 'timezone'])]
+#[Fillable(['name', 'username', 'email', 'password', 'timezone', 'profile_photo_path'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -40,6 +41,18 @@ class User extends Authenticatable
     public function getDisplayNameAttribute(): string
     {
         return $this->username ?? explode(' ', $this->name)[0];
+    }
+
+    /**
+     * Get the avatar url for the user
+     */
+    public function getAvatarUrlAttribute(): string
+    {
+        if ($this->profile_photo_path) {
+            return Storage::url($this->profile_photo_path);
+        }
+
+        return 'https://unavatar.io/'.urlencode($this->email).'?fallback='.urlencode('https://ui-avatars.com/api/?name='.$this->name.'&color=7F9CF5&background=EBF4FF');
     }
 
     /**
