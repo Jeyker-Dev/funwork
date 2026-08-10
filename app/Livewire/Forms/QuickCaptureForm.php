@@ -30,7 +30,7 @@ class QuickCaptureForm extends Form
         ]);
 
         $this->reset('content');
-        
+
         $this->component->dispatch('item-captured');
     }
 }

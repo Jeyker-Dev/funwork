@@ -13,6 +13,7 @@ class InboxItemForm extends Form
     public string $content = '';
 
     public ?int $projectId = null;
+
     public ?int $userId = null;
 
     public function store(): void

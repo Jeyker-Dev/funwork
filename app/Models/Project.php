@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\DB;
 
 class Project extends Model
 {
@@ -50,10 +51,10 @@ class Project extends Model
     public function getRecentActivities()
     {
         $notebooks = $this->notebooks()
-            ->select('id', 'name', 'created_by', 'updated_at', \Illuminate\Support\Facades\DB::raw("'notebook' as type"));
+            ->select('id', 'name', 'created_by', 'updated_at', DB::raw("'notebook' as type"));
 
         $files = $this->files()
-            ->select('id', 'name', 'created_by', 'updated_at', \Illuminate\Support\Facades\DB::raw("'file' as type"));
+            ->select('id', 'name', 'created_by', 'updated_at', DB::raw("'file' as type"));
 
         return $notebooks->unionAll($files)
             ->orderBy('updated_at', 'desc')

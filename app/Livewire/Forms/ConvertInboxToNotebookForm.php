@@ -3,8 +3,8 @@
 namespace App\Livewire\Forms;
 
 use App\Models\InboxItem;
-use App\Models\Project;
 use App\Models\Notebook;
+use App\Models\Project;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 

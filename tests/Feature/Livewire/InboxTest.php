@@ -1,8 +1,8 @@
 <?php
 
 use App\Models\InboxItem;
-use App\Models\User;
 use App\Models\Project;
+use App\Models\User;
 use Livewire\Livewire;
 
 it('renders inbox component', function () {

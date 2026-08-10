@@ -1,8 +1,8 @@
 <?php
 
+use App\Models\InboxItem;
 use App\Models\Project;
 use App\Models\User;
-use App\Models\InboxItem;
 use Livewire\Livewire;
 
 test('quick capture form saves inbox item and resets', function () {
@@ -16,10 +16,10 @@ test('quick capture form saves inbox item and resets', function () {
         ->call('saveQuickCapture');
 
     $response->assertHasNoErrors()
-             ->assertSet('captureForm.content', '');
+        ->assertSet('captureForm.content', '');
 
     expect(InboxItem::count())->toBe(1);
-    
+
     $item = InboxItem::first();
     expect($item->content)->toBe('Test quick idea');
     expect($item->project_id)->toBe($project->id);

@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\Notebook;
+use App\Models\Project;
+use App\Models\ProjectFile;
 use App\Models\User;
 
 test('guests are redirected to the login page', function () {
@@ -17,15 +20,15 @@ test('authenticated users can visit the dashboard', function () {
 
 test('project returns recent activities combined from notebooks and files', function () {
     $user = User::factory()->create();
-    $project = \App\Models\Project::factory()->create(['owner_id' => $user->id]);
-    
-    $notebook = \App\Models\Notebook::factory()->create([
+    $project = Project::factory()->create(['owner_id' => $user->id]);
+
+    $notebook = Notebook::factory()->create([
         'project_id' => $project->id,
         'created_by' => $user->id,
         'updated_at' => now()->subDay(),
     ]);
 
-    $file = \App\Models\ProjectFile::factory()->create([
+    $file = ProjectFile::factory()->create([
         'project_id' => $project->id,
         'created_by' => $user->id,
         'updated_at' => now(),
@@ -37,7 +40,7 @@ test('project returns recent activities combined from notebooks and files', func
     // The most recently updated should be first (the file)
     expect($activities[0]->type)->toBe('file');
     expect($activities[0]->id)->toBe($file->id);
-    
+
     expect($activities[1]->type)->toBe('notebook');
     expect($activities[1]->id)->toBe($notebook->id);
 });
