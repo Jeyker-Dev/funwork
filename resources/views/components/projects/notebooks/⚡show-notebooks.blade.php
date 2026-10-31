@@ -17,6 +17,8 @@ new class extends Component
 
     public function mount(Project $project): void
     {
+        $this->authorize('view', $project);
+
         $this->project = $project;
     }
     public function with(): array
@@ -66,9 +68,14 @@ new class extends Component
 
     public function openNotebook(Notebook $notebook)
     {
+        $this->authorize('view', $notebook);
+        abort_if($notebook->project_id !== $this->project->id, 403);
+
         $page = $notebook->pages()->orderBy('order', 'asc')->first();
 
         if (! $page) {
+            $this->authorize('create', [\App\Models\NotebookPage::class, $notebook]);
+
             $page = $notebook->pages()->create([
                 'content' => ['body' => ''],
                 'order' => 1,

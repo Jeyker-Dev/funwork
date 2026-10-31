@@ -16,12 +16,16 @@ new class extends Component {
 
     public function mount(Project $project, ?int $currentFolderId = null)
     {
+        $this->authorize('view', $project);
+
         $this->project = $project;
         $this->currentFolderId = $currentFolderId;
     }
 
     public function save()
     {
+        $this->authorize('create', [\App\Models\ProjectFile::class, $this->project]);
+
         $this->form->setContext($this->project, $this->currentFolderId);
         $this->form->store();
         $this->dispatch('file-uploaded');

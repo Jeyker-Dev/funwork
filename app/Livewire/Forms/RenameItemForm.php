@@ -4,6 +4,7 @@ namespace App\Livewire\Forms;
 
 use App\Models\Folder;
 use App\Models\ProjectFile;
+use Illuminate\Support\Facades\Gate;
 use Livewire\Form;
 
 class RenameItemForm extends Form
@@ -39,6 +40,8 @@ class RenameItemForm extends Form
 
     public function updateItem()
     {
+        Gate::authorize('update', $this->file ?? $this->folder);
+
         $this->validate([
             'name' => ['required', 'string', 'max:255', 'min:1'],
         ]);

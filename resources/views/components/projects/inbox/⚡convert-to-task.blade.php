@@ -14,11 +14,9 @@ new class extends Component {
     {
         if ($item) {
             $inboxItem = InboxItem::findOrFail($item);
-            
-            if ($inboxItem->user_id !== auth()->id()) {
-                abort(403);
-            }
-            
+
+            $this->authorize('update', $inboxItem);
+
             $this->form->setItem($inboxItem);
 
             Flux::modal('convert-to-task')->show();

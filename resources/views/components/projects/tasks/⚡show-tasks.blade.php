@@ -13,6 +13,8 @@ new class extends Component {
 
     public function mount(Project $project, ?string $status = null): void
     {
+        $this->authorize('view', $project);
+
         $this->project = $project;
         $this->projectId = $project->id;
         $this->status = $status;

@@ -13,11 +13,9 @@ new class extends Component {
     {
         if ($id) {
             $this->item = InboxItem::findOrFail($id);
-            
-            if ($this->item->user_id !== auth()->id()) {
-                abort(403);
-            }
-            
+
+            $this->authorize('delete', $this->item);
+
             Flux::modal('delete-item-modal')->show();
         }
     }
@@ -25,9 +23,11 @@ new class extends Component {
     public function delete(): void
     {
         if ($this->item) {
+            $this->authorize('delete', $this->item);
+
             $this->item->delete();
             $this->item = null;
-            
+
             Flux::toast(
                 heading: 'Item Deleted',
                 text: 'The idea has been removed from your inbox.',
@@ -37,7 +37,7 @@ new class extends Component {
         }
 
         Flux::modal('delete-item-modal')->close();
-        
+
         $this->dispatch('item-deleted');
     }
 };

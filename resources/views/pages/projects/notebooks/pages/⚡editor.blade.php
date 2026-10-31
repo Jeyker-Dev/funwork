@@ -23,6 +23,10 @@ class extends Component {
 
     public function mount(Project $project, Notebook $notebook, NotebookPage $page): void
     {
+        $this->authorize('view', $project);
+        $this->authorize('view', $notebook);
+        $this->authorize('update', $page);
+
         $this->project = $project;
         $this->notebook = $notebook;
         $this->page = $page;
@@ -67,6 +71,8 @@ class extends Component {
 
     public function save(): void
     {
+        $this->authorize('update', $this->page);
+
         $this->resetErrorBag();
         $this->hasError = false;
 
@@ -99,6 +105,8 @@ class extends Component {
 
     public function deletePage(): ?\Illuminate\Http\RedirectResponse
     {
+        $this->authorize('delete', $this->page);
+
         if ($this->totalPages <= 1) {
             $this->title = '';
             $this->content = '';
@@ -123,6 +131,8 @@ class extends Component {
 
     public function createNextPage()
     {
+        $this->authorize('create', [NotebookPage::class, $this->notebook]);
+
         $nextOrder = $this->notebook->pages()->max('order') + 1;
         $newPage = $this->notebook->pages()->create([
             'content' => ['title' => '', 'body' => ''],

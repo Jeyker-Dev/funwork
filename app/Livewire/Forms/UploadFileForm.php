@@ -2,9 +2,12 @@
 
 namespace App\Livewire\Forms;
 
+use App\Models\Folder;
 use App\Models\Project;
+use App\Models\ProjectFile;
 use Flux\Flux;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
@@ -30,6 +33,14 @@ class UploadFileForm extends Form
     public function store(): void
     {
         $this->validate();
+
+        Gate::authorize('create', [ProjectFile::class, $this->project]);
+
+        if ($this->currentFolderId !== null) {
+            $folder = Folder::findOrFail($this->currentFolderId);
+            Gate::authorize('view', $folder);
+            abort_if($folder->project_id !== $this->project->id, 403);
+        }
 
         foreach ($this->files as $file) {
             $name = $file->getClientOriginalName();

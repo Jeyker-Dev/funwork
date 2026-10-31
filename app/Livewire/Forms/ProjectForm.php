@@ -4,6 +4,7 @@ namespace App\Livewire\Forms;
 
 use App\Models\Project;
 use Flux\Flux;
+use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 
@@ -36,6 +37,9 @@ class ProjectForm extends Form
     public function store(): void
     {
         $this->validate();
+
+        Gate::authorize('create', Project::class);
+        abort_if($this->ownerId !== auth()->id(), 403);
 
         Project::create([
             'name' => $this->name,

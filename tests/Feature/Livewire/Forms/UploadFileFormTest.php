@@ -40,7 +40,7 @@ test('it validates required files', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    $project = Project::factory()->create();
+    $project = Project::factory()->create(['owner_id' => $user->id]);
 
     $response = Livewire::test(UploadFileFormTestComponent::class, ['project' => $project])
         ->set('form.files', [])
@@ -55,7 +55,7 @@ test('it successfully uploads files and resets form', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    $project = Project::factory()->create();
+    $project = Project::factory()->create(['owner_id' => $user->id]);
 
     $file1 = UploadedFile::fake()->create('document.pdf', 1024, 'application/pdf');
     $file2 = UploadedFile::fake()->create('image.png', 512, 'image/png');
@@ -92,7 +92,7 @@ test('it successfully uploads files to a specific folder', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    $project = Project::factory()->create();
+    $project = Project::factory()->create(['owner_id' => $user->id]);
     $folder = Folder::factory()->create([
         'project_id' => $project->id,
         'created_by' => $user->id,

@@ -4,6 +4,7 @@ namespace App\Livewire\Forms;
 
 use App\Models\InboxItem;
 use App\Models\Project;
+use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 
@@ -22,6 +23,8 @@ class QuickCaptureForm extends Form
     public function save()
     {
         $this->validate();
+
+        Gate::authorize('create', [InboxItem::class, $this->project]);
 
         InboxItem::create([
             'user_id' => auth()->id(),

@@ -33,6 +33,8 @@ class extends Component {
 
     public function mount(Project $project): void
     {
+        $this->authorize('view', $project);
+
         $this->project = $project;
     }
 
@@ -109,6 +111,8 @@ class extends Component {
 
     public function downloadSelected(DownloadFilesZipAction $action)
     {
+        $this->authorize('view', $this->project);
+
         if (empty($this->selectedIds)) {
             return null;
         }
@@ -124,6 +128,8 @@ class extends Component {
     #[On('delete-confirmed')]
     public function deleteSelected(DeleteSelectionAction $action): void
     {
+        $this->authorize('view', $this->project);
+
         if (empty($this->selectedIds)) {
             return;
         }
@@ -155,6 +161,10 @@ class extends Component {
 
     public function navigateToFolder(int $folderId): void
     {
+        $folder = Folder::findOrFail($folderId);
+        $this->authorize('view', $folder);
+        abort_if($folder->project_id !== $this->project->id, 403);
+
         $this->currentFolderId = $folderId;
         $this->clearSelection();
     }
@@ -189,7 +199,7 @@ class extends Component {
     {
         $breadcrumbs = [];
         if ($this->currentFolderId) {
-            $folder = Folder::find($this->currentFolderId);
+            $folder = $this->project->folders()->find($this->currentFolderId);
             $breadcrumbs = $folder ? $folder->breadcrumbs : [];
         }
 

@@ -12,7 +12,7 @@ beforeEach(function () {
 
 it('streams local file inline', function () {
     $user = User::factory()->create();
-    $project = Project::factory()->create();
+    $project = Project::factory()->create(['owner_id' => $user->id]);
 
     Storage::disk('local')->put('test.png', 'fake image content');
 
@@ -32,7 +32,7 @@ it('streams local file inline', function () {
 
 it('redirects to temporary url for s3 file with inline disposition', function () {
     $user = User::factory()->create();
-    $project = Project::factory()->create();
+    $project = Project::factory()->create(['owner_id' => $user->id]);
 
     Storage::disk('s3')->put('test.pdf', 'fake pdf content');
 
@@ -55,8 +55,8 @@ it('redirects to temporary url for s3 file with inline disposition', function ()
 
 it('aborts 404 if file does not belong to project', function () {
     $user = User::factory()->create();
-    $project1 = Project::factory()->create();
-    $project2 = Project::factory()->create();
+    $project1 = Project::factory()->create(['owner_id' => $user->id]);
+    $project2 = Project::factory()->create(['owner_id' => $user->id]);
 
     $file = ProjectFile::factory()->create([
         'project_id' => $project1->id,

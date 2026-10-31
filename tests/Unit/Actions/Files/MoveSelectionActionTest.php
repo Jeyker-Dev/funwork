@@ -13,6 +13,7 @@ uses(TestCase::class, RefreshDatabase::class);
 
 it('moves files and folders to a target folder', function () {
     $user = User::factory()->create();
+    $this->actingAs($user);
     $project = Project::factory()->create(['owner_id' => $user->id]);
     $sourceFolder = Folder::factory()->create(['project_id' => $project->id, 'created_by' => $user->id]);
     $targetFolder = Folder::factory()->create(['project_id' => $project->id, 'created_by' => $user->id]);
@@ -40,6 +41,7 @@ it('moves files and folders to a target folder', function () {
 
 it('prevents moving to the same directory', function () {
     $user = User::factory()->create();
+    $this->actingAs($user);
     $project = Project::factory()->create(['owner_id' => $user->id]);
     $folder = Folder::factory()->create(['project_id' => $project->id, 'created_by' => $user->id]);
 
@@ -57,6 +59,7 @@ it('prevents moving to the same directory', function () {
 
 it('prevents inception paradox (moving folder into itself or descendant)', function () {
     $user = User::factory()->create();
+    $this->actingAs($user);
     $project = Project::factory()->create(['owner_id' => $user->id]);
 
     $parent = Folder::factory()->create(['project_id' => $project->id, 'created_by' => $user->id]);
@@ -80,6 +83,7 @@ it('prevents inception paradox (moving folder into itself or descendant)', funct
 
 it('auto-renames items on collision', function () {
     $user = User::factory()->create();
+    $this->actingAs($user);
     $project = Project::factory()->create(['owner_id' => $user->id]);
 
     $sourceFolder = Folder::factory()->create(['project_id' => $project->id, 'created_by' => $user->id]);

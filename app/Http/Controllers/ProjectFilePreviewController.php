@@ -6,6 +6,7 @@ use App\Models\Project;
 use App\Models\ProjectFile;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -13,6 +14,8 @@ class ProjectFilePreviewController extends Controller
 {
     public function __invoke(Request $request, Project $project, ProjectFile $projectFile): Response|RedirectResponse
     {
+        Gate::authorize('view', $project);
+        Gate::authorize('view', $projectFile);
         abort_if($projectFile->project_id !== $project->id, 404);
 
         $disk = Storage::disk($projectFile->disk);

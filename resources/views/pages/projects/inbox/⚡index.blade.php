@@ -17,6 +17,8 @@ class extends Component {
 
     public function mount(Project $project): void
     {
+        $this->authorize('view', $project);
+
         $this->project = $project;
         $this->form->projectId = $project->id;
         $this->form->userId = auth()->id();
@@ -24,6 +26,8 @@ class extends Component {
 
     public function addItem(): void
     {
+        $this->authorize('create', [InboxItem::class, $this->project]);
+
         $this->form->store();
     }
 

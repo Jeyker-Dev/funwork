@@ -3,6 +3,7 @@
 namespace App\Actions\Files;
 
 use App\Models\Project;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use ZipArchive;
@@ -11,11 +12,15 @@ class DownloadFilesZipAction
 {
     public function execute(Project $project, array $selectedIds)
     {
+        Gate::authorize('view', $project);
+
         if (count($selectedIds) === 1 && str_starts_with($selectedIds[0], 'file_')) {
             $fileId = str_replace('file_', '', $selectedIds[0]);
             $file = $project->files()->find($fileId);
 
             if ($file) {
+                Gate::authorize('view', $file);
+
                 if (! Storage::disk($file->disk)->exists($file->file_path)) {
                     throw ValidationException::withMessages([
                         'files' => 'The requested file is unavailable.',
@@ -59,6 +64,8 @@ class DownloadFilesZipAction
                         $file = $project->files()->find($fileId);
 
                         if ($file) {
+                            Gate::authorize('view', $file);
+
                             if (! Storage::disk($file->disk)->exists($file->file_path)) {
                                 throw ValidationException::withMessages([
                                     'files' => 'One or more requested files are unavailable.',
@@ -83,6 +90,7 @@ class DownloadFilesZipAction
                         $folder = $project->folders()->find($folderId);
 
                         if ($folder) {
+                            Gate::authorize('view', $folder);
                             $this->addFolderToZip($zip, $folder, $folder->name.'/', $tempFilesToClean);
                         }
                     }

@@ -2,9 +2,11 @@
 
 namespace App\Livewire\Forms;
 
+use App\Models\Folder;
 use App\Models\Project;
 use Flux\Flux;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 
@@ -26,6 +28,14 @@ class FolderForm extends Form
     public function store(): void
     {
         $this->validate();
+
+        Gate::authorize('create', [Folder::class, $this->project]);
+
+        if ($this->currentFolderId !== null) {
+            $parentFolder = Folder::findOrFail($this->currentFolderId);
+            Gate::authorize('view', $parentFolder);
+            abort_if($parentFolder->project_id !== $this->project->id, 403);
+        }
 
         $this->project->folders()->create([
             'name' => $this->name,

@@ -5,6 +5,7 @@ namespace App\Livewire\Forms;
 use App\Models\InboxItem;
 use App\Models\Project;
 use App\Models\Task;
+use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 
@@ -33,10 +34,10 @@ class ConvertInboxToTaskForm extends Form
     {
         $this->validate();
 
+        Gate::authorize('update', $this->item);
+
         $project = Project::findOrFail($this->projectId);
-        if ($project->owner_id !== auth()->id()) {
-            abort(403);
-        }
+        Gate::authorize('create', [Task::class, $project]);
 
         $position = Task::where('project_id', $this->projectId)->max('position');
         $position = $position ? $position + 1 : 1;

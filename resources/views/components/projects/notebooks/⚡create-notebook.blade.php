@@ -11,6 +11,8 @@ new class extends Component {
 
     public function mount(Project $project): void
     {
+        $this->authorize('view', $project);
+
         $this->project = $project;
         $this->form->projectId = $project->id;
 
@@ -22,6 +24,8 @@ new class extends Component {
 
     public function save(): void
     {
+        $this->authorize('create', [\App\Models\Notebook::class, $this->project]);
+
         $this->form->store();
 
         $this->dispatch('created-notebook');

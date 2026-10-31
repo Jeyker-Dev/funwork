@@ -2,8 +2,10 @@
 
 namespace App\Livewire\Forms;
 
+use App\Models\Project;
 use App\Models\Task;
 use Flux\Flux;
+use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 
@@ -36,6 +38,9 @@ class TaskForm extends Form
     public function store()
     {
         $this->validate();
+
+        $project = Project::findOrFail($this->projectId);
+        Gate::authorize('create', [Task::class, $project]);
 
         $task = Task::create([
             'title' => $this->title,

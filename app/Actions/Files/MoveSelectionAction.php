@@ -6,6 +6,7 @@ use App\Models\Folder;
 use App\Models\Project;
 use App\Models\ProjectFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 
 class MoveSelectionAction
@@ -19,10 +20,15 @@ class MoveSelectionAction
      */
     public function execute(Project $project, array $selectedIds, ?int $targetFolderId): void
     {
+        Gate::authorize('view', $project);
+
         DB::transaction(function () use ($project, $selectedIds, $targetFolderId) {
             $targetFolder = null;
             if ($targetFolderId) {
                 $targetFolder = Folder::where('project_id', $project->id)->find($targetFolderId);
+                if ($targetFolder) {
+                    Gate::authorize('view', $targetFolder);
+                }
             }
 
             foreach ($selectedIds as $idStr) {
@@ -30,6 +36,8 @@ class MoveSelectionAction
                     $fileId = (int) substr($idStr, 5);
                     $file = ProjectFile::where('project_id', $project->id)->find($fileId);
                     if ($file) {
+                        Gate::authorize('update', $file);
+
                         if ($file->folder_id === $targetFolderId) {
                             throw ValidationException::withMessages(['targetFolderId' => 'Source and target directories are identical.']);
                         }
@@ -41,6 +49,8 @@ class MoveSelectionAction
                     $folderId = (int) substr($idStr, 7);
                     $folder = Folder::where('project_id', $project->id)->find($folderId);
                     if ($folder) {
+                        Gate::authorize('update', $folder);
+
                         if ($folder->parent_id === $targetFolderId) {
                             throw ValidationException::withMessages(['targetFolderId' => 'Source and target directories are identical.']);
                         }

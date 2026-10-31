@@ -5,6 +5,7 @@ namespace App\Livewire\Actions;
 use App\Models\Project;
 use App\Models\Task;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 /**
  * Reorders tasks across columns after a drag-and-drop operation.
@@ -17,19 +18,23 @@ class ReorderTasks
     public function __invoke(array $payload, int $projectId): void
     {
         $project = Project::findOrFail($projectId);
-        if ($project->owner_id !== auth()->id()) {
-            abort(403, 'Unauthorized action.');
-        }
+        Gate::authorize('update', $project);
 
         DB::transaction(function () use ($payload, $projectId) {
             foreach ($payload as $status => $orderedIds) {
                 foreach ($orderedIds as $index => $id) {
-                    Task::where('project_id', $projectId)
+                    $task = Task::where('project_id', $projectId)
                         ->where('id', $id)
-                        ->update([
+                        ->first();
+
+                    if ($task) {
+                        Gate::authorize('update', $task);
+
+                        $task->update([
                             'status' => $status,
                             'position' => $index + 1,
                         ]);
+                    }
                 }
             }
         });

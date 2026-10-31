@@ -4,7 +4,7 @@ use App\Livewire\Actions\ReorderTasks;
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;
-use Symfony\Component\HttpKernel\Exception\HttpException;
+use Illuminate\Auth\Access\AuthorizationException;
 
 test('it reorders tasks and updates status', function () {
     $user = User::factory()->create();
@@ -49,4 +49,4 @@ test('it prevents unauthorized users from reordering tasks', function () {
     ];
 
     $action($payload, $project->id);
-})->throws(HttpException::class, 'Unauthorized action.');
+})->throws(AuthorizationException::class);

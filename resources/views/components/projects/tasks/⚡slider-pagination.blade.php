@@ -16,6 +16,8 @@ new class extends Component
 
     public function mount(Project $project, ?string $initialFilter = null): void
     {
+        $this->authorize('view', $project);
+
         $this->project = $project;
         $this->projectId = $project->id;
         $this->initialFilter = $initialFilter;

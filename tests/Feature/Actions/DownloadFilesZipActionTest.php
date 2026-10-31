@@ -12,6 +12,7 @@ test('generates zip with selected files and folders', function () {
     Storage::fake('local');
 
     $project = Project::factory()->create();
+    $this->actingAs($project->owner);
 
     $folder = Folder::factory()->create([
         'project_id' => $project->id,
@@ -56,6 +57,7 @@ test('throws exception if a requested file is missing', function () {
     Storage::fake('local');
 
     $project = Project::factory()->create();
+    $this->actingAs($project->owner);
 
     $file1 = ProjectFile::factory()->create([
         'project_id' => $project->id,

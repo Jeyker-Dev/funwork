@@ -14,12 +14,16 @@ class extends Component {
 
     public function mount(Project $project)
     {
+        $this->authorize('view', $project);
+
         $this->project = $project;
         $this->captureForm->setProject($project);
     }
     
     public function saveQuickCapture()
     {
+        $this->authorize('view', $this->project);
+
         $this->captureForm->save();
         Flux::toast('Item captured to Inbox');
     }

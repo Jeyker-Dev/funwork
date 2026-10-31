@@ -15,6 +15,8 @@ new class extends Component
 
     public function mount(Project $project, ?string $status = null): void
     {
+        $this->authorize('view', $project);
+
         $this->project = $project;
         $this->projectId = $project->id;
         $this->status = $status;
@@ -29,6 +31,8 @@ new class extends Component
 
     public function save(): void
     {
+        $this->authorize('create', [Task::class, $this->project]);
+
         $this->form->projectId = $this->projectId;
         $this->form->status = $this->status ?? $this->form->status;
 

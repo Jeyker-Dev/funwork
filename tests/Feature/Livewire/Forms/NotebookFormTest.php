@@ -9,7 +9,7 @@ test('it validates required project_id', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    $project = Project::factory()->create();
+    $project = Project::factory()->create(['owner_id' => $user->id]);
 
     $response = Livewire::test('projects.notebooks.⚡create-notebook', ['project' => $project])
         ->set('form.projectId', null)
@@ -24,7 +24,7 @@ test('it validates required created_by', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    $project = Project::factory()->create();
+    $project = Project::factory()->create(['owner_id' => $user->id]);
 
     $response = Livewire::test('projects.notebooks.⚡create-notebook', ['project' => $project])
         ->set('form.createdBy', null)
@@ -39,7 +39,7 @@ test('it successfully persists notebook, dispatches event and resets form', func
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    $project = Project::factory()->create();
+    $project = Project::factory()->create(['owner_id' => $user->id]);
 
     $response = Livewire::test('projects.notebooks.⚡create-notebook', ['project' => $project])
         ->set('form.name', 'My Notebook')

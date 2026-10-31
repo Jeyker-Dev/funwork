@@ -16,10 +16,8 @@ new class extends Component {
     public function mountFile(int $fileId)
     {
         $file = ProjectFile::findOrFail($fileId);
-        // Add auth check
-        if ($file->project->owner_id !== auth()->id()) {
-            abort(403);
-        }
+        $this->authorize('update', $file);
+
         $this->type = 'file';
         $this->form->setContextForFile($file);
         Flux::modal('rename-item-modal')->show();
@@ -29,10 +27,8 @@ new class extends Component {
     public function mountFolder(int $folderId)
     {
         $folder = Folder::findOrFail($folderId);
-        // Add auth check
-        if ($folder->project->owner_id !== auth()->id()) {
-            abort(403);
-        }
+        $this->authorize('update', $folder);
+
         $this->type = 'folder';
         $this->form->setContextForFolder($folder);
         Flux::modal('rename-item-modal')->show();

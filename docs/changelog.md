@@ -2,6 +2,7 @@
 
 ## 2026-10-31
 
+- Policies de autorización (`app/Policies/*Policy.php`) para `Project`, `Task`, `Notebook`, `NotebookPage`, `Folder`, `ProjectFile` e `InboxItem`, aplicadas en rutas (`routes/web.php`), controlador de vista previa, páginas y componentes Livewire, Form Objects y Actions. Test: `tests/Feature/Authorization/PoliciesTest.php`.
 - Registro público desactivado (`config/fortify.php`) hasta que existan las Policies. Test: `tests/Feature/Auth/RegistrationDisabledTest.php`.
 - Auditoría del proyecto y roadmap por fases (`roadmap.md`), backlog cargado por fase y [ADR-002](decisions/ADR-002-funwork-as-workflow-hub.md): FunWork como hub del flujo. Se corrigió la documentación que afirmaba que existían Policies.
 - Despliegue en producción con Docker: Laravel Octane sobre FrankenPHP (HTTPS automático), `Dockerfile` multi-stage, `compose.prod.yml` (app, queue, scheduler, MySQL) y `deploy.yml` que construye la imagen en GitHub Actions y la publica en GHCR.

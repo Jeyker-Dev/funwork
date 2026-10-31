@@ -21,12 +21,16 @@ new class extends Component {
 
     public function mount(Project $project)
     {
+        $this->authorize('view', $project);
+
         $this->project = $project;
     }
 
     #[On('open-move-modal')]
     public function open(array $selectedIds)
     {
+        $this->authorize('view', $this->project);
+
         $this->selectedIds = $selectedIds;
         $this->targetFolderId = null;
         $this->isCreatingFolder = false;
@@ -37,6 +41,12 @@ new class extends Component {
 
     public function navigateTo(?int $folderId)
     {
+        if ($folderId !== null) {
+            $folder = Folder::findOrFail($folderId);
+            $this->authorize('view', $folder);
+            abort_if($folder->project_id !== $this->project->id, 403);
+        }
+
         $this->targetFolderId = $folderId;
         $this->isCreatingFolder = false;
     }
@@ -44,7 +54,7 @@ new class extends Component {
     public function navigateUp()
     {
         if ($this->targetFolderId) {
-            $folder = Folder::find($this->targetFolderId);
+            $folder = $this->project->folders()->find($this->targetFolderId);
             $this->targetFolderId = $folder ? $folder->parent_id : null;
         }
         $this->isCreatingFolder = false;
@@ -58,6 +68,14 @@ new class extends Component {
 
     public function createFolder()
     {
+        $this->authorize('create', [Folder::class, $this->project]);
+
+        if ($this->targetFolderId !== null) {
+            $parentFolder = Folder::findOrFail($this->targetFolderId);
+            $this->authorize('view', $parentFolder);
+            abort_if($parentFolder->project_id !== $this->project->id, 403);
+        }
+
         $this->validate([
             'newFolderName' => 'required|string|max:255',
         ], [], ['newFolderName' => 'Folder name']);
@@ -65,6 +83,7 @@ new class extends Component {
         $folder = Folder::create([
             'project_id' => $this->project->id,
             'parent_id' => $this->targetFolderId,
+            'created_by' => auth()->id(),
             'name' => $this->newFolderName,
         ]);
 
@@ -75,6 +94,8 @@ new class extends Component {
 
     public function move(MoveSelectionAction $action)
     {
+        $this->authorize('view', $this->project);
+
         try {
             $action->execute($this->project, $this->selectedIds, $this->targetFolderId);
             Flux::modal('move-items-modal')->close();
@@ -96,7 +117,7 @@ new class extends Component {
         // Get breadcrumbs
         $breadcrumbs = [];
         if ($this->targetFolderId) {
-            $current = Folder::find($this->targetFolderId);
+            $current = $this->project->folders()->find($this->targetFolderId);
             if ($current) {
                 $breadcrumbs = $current->breadcrumbs; // Assuming this accessor exists
             }

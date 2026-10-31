@@ -3,7 +3,9 @@
 namespace App\Livewire\Forms;
 
 use App\Models\Notebook;
+use App\Models\Project;
 use Flux\Flux;
+use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 
@@ -24,6 +26,9 @@ class NotebookForm extends Form
     public function store(): void
     {
         $this->validate();
+
+        $project = Project::findOrFail($this->projectId);
+        Gate::authorize('create', [Notebook::class, $project]);
 
         Notebook::create([
             'project_id' => $this->projectId,

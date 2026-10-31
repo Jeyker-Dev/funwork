@@ -7,6 +7,7 @@ use App\Models\ProjectFile;
 
 test('deletes selected files and folders cascadingly', function () {
     $project = Project::factory()->create();
+    $this->actingAs($project->owner);
 
     $folder1 = Folder::factory()->create([
         'project_id' => $project->id,

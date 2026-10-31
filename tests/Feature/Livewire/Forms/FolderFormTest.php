@@ -34,7 +34,7 @@ test('it validates required name', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    $project = Project::factory()->create();
+    $project = Project::factory()->create(['owner_id' => $user->id]);
 
     $response = Livewire::test(FolderFormTestComponent::class, ['project' => $project])
         ->set('form.name', '')
@@ -47,7 +47,7 @@ test('it successfully creates a folder and resets form', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    $project = Project::factory()->create();
+    $project = Project::factory()->create(['owner_id' => $user->id]);
 
     $response = Livewire::test(FolderFormTestComponent::class, ['project' => $project])
         ->set('form.name', 'My New Folder')
@@ -69,7 +69,7 @@ test('it successfully creates a nested folder', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    $project = Project::factory()->create();
+    $project = Project::factory()->create(['owner_id' => $user->id]);
     $parentFolder = Folder::factory()->create([
         'project_id' => $project->id,
         'created_by' => $user->id,

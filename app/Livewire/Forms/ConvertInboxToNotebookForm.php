@@ -5,6 +5,7 @@ namespace App\Livewire\Forms;
 use App\Models\InboxItem;
 use App\Models\Notebook;
 use App\Models\Project;
+use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 
@@ -33,10 +34,10 @@ class ConvertInboxToNotebookForm extends Form
     {
         $this->validate();
 
+        Gate::authorize('update', $this->item);
+
         $project = Project::findOrFail($this->projectId);
-        if ($project->owner_id !== auth()->id()) {
-            abort(403);
-        }
+        Gate::authorize('create', [Notebook::class, $project]);
 
         $notebook = Notebook::create([
             'project_id' => $this->projectId,
