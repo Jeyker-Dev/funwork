@@ -1,0 +1,38 @@
+.git
+.github
+.idea
+.vscode
+.atl
+.codegraph
+.phpunit.cache
+node_modules
+vendor
+public/build
+public/hot
+public/storage
+
+# Secrets and local environment
+.env
+.env.*
+!.env.example
+auth.json
+
+# Runtime state
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/framework/testing/*
+storage/app/private/*
+storage/app/public/*
+bootstrap/cache/*.php
+database/*.sqlite
+
+# Not needed at runtime
+tests
+docs
+odd
+openspec
+sdd
+compose.yaml
+compose.prod.yml

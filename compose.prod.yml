@@ -1,0 +1,64 @@
+# Production stack for the VPS. Lives next to the production .env in ~/funwork.
+# Usage: docker compose -f compose.prod.yml up -d
+
+x-app: &app
+    image: '${APP_IMAGE:-ghcr.io/jeyker-dev/funwork:latest}'
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+        - 'storage:/app/storage/app'
+    networks:
+        - funwork
+    depends_on:
+        mysql:
+            condition: service_healthy
+
+services:
+    app:
+        <<: *app
+        ports:
+            - '80:80'
+            - '443:443'
+            - '443:443/udp'
+        volumes:
+            - 'storage:/app/storage/app'
+            # Let's Encrypt certificates; losing them would hit rate limits on redeploy.
+            - 'caddy_data:/data'
+            - 'caddy_config:/config'
+
+    queue:
+        <<: *app
+        command: ['php', 'artisan', 'queue:work', '--tries=3', '--max-time=3600']
+
+    scheduler:
+        <<: *app
+        command: ['php', 'artisan', 'schedule:work']
+
+    mysql:
+        image: 'mysql:8.4'
+        restart: unless-stopped
+        # No published ports: Docker bypasses ufw, so MySQL stays reachable only inside this network.
+        environment:
+            MYSQL_DATABASE: '${DB_DATABASE}'
+            MYSQL_USER: '${DB_USERNAME}'
+            MYSQL_PASSWORD: '${DB_PASSWORD}'
+            MYSQL_ROOT_PASSWORD: '${DB_ROOT_PASSWORD}'
+        volumes:
+            - 'mysql:/var/lib/mysql'
+        networks:
+            - funwork
+        healthcheck:
+            test: ['CMD-SHELL', 'mysqladmin ping -h localhost -u root -p"$$MYSQL_ROOT_PASSWORD"']
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
+networks:
+    funwork:
+        driver: bridge
+
+volumes:
+    storage:
+    caddy_data:
+    caddy_config:
+    mysql:
