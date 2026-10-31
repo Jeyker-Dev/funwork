@@ -35,5 +35,5 @@ Laravel 13. Skills de referencia: `laravel-clean-architecture` y `pest-laravel-t
 - Los ítems se convierten a otros elementos mediante modales.
 
 ### Cuenta
-- Registro público desactivado (Fortify) hasta que existan las Policies; los usuarios nuevos se crean a mano.
+- Registro público desactivado (Fortify) hasta que exista el multiusuario (Fase 5); los usuarios nuevos se crean a mano.
 - Avatares en S3 con URLs temporales firmadas (el bucket es privado y no se usan ACL públicas).
