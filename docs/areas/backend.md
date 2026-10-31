@@ -5,7 +5,7 @@ Laravel 13. Skills de referencia: `laravel-clean-architecture` y `pest-laravel-t
 ## Convenciones
 
 - La lógica de negocio va en `app/Actions/*` y en Form Objects (`app/Livewire/Forms`).
-- Autorización con Policies; ninguna acción de escritura sin policy.
+- Autorización: **objetivo**, ninguna acción sin Policy. **Estado actual**, no existen Policies y las rutas de proyecto no verifican el dueño (ver la Fase 0 del [roadmap](../roadmap.md)).
 - Storage siempre a través de los discos de Laravel, nunca con rutas absolutas.
 - Tareas pesadas en Jobs encolados; el resultado se avisa con `DatabaseNotification`.
 
@@ -22,13 +22,14 @@ Laravel 13. Skills de referencia: `laravel-clean-architecture` y `pest-laravel-t
 - Crear carpeta: el nombre es obligatorio y se valida.
 - Borrado: prohibido si el archivo está en uso o en un proceso activo; en ese caso se devuelve un error explicativo.
 - ZIP de selección: si falta algún archivo, se aborta de forma segura y se devuelve un error.
-- ZIP de carpeta: asíncrono con `CreateFolderZipJob` → toast "Preparing download..." → notificación con el link (o con el fallo).
+- ZIP de carpeta: asíncrono con `CreateFolderZipJob` → toast "Preparing download..." → notificación con el link (o con el fallo). **Estado actual: roto.** El job nunca se despacha, solo lee del disco `local` y las notificaciones no se muestran en la UI.
 - Mover: no se permite mover al mismo directorio ni dentro de sí mismo o de una subcarpeta (la "paradoja Inception"). Si el nombre ya existe en el destino, se renombra solo: `name (1)`, `name (2)`…
 - Renombrar: el nombre debe ser único entre archivos y carpetas del mismo directorio; la extensión se preserva; requiere permiso `update`.
 - Búsqueda global: `LIKE` sobre `name` e ignora `currentFolderId` mientras haya una búsqueda activa.
 
 ### Tareas
-- Varios asignados por tarea (pivot `task_user`). El reordenamiento está autorizado por policy.
+- Varios asignados por tarea (pivot `task_user`); hoy el selector lista a todos los usuarios del sistema.
+- Estados: el tablero usa `Todo/Doing/Done`, pero el dashboard filtra por `'completed'` (bug conocido). No hay Enums: estado y prioridad se validan solo como `required`.
 
 ### Inbox
 - Los ítems se convierten a otros elementos mediante modales.

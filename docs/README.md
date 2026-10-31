@@ -12,6 +12,7 @@ Esta carpeta es la **fuente de verdad del proyecto**. Lo que no está escrito aq
 
 - [`00-vision.md`](00-vision.md): qué es FunWork, para quién y qué entra en el alcance.
 - [`01-architecture.md`](01-architecture.md): stack, capas, módulos y convenciones.
+- [`roadmap.md`](roadmap.md): fases, prioridades y por qué (auditoría del 2026-10-31).
 - [`areas/`](areas/): estado actual y reglas por área (frontend, backend, database, design).
 - [`decisions/`](decisions/): ADRs, una decisión por archivo.
 - [`tasks/backlog.md`](tasks/backlog.md): tareas candidatas (salen de NotebookLM).

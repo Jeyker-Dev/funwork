@@ -27,7 +27,7 @@
 - Los componentes Livewire se crean **siempre** con `php artisan make:livewire`, nunca a mano.
 - No usar `Livewire\Volt\Volt`; en tests usar `Livewire::test()` / `Livewire::actingAs()`.
 - La lógica de negocio va en Actions o Form Objects, no en las vistas (skill `laravel-clean-architecture`).
-- Autorización con Policies (por ejemplo, el reordenamiento de tareas y el renombrado de archivos).
+- Autorización: **hoy no hay Policies** (`app/Policies` no existe); solo hay chequeos manuales de dueño en algunos puntos. Las rutas `/projects/{project}/*` no verifican el dueño. Ver la Fase 0 del [roadmap](roadmap.md).
 
 ## Mapa de rutas
 
