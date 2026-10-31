@@ -24,9 +24,16 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Create Flux credentials for the build
+        env:
+          FLUX_USERNAME: ${{ secrets.FLUX_USERNAME }}
+          FLUX_LICENSE_KEY: ${{ secrets.FLUX_LICENSE_KEY }}
         run: |
+          if [ -z "$FLUX_USERNAME" ] || [ -z "$FLUX_LICENSE_KEY" ]; then
+            echo "::error::FLUX_USERNAME / FLUX_LICENSE_KEY are empty. Add them as repository secrets."
+            exit 1
+          fi
           printf '{"http-basic":{"composer.fluxui.dev":{"username":"%s","password":"%s"}}}' \
-            "${{ secrets.FLUX_USERNAME }}" "${{ secrets.FLUX_LICENSE_KEY }}" > "$RUNNER_TEMP/auth.json"
+            "$FLUX_USERNAME" "$FLUX_LICENSE_KEY" > "$RUNNER_TEMP/auth.json"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3

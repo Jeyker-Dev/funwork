@@ -47,11 +47,14 @@ services:
             - 'mysql:/var/lib/mysql'
         networks:
             - funwork
+        # 127.0.0.1 forces TCP: during first-time init MySQL runs a temporary socket-only server,
+        # so a socket ping reports healthy before the real server accepts connections.
         healthcheck:
-            test: ['CMD-SHELL', 'mysqladmin ping -h localhost -u root -p"$$MYSQL_ROOT_PASSWORD"']
+            test: ['CMD-SHELL', 'mysqladmin ping -h 127.0.0.1 -u root -p"$$MYSQL_ROOT_PASSWORD"']
             interval: 10s
             timeout: 5s
-            retries: 5
+            retries: 10
+            start_period: 30s
 
 networks:
     funwork:
