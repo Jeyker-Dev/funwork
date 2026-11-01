@@ -239,15 +239,15 @@ test('user B cannot access, convert, or delete user A inbox items or convert int
 
     Livewire::test('projects.inbox.delete-item-modal')
         ->call('loadModal', $itemA->id)
-        ->assertForbidden();
+        ->assertNotFound();
 
     Livewire::test('projects.inbox.convert-to-task')
         ->call('loadModal', $itemA->id)
-        ->assertForbidden();
+        ->assertNotFound();
 
     Livewire::test('projects.inbox.convert-to-notebook')
         ->call('loadModal', $itemA->id)
-        ->assertForbidden();
+        ->assertNotFound();
 
     // User B tries to convert their own inbox item into User A's project
     Livewire::test('projects.inbox.convert-to-task')

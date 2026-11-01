@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-01
+
+- Los modales del inbox (borrar, convertir a tarea y a notebook) buscan el ítem filtrando por `user_id` y responden 404 si es ajeno, en vez de 403, para no revelar que el ID existe. Test: `tests/Feature/Authorization/PoliciesTest.php`.
+
 ## 2026-10-31
 
 - Scoped bindings (`scopeBindings()`) en las rutas anidadas de tareas y páginas de notebook (`routes/web.php`): una tarea, notebook o página de otro proyecto o notebook en la URL devuelve 404. La vista previa de archivos ya devolvía 404 desde el controlador. Test: `tests/Feature/Authorization/ScopedBindingsTest.php`.

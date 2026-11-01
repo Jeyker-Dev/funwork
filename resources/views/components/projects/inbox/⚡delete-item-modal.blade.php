@@ -12,7 +12,8 @@ new class extends Component {
     public function loadModal($id = null): void
     {
         if ($id) {
-            $this->item = InboxItem::findOrFail($id);
+            $this->item = InboxItem::where('user_id', auth()->id())->find($id);
+            abort_unless($this->item, 404);
 
             $this->authorize('delete', $this->item);
 

@@ -13,7 +13,8 @@ new class extends Component {
     public function loadModal($item = null): void
     {
         if ($item) {
-            $inboxItem = InboxItem::findOrFail($item);
+            $inboxItem = InboxItem::where('user_id', auth()->id())->find($item);
+            abort_unless($inboxItem, 404);
 
             $this->authorize('update', $inboxItem);
 
