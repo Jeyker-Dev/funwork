@@ -30,7 +30,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('projects/{project}/tasks/{task}', static function (Project $project, Task $task) {
         return view('app.projects.tasks.show', compact('project', 'task'));
-    })->can('view', 'project')->can('view', 'task')->name('show.task');
+    })->scopeBindings()->can('view', 'project')->can('view', 'task')->name('show.task');
 
     Route::livewire('/projects/{project}/notebooks', 'pages::projects.notebooks.index')
         ->can('view', 'project')
@@ -43,6 +43,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->can('view', 'projectFile')
         ->name('project.files.preview');
     Route::livewire('/projects/{project}/notebooks/{notebook}/pages/{page}/edit', 'pages::projects.notebooks.pages.editor')
+        ->scopeBindings()
         ->can('view', 'project')
         ->can('view', 'notebook')
         ->can('update', 'page')

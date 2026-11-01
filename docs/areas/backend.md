@@ -5,7 +5,7 @@ Laravel 13. Skills de referencia: `laravel-clean-architecture` y `pest-laravel-t
 ## Convenciones
 
 - La lógica de negocio va en `app/Actions/*` y en Form Objects (`app/Livewire/Forms`).
-- Autorización: ninguna acción sin Policy (`app/Policies/*Policy.php`). Las rutas `/projects/{project}/*` usan middleware `can`, los componentes Livewire usan `$this->authorize()`, y los Form Objects/Actions usan `Gate::authorize()`.
+- Autorización: ninguna acción sin Policy (`app/Policies/*Policy.php`). Las rutas `/projects/{project}/*` usan middleware `can`, los componentes Livewire usan `$this->authorize()`, y los Form Objects/Actions usan `Gate::authorize()`. Las rutas anidadas usan `scopeBindings()` para que el hijo pertenezca al padre de la URL (404 si no).
 - Storage siempre a través de los discos de Laravel, nunca con rutas absolutas.
 - Tareas pesadas en Jobs encolados; el resultado se avisa con `DatabaseNotification`.
 
