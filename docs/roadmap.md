@@ -12,7 +12,7 @@
 
 Estado al iniciar la fase (auditoría 2026-10-31): no hay Policies (`app/Policies` no existe), ninguna ruta `/projects/{project}/*` verifica el dueño (`routes/web.php:16-35`) y el registro público está abierto (`config/fortify.php:147`). Cualquier usuario verificado puede leer, editar o borrar proyectos ajenos. Los ítems del inbox se cargan con `findOrFail` sin filtrar por usuario.
 
-Avance: registro cerrado (`0d4c87b`) y Policies hechas (`45df993`).
+Avance: registro cerrado (`0d4c87b`), Policies hechas (`45df993`) y scoped bindings hechos (`718bffa`).
 
 - Cerrar el registro público mientras no exista el multiusuario.
 - Policies para `Project`, `Task`, `Notebook`, `NotebookPage`, `Folder`, `ProjectFile` e `InboxItem`.
