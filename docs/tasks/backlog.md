@@ -26,7 +26,7 @@ Orden y motivos: ver [`../roadmap.md`](../roadmap.md).
 - [ ] [DEVOPS] Deploy: migrar antes de servir y hacer backup de la base de datos antes de migrar — el código nuevo nunca corre sobre un esquema viejo — depende de: -
 - [ ] [BACKEND] Escapar los comodines de `LIKE` en la búsqueda de archivos — buscar `%` o `_` no rompe los resultados — depende de: -
 - [ ] [QA] Verificar la cobertura de tests de búsqueda global y del dashboard — tests de Pest en verde para ambos — depende de: -
-- [ ] [QA] Arreglar los 5 tests que ya fallaban (ShowProjects, UploadFileForm, Files/Index upload, ProfileUpdate ×2) — suite de Pest en verde — depende de: - (traída al sprint de Fase 0)
+- [x] [QA] Arreglar los 5 tests que ya fallaban (ShowProjects, UploadFileForm, Files/Index upload, ProfileUpdate ×2) — suite de Pest en verde — depende de: - (traída al sprint de Fase 0, commit `2b29862`)
 
 ## Fase 2 — Áreas y flujo NotebookLM
 
