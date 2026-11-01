@@ -11,6 +11,7 @@ use App\Models\Task;
 use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 
@@ -267,3 +268,82 @@ test('user B cannot access, convert, or delete user A inbox items or convert int
     expect($itemA->fresh()->trashed())->toBeFalse()
         ->and($itemB->fresh()->trashed())->toBeFalse();
 });
+
+test('user B cannot move user A file into user B project folder via move-items-modal', function () {
+    $folderA = Folder::factory()->create([
+        'project_id' => $this->projectA->id,
+        'created_by' => $this->userA->id,
+    ]);
+    $fileA = ProjectFile::factory()->create([
+        'project_id' => $this->projectA->id,
+        'folder_id' => $folderA->id,
+        'created_by' => $this->userA->id,
+    ]);
+
+    $projectB = Project::factory()->create(['owner_id' => $this->userB->id]);
+    $folderB = Folder::factory()->create([
+        'project_id' => $projectB->id,
+        'created_by' => $this->userB->id,
+    ]);
+
+    $this->actingAs($this->userB);
+
+    Livewire::test('projects.files.move-items-modal', ['project' => $projectB])
+        ->set('selectedIds', ["file_{$fileA->id}"])
+        ->set('targetFolderId', $folderB->id)
+        ->call('move')
+        ->assertForbidden();
+
+    expect($fileA->fresh()->folder_id)->toBe($folderA->id)
+        ->and($fileA->fresh()->project_id)->toBe($this->projectA->id);
+})->skip('Falta autorización en projects.files.move-items-modal::move');
+
+test('user B cannot move user A folder into user B project folder via move-items-modal', function () {
+    $parentFolderA = Folder::factory()->create([
+        'project_id' => $this->projectA->id,
+        'created_by' => $this->userA->id,
+    ]);
+    $folderA = Folder::factory()->create([
+        'project_id' => $this->projectA->id,
+        'parent_id' => $parentFolderA->id,
+        'created_by' => $this->userA->id,
+    ]);
+
+    $projectB = Project::factory()->create(['owner_id' => $this->userB->id]);
+    $folderB = Folder::factory()->create([
+        'project_id' => $projectB->id,
+        'created_by' => $this->userB->id,
+    ]);
+
+    $this->actingAs($this->userB);
+
+    Livewire::test('projects.files.move-items-modal', ['project' => $projectB])
+        ->set('selectedIds', ["folder_{$folderA->id}"])
+        ->set('targetFolderId', $folderB->id)
+        ->call('move')
+        ->assertForbidden();
+
+    expect($folderA->fresh()->parent_id)->toBe($parentFolderA->id)
+        ->and($folderA->fresh()->project_id)->toBe($this->projectA->id);
+})->skip('Falta autorización en projects.files.move-items-modal::move');
+
+test('user B cannot download user A folder as ZIP via downloadFolderAsync', function () {
+    Storage::fake(config('filesystems.default'));
+    Notification::fake();
+
+    $folderA = Folder::factory()->create([
+        'project_id' => $this->projectA->id,
+        'created_by' => $this->userA->id,
+    ]);
+
+    $projectB = Project::factory()->create(['owner_id' => $this->userB->id]);
+
+    $this->actingAs($this->userB);
+
+    Livewire::test('pages::projects.files.index', ['project' => $projectB])
+        ->call('downloadFolderAsync', $folderA->id)
+        ->assertForbidden()
+        ->assertNoFileDownloaded();
+
+    Notification::assertNothingSent();
+})->skip('Falta autorización en pages::projects.files.index::downloadFolderAsync');
