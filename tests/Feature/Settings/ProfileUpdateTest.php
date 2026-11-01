@@ -16,6 +16,7 @@ test('profile information can be updated', function () {
 
     $response = Livewire::test('pages::settings.profile')
         ->set('name', 'Test User')
+        ->set('username', 'test_user')
         ->set('email', 'test@example.com')
         ->call('updateProfileInformation');
 
@@ -35,6 +36,7 @@ test('email verification status is unchanged when email address is unchanged', f
 
     $response = Livewire::test('pages::settings.profile')
         ->set('name', 'Test User')
+        ->set('username', 'test_user')
         ->set('email', $user->email)
         ->call('updateProfileInformation');
 

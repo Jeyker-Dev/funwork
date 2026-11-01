@@ -50,7 +50,8 @@ test('it validates required files', function () {
 });
 
 test('it successfully uploads files and resets form', function () {
-    Storage::fake('s3');
+    $disk = config('filesystems.default');
+    Storage::fake($disk);
 
     $user = User::factory()->create();
     $this->actingAs($user);
@@ -82,12 +83,12 @@ test('it successfully uploads files and resets form', function () {
         ->and($files[1]->mime_type)->toBe('image/png')
         ->and($files[1]->project_id)->toBe($project->id);
 
-    Storage::disk('s3')->assertExists($files[0]->file_path);
-    Storage::disk('s3')->assertExists($files[1]->file_path);
+    Storage::disk($disk)->assertExists($files[0]->file_path);
+    Storage::disk($disk)->assertExists($files[1]->file_path);
 });
 
 test('it successfully uploads files to a specific folder', function () {
-    Storage::fake('s3');
+    Storage::fake(config('filesystems.default'));
 
     $user = User::factory()->create();
     $this->actingAs($user);

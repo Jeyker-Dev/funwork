@@ -23,7 +23,7 @@ test('renders a list of projects with correct information', function () {
     Livewire::test('projects.show-projects')
         ->assertSee('Awesome Project')
         ->assertSee('A very awesome project.')
-        ->assertSee('John Doe')
+        ->assertSee($user->display_name)
         ->assertSee('active')
         ->assertSee(Carbon::parse($project->due_at)->format('Y-m-d'));
 });

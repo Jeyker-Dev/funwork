@@ -36,7 +36,8 @@ test('it can create a folder', function () {
 
 test('it can upload files', function () {
     $this->actingAs($this->user);
-    Storage::fake('s3');
+    $disk = config('filesystems.default');
+    Storage::fake($disk);
 
     $file = UploadedFile::fake()->image('test.jpg');
 
@@ -48,7 +49,7 @@ test('it can upload files', function () {
     expect(ProjectFile::where('name', 'test.jpg')->where('project_id', $this->project->id)->exists())->toBeTrue();
 
     $uploadedFile = ProjectFile::where('name', 'test.jpg')->first();
-    Storage::disk('s3')->assertExists($uploadedFile->file_path);
+    Storage::disk($disk)->assertExists($uploadedFile->file_path);
 });
 
 test('it can download selected items', function () {
