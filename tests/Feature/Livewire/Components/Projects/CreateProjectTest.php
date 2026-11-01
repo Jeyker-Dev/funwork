@@ -86,3 +86,33 @@ test('successfully creates a project', function () {
         'archived_at' => '2026-01-01',
     ]);
 });
+
+test('only offers the authenticated user in the project owner selector', function () {
+    $user = User::factory()->create(['username' => 'authenticated_owner']);
+    $otherUser = User::factory()->create(['username' => 'other_foreign_user']);
+
+    Livewire::actingAs($user)
+        ->test('projects.create-project', ['elementName' => ''])
+        ->assertSee('authenticated_owner')
+        ->assertDontSee('other_foreign_user');
+});
+
+test('aborts with 403 when attempting to create a project with another user as owner', function () {
+    $user = User::factory()->create();
+    $otherUser = User::factory()->create();
+
+    Livewire::actingAs($user)
+        ->test('projects.create-project', ['elementName' => ''])
+        ->set('form.name', 'Spoofed Project')
+        ->set('form.description', 'Test Description')
+        ->set('form.icon', 'wrench')
+        ->set('form.type', 'Programming')
+        ->set('form.status', 'active')
+        ->set('form.ownerId', $otherUser->id)
+        ->call('save')
+        ->assertForbidden();
+
+    $this->assertDatabaseMissing('projects', [
+        'name' => 'Spoofed Project',
+    ]);
+});

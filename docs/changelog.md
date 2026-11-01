@@ -2,6 +2,7 @@
 
 ## 2026-11-01
 
+- Validación server-side de `assignedUserIds.*` contra `auth()->id()` en `TaskForm`, remoción de `User::all()` en `components/projects/tasks/⚡create-task.blade.php` para que el selector solo exponga al usuario autenticado, y pruebas en Pest para la asignación de tareas y el selector/validación de dueño de proyecto (`CreateTaskTest.php` y `CreateProjectTest.php`).
 - Los modales del inbox (borrar, convertir a tarea y a notebook) buscan el ítem filtrando por `user_id` y responden 404 si es ajeno, en vez de 403, para no revelar que el ID existe. Test: `tests/Feature/Authorization/PoliciesTest.php`.
 
 ## 2026-10-31

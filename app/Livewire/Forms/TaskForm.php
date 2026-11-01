@@ -6,6 +6,7 @@ use App\Models\Project;
 use App\Models\Task;
 use Flux\Flux;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 
@@ -35,7 +36,14 @@ class TaskForm extends Form
     #[Validate('nullable|integer')]
     public ?int $position = null;
 
-    public function store()
+    protected function rules(): array
+    {
+        return [
+            'assignedUserIds.*' => ['integer', Rule::in([auth()->id()])],
+        ];
+    }
+
+    public function store(): void
     {
         $this->validate();
 

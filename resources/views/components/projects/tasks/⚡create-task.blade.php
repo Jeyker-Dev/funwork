@@ -3,7 +3,6 @@
 use Livewire\Component;
 use App\Livewire\Forms\TaskForm;
 use App\Models\Task;
-use App\Models\User;
 use App\Models\Project;
 
 new class extends Component
@@ -25,7 +24,7 @@ new class extends Component
     public function with(): array
     {
         return [
-            'users' => User::all(),
+            'user' => auth()->user(),
         ];
     }
 
@@ -112,9 +111,7 @@ new class extends Component
 
                     <div class="w-1/2">
                         <flux:select variant="listbox" multiple label="Assigned Users" placeholder="Choose users..." wire:model="form.assignedUserIds">
-                            @foreach($users as $user)
-                                <flux:select.option value="{{ $user->id }}">{{ $user->display_name }}</flux:select.option>
-                            @endforeach
+                            <flux:select.option value="{{ $user->id }}">{{ $user->display_name }}</flux:select.option>
                         </flux:select>
                     </div>
                 </div>

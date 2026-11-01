@@ -13,6 +13,7 @@ Laravel 13. Skills de referencia: `laravel-clean-architecture` y `pest-laravel-t
 
 ### Proyectos (`ProjectForm`)
 - Requeridos: `name`, `description`, `icon`, `type`, `status`, `ownerId`.
+- `ownerId` debe coincidir con `auth()->id()` (de lo contrario aborta con 403); el selector de dueño solo ofrece al usuario autenticado.
 - `dueDate` y `archiveDate` se validan como fecha; `archiveDate` se guarda en `archived_at`.
 
 ### Notebooks (`NotebookForm`)
@@ -28,7 +29,7 @@ Laravel 13. Skills de referencia: `laravel-clean-architecture` y `pest-laravel-t
 - Búsqueda global: `LIKE` sobre `name` e ignora `currentFolderId` mientras haya una búsqueda activa.
 
 ### Tareas
-- Varios asignados por tarea (pivot `task_user`); hoy el selector lista a todos los usuarios del sistema.
+- Varios asignados por tarea (pivot `task_user`); el selector solo ofrece al usuario autenticado y `TaskForm` valida `assignedUserIds.*` contra `auth()->id()`.
 - Estados: el tablero usa `Todo/Doing/Done`, pero el dashboard filtra por `'completed'` (bug conocido). No hay Enums: estado y prioridad se validan solo como `required`.
 
 ### Inbox
