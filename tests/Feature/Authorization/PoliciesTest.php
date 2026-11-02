@@ -292,11 +292,11 @@ test('user B cannot move user A file into user B project folder via move-items-m
         ->set('selectedIds', ["file_{$fileA->id}"])
         ->set('targetFolderId', $folderB->id)
         ->call('move')
-        ->assertForbidden();
+        ->assertNotFound();
 
     expect($fileA->fresh()->folder_id)->toBe($folderA->id)
         ->and($fileA->fresh()->project_id)->toBe($this->projectA->id);
-})->skip('Falta autorización en projects.files.move-items-modal::move');
+});
 
 test('user B cannot move user A folder into user B project folder via move-items-modal', function () {
     $parentFolderA = Folder::factory()->create([
@@ -321,11 +321,40 @@ test('user B cannot move user A folder into user B project folder via move-items
         ->set('selectedIds', ["folder_{$folderA->id}"])
         ->set('targetFolderId', $folderB->id)
         ->call('move')
-        ->assertForbidden();
+        ->assertNotFound();
 
     expect($folderA->fresh()->parent_id)->toBe($parentFolderA->id)
         ->and($folderA->fresh()->project_id)->toBe($this->projectA->id);
-})->skip('Falta autorización en projects.files.move-items-modal::move');
+});
+
+test('user B cannot move their own file into user A folder via move-items-modal', function () {
+    $folderA = Folder::factory()->create([
+        'project_id' => $this->projectA->id,
+        'created_by' => $this->userA->id,
+    ]);
+
+    $projectB = Project::factory()->create(['owner_id' => $this->userB->id]);
+    $folderB = Folder::factory()->create([
+        'project_id' => $projectB->id,
+        'created_by' => $this->userB->id,
+    ]);
+    $fileB = ProjectFile::factory()->create([
+        'project_id' => $projectB->id,
+        'folder_id' => $folderB->id,
+        'created_by' => $this->userB->id,
+    ]);
+
+    $this->actingAs($this->userB);
+
+    Livewire::test('projects.files.move-items-modal', ['project' => $projectB])
+        ->set('selectedIds', ["file_{$fileB->id}"])
+        ->set('targetFolderId', $folderA->id)
+        ->call('move')
+        ->assertNotFound();
+
+    expect($fileB->fresh()->folder_id)->toBe($folderB->id)
+        ->and($fileB->fresh()->project_id)->toBe($projectB->id);
+});
 
 test('user B cannot download user A folder as ZIP via downloadFolderAsync', function () {
     Storage::fake(config('filesystems.default'));
@@ -342,8 +371,34 @@ test('user B cannot download user A folder as ZIP via downloadFolderAsync', func
 
     Livewire::test('pages::projects.files.index', ['project' => $projectB])
         ->call('downloadFolderAsync', $folderA->id)
-        ->assertForbidden()
+        ->assertNotFound()
         ->assertNoFileDownloaded();
 
     Notification::assertNothingSent();
-})->skip('Falta autorización en pages::projects.files.index::downloadFolderAsync');
+});
+
+test('user A can download their own folder and files as ZIP on local disk', function () {
+    Storage::fake('local');
+
+    $folderA = Folder::factory()->create([
+        'project_id' => $this->projectA->id,
+        'created_by' => $this->userA->id,
+        'name' => 'Docs',
+    ]);
+    $fileA = ProjectFile::factory()->create([
+        'project_id' => $this->projectA->id,
+        'folder_id' => $folderA->id,
+        'created_by' => $this->userA->id,
+        'disk' => 'local',
+        'file_path' => 'projects/'.$this->projectA->id.'/doc.txt',
+        'name' => 'doc.txt',
+    ]);
+    Storage::disk('local')->put($fileA->file_path, 'secret content');
+
+    $this->actingAs($this->userA);
+
+    Livewire::test('pages::projects.files.index', ['project' => $this->projectA])
+        ->call('downloadFolderAsync', $folderA->id)
+        ->assertHasNoErrors()
+        ->assertFileDownloaded();
+});

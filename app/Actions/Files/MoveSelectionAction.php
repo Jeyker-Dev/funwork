@@ -24,50 +24,49 @@ class MoveSelectionAction
 
         DB::transaction(function () use ($project, $selectedIds, $targetFolderId) {
             $targetFolder = null;
-            if ($targetFolderId) {
+            if ($targetFolderId !== null) {
                 $targetFolder = Folder::where('project_id', $project->id)->find($targetFolderId);
-                if ($targetFolder) {
-                    Gate::authorize('view', $targetFolder);
-                }
+                abort_unless($targetFolder, 404);
+                Gate::authorize('view', $targetFolder);
             }
 
             foreach ($selectedIds as $idStr) {
                 if (str_starts_with($idStr, 'file_')) {
                     $fileId = (int) substr($idStr, 5);
                     $file = ProjectFile::where('project_id', $project->id)->find($fileId);
-                    if ($file) {
-                        Gate::authorize('update', $file);
+                    abort_unless($file, 404);
 
-                        if ($file->folder_id === $targetFolderId) {
-                            throw ValidationException::withMessages(['targetFolderId' => 'Source and target directories are identical.']);
-                        }
+                    Gate::authorize('update', $file);
 
-                        $newName = $this->getUniqueFileName($project->id, $targetFolderId, $file->name);
-                        $file->update(['folder_id' => $targetFolderId, 'name' => $newName]);
+                    if ($file->folder_id === $targetFolderId) {
+                        throw ValidationException::withMessages(['targetFolderId' => 'Source and target directories are identical.']);
                     }
+
+                    $newName = $this->getUniqueFileName($project->id, $targetFolderId, $file->name);
+                    $file->update(['folder_id' => $targetFolderId, 'name' => $newName]);
                 } elseif (str_starts_with($idStr, 'folder_')) {
                     $folderId = (int) substr($idStr, 7);
                     $folder = Folder::where('project_id', $project->id)->find($folderId);
-                    if ($folder) {
-                        Gate::authorize('update', $folder);
+                    abort_unless($folder, 404);
 
-                        if ($folder->parent_id === $targetFolderId) {
-                            throw ValidationException::withMessages(['targetFolderId' => 'Source and target directories are identical.']);
-                        }
+                    Gate::authorize('update', $folder);
 
-                        if ($targetFolder) {
-                            $current = $targetFolder;
-                            while ($current) {
-                                if ($current->id === $folder->id) {
-                                    throw ValidationException::withMessages(['targetFolderId' => 'Cannot move a folder into itself or its descendants.']);
-                                }
-                                $current = $current->parent;
-                            }
-                        }
-
-                        $newName = $this->getUniqueFolderName($project->id, $targetFolderId, $folder->name);
-                        $folder->update(['parent_id' => $targetFolderId, 'name' => $newName]);
+                    if ($folder->parent_id === $targetFolderId) {
+                        throw ValidationException::withMessages(['targetFolderId' => 'Source and target directories are identical.']);
                     }
+
+                    if ($targetFolder) {
+                        $current = $targetFolder;
+                        while ($current) {
+                            if ($current->id === $folder->id) {
+                                throw ValidationException::withMessages(['targetFolderId' => 'Cannot move a folder into itself or its descendants.']);
+                            }
+                            $current = $current->parent;
+                        }
+                    }
+
+                    $newName = $this->getUniqueFolderName($project->id, $targetFolderId, $folder->name);
+                    $folder->update(['parent_id' => $targetFolderId, 'name' => $newName]);
                 }
             }
         });
