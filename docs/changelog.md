@@ -2,6 +2,7 @@
 
 ## 2026-11-02
 
+- Creación de los Backed Enums `TaskStatus` (`Todo`, `Doing`, `Done`) y `TaskPriority` (`Low`, `Medium`, `High`) con casts en `Task`, validación con `Rule::enum` en `TaskForm` y `ConvertInboxToTaskForm`, validación previa a la transacción con `TaskStatus::tryFrom` en `ReorderTasks`, migración para normalizar valores en minúscula y defaults del esquema, reemplazo de literales en componentes de tareas y cobertura de tests en Pest (commit `bb637b5`).
 - Validación de pertenencia al proyecto (`abort_unless(..., 404)`) en `MoveSelectionAction` (incluyendo `targetFolderId` antes de mutar y cada ítem de `selectedIds`) y en `DownloadFilesZipAction` (todos los `selectedIds`: archivos individuales, múltiples y carpetas); se quitan los 3 `skip` en `tests/Feature/Authorization/PoliciesTest.php` y se suman tests para destino ajeno y descarga ZIP propia en disco local (commit `7d91ec7`).
 
 ## 2026-11-01
