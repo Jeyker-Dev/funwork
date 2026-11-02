@@ -6,9 +6,9 @@ Tareas tomadas del backlog para ejecutar ahora. Las grandes abren un documento `
 
 ## En curso
 
-Orden de ejecución: de arriba hacia abajo. Los 5 tests se arreglan antes de la QA de aislamiento para que "Pest en verde" sea verificable.
+Cierre de la Fase 0: los hallazgos de los tests de aislamiento (`368c132`). Se hacen juntos porque comparten patrón y test.
 
-*(Sin tareas en curso)*
+- [ ] [BACKEND] Autorizar ítems ajenos en `projects.files.move-items-modal::move` (`MoveSelectionAction`) y en `pages::projects.files.index::downloadFolderAsync` (`DownloadFilesZipAction`) — el usuario B recibe 403/404 y los 3 tests de `PoliciesTest` pasan sin `skip` — depende de: -
 
 ## Hechas en este sprint
 
