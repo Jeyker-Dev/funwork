@@ -1,10 +1,11 @@
 <?php
 
-use Livewire\Component;
-use App\Models\Project;
-use Livewire\Attributes\Layout;
+use App\Enums\TaskStatus;
 use App\Livewire\Forms\QuickCaptureForm;
+use App\Models\Project;
 use Flux\Flux;
+use Livewire\Attributes\Layout;
+use Livewire\Component;
 
 new #[Layout('layouts.app', ['title' => 'Home'])]
 class extends Component {
@@ -34,13 +35,13 @@ class extends Component {
             'recentActivities' => $this->project->getRecentActivities()->take(5),
             'urgentTasks' => $this->project->tasks()
                 ->where('due_date', '<=', now())
-                ->where('status', '!=', 'completed')
+                ->where('status', '!=', TaskStatus::Done->value)
                 ->orderBy('due_date', 'asc')
                 ->take(5)
                 ->get(),
             'stats' => [
-                'tasks_count' => $this->project->tasks()->where('status', '!=', 'completed')->count(),
-                'today_tasks_count' => $this->project->tasks()->where('status', '!=', 'completed')->whereDate('due_date', now()->toDateString())->count(),
+                'tasks_count' => $this->project->tasks()->where('status', '!=', TaskStatus::Done->value)->count(),
+                'today_tasks_count' => $this->project->tasks()->where('status', '!=', TaskStatus::Done->value)->whereDate('due_date', now()->toDateString())->count(),
                 'inbox_count' => \App\Models\InboxItem::where('project_id', $this->project->id)->count(),
             ]
         ];
