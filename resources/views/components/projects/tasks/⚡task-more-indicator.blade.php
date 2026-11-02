@@ -1,6 +1,7 @@
 <?php
 
 use Livewire\Component;
+use App\Enums\TaskStatus;
 use App\Models\Task;
 use App\Models\Project;
 use Livewire\Attributes\On;
@@ -40,9 +41,9 @@ new class extends Component
 
 @php
     $indicatorClasses = match ($status) {
-        'Todo' => 'border-orange-200 bg-orange-50 hover:bg-orange-200 text-orange-500',
-        'Doing' => 'border-yellow-200 bg-yellow-50 hover:bg-yellow-200 text-yellow-600',
-        'Done' => 'border-green-200 bg-green-50 hover:bg-green-200 text-green-600',
+        TaskStatus::Todo->value => 'border-orange-200 bg-orange-50 hover:bg-orange-200 text-orange-500',
+        TaskStatus::Doing->value => 'border-yellow-200 bg-yellow-50 hover:bg-yellow-200 text-yellow-600',
+        TaskStatus::Done->value => 'border-green-200 bg-green-50 hover:bg-green-200 text-green-600',
         default => 'border-gray-200 bg-gray-50 hover:bg-gray-200 text-gray-500',
     };
 @endphp

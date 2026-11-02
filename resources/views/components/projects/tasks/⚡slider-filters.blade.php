@@ -2,6 +2,7 @@
 
 use Livewire\Component;
 use Livewire\Attributes\On;
+use App\Enums\TaskStatus;
 use App\Models\Task;
 use App\Models\Project;
 
@@ -41,9 +42,9 @@ new class extends Component
         return [
             'counts' => [
                 'all' => (clone $baseQuery)->count(),
-                'Todo' => (clone $baseQuery)->where('status', 'Todo')->count(),
-                'Doing' => (clone $baseQuery)->where('status', 'Doing')->count(),
-                'Done' => (clone $baseQuery)->where('status', 'Done')->count(),
+                TaskStatus::Todo->value => (clone $baseQuery)->where('status', TaskStatus::Todo->value)->count(),
+                TaskStatus::Doing->value => (clone $baseQuery)->where('status', TaskStatus::Doing->value)->count(),
+                TaskStatus::Done->value => (clone $baseQuery)->where('status', TaskStatus::Done->value)->count(),
             ],
         ];
     }
@@ -76,19 +77,19 @@ new class extends Component
             type="button"
             @class([
                 'text-sm font-bold uppercase transition-colors duration-200 cursor-pointer group relative hover:text-orange-500',
-                'text-orange-500' => $activeFilter === 'Todo',
-                'text-gray-500' => $activeFilter !== 'Todo',
+                'text-orange-500' => $activeFilter === TaskStatus::Todo->value,
+                'text-gray-500' => $activeFilter !== TaskStatus::Todo->value,
             ])
-            wire:click="setFilter('Todo')"
+            wire:click="setFilter('{{ TaskStatus::Todo->value }}')"
         >
             <span class="inline-flex items-center gap-2">
-                <span>Todo</span>
-                <livewire:projects.tasks.filter-count :count="$counts['Todo']" :active="$activeFilter === 'Todo'" :key="'count-todo-'.$counts['Todo'].'-'.($activeFilter === 'Todo' ? '1' : '0')" />
+                <span>{{ TaskStatus::Todo->value }}</span>
+                <livewire:projects.tasks.filter-count :count="$counts[TaskStatus::Todo->value]" :active="$activeFilter === TaskStatus::Todo->value" :key="'count-todo-'.$counts[TaskStatus::Todo->value].'-'.($activeFilter === TaskStatus::Todo->value ? '1' : '0')" />
             </span>
             <span @class([
                 'absolute left-0 -bottom-1 w-full h-0.5 bg-orange-500 transition-transform duration-200 origin-left',
-                'scale-x-100' => $activeFilter === 'Todo',
-                'scale-x-0 group-hover:scale-x-100' => $activeFilter !== 'Todo',
+                'scale-x-100' => $activeFilter === TaskStatus::Todo->value,
+                'scale-x-0 group-hover:scale-x-100' => $activeFilter !== TaskStatus::Todo->value,
             ])></span>
         </button>
 
@@ -96,19 +97,19 @@ new class extends Component
             type="button"
             @class([
                 'text-sm font-bold uppercase transition-colors duration-200 cursor-pointer group relative hover:text-orange-500',
-                'text-orange-500' => $activeFilter === 'Doing',
-                'text-gray-500' => $activeFilter !== 'Doing',
+                'text-orange-500' => $activeFilter === TaskStatus::Doing->value,
+                'text-gray-500' => $activeFilter !== TaskStatus::Doing->value,
             ])
-            wire:click="setFilter('Doing')"
+            wire:click="setFilter('{{ TaskStatus::Doing->value }}')"
         >
             <span class="inline-flex items-center gap-2">
-                <span>Doing</span>
-                <livewire:projects.tasks.filter-count :count="$counts['Doing']" :active="$activeFilter === 'Doing'" :key="'count-doing-'.$counts['Doing'].'-'.($activeFilter === 'Doing' ? '1' : '0')" />
+                <span>{{ TaskStatus::Doing->value }}</span>
+                <livewire:projects.tasks.filter-count :count="$counts[TaskStatus::Doing->value]" :active="$activeFilter === TaskStatus::Doing->value" :key="'count-doing-'.$counts[TaskStatus::Doing->value].'-'.($activeFilter === TaskStatus::Doing->value ? '1' : '0')" />
             </span>
             <span @class([
                 'absolute left-0 -bottom-1 w-full h-0.5 bg-orange-500 transition-transform duration-200 origin-left',
-                'scale-x-100' => $activeFilter === 'Doing',
-                'scale-x-0 group-hover:scale-x-100' => $activeFilter !== 'Doing',
+                'scale-x-100' => $activeFilter === TaskStatus::Doing->value,
+                'scale-x-0 group-hover:scale-x-100' => $activeFilter !== TaskStatus::Doing->value,
             ])></span>
         </button>
 
@@ -116,19 +117,19 @@ new class extends Component
             type="button"
             @class([
                 'text-sm font-bold uppercase transition-colors duration-200 cursor-pointer group relative hover:text-orange-500',
-                'text-orange-500' => $activeFilter === 'Done',
-                'text-gray-500' => $activeFilter !== 'Done',
+                'text-orange-500' => $activeFilter === TaskStatus::Done->value,
+                'text-gray-500' => $activeFilter !== TaskStatus::Done->value,
             ])
-            wire:click="setFilter('Done')"
+            wire:click="setFilter('{{ TaskStatus::Done->value }}')"
         >
             <span class="inline-flex items-center gap-2">
-                <span>Done</span>
-                <livewire:projects.tasks.filter-count :count="$counts['Done']" :active="$activeFilter === 'Done'" :key="'count-done-'.$counts['Done'].'-'.($activeFilter === 'Done' ? '1' : '0')" />
+                <span>{{ TaskStatus::Done->value }}</span>
+                <livewire:projects.tasks.filter-count :count="$counts[TaskStatus::Done->value]" :active="$activeFilter === TaskStatus::Done->value" :key="'count-done-'.$counts[TaskStatus::Done->value].'-'.($activeFilter === TaskStatus::Done->value ? '1' : '0')" />
             </span>
             <span @class([
                 'absolute left-0 -bottom-1 w-full h-0.5 bg-orange-500 transition-transform duration-200 origin-left',
-                'scale-x-100' => $activeFilter === 'Done',
-                'scale-x-0 group-hover:scale-x-100' => $activeFilter !== 'Done',
+                'scale-x-100' => $activeFilter === TaskStatus::Done->value,
+                'scale-x-0 group-hover:scale-x-100' => $activeFilter !== TaskStatus::Done->value,
             ])></span>
         </button>
     </div>

@@ -1,5 +1,7 @@
 <?php
 
+use App\Enums\TaskPriority;
+use App\Enums\TaskStatus;
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;
@@ -95,4 +97,84 @@ test('it rejects assigning a task to another user and leaves pivot table intact'
         'title' => 'Unauthorized Assignee Task',
     ]);
     $this->assertDatabaseCount('task_user', 0);
+});
+
+test('it rejects invalid status or priority in TaskForm', function () {
+    $user = User::factory()->create();
+    $project = Project::factory()->create(['owner_id' => $user->id]);
+
+    Livewire::actingAs($user)
+        ->test('projects.tasks.⚡create-task', ['project' => $project])
+        ->set('form.title', 'Invalid Enum Task')
+        ->set('form.description', 'Testing enum validation')
+        ->set('form.status', 'InvalidStatus')
+        ->set('form.priority', 'InvalidPriority')
+        ->call('save')
+        ->assertHasErrors(['form.status', 'form.priority']);
+
+    $this->assertDatabaseMissing('tasks', [
+        'title' => 'Invalid Enum Task',
+    ]);
+});
+
+test('task-board, slider-tasks and show-tasks render tasks of each status and priority', function () {
+    $user = User::factory()->create();
+    $project = Project::factory()->create(['owner_id' => $user->id]);
+
+    Task::factory()->create([
+        'project_id' => $project->id,
+        'title' => 'Todo Low Task',
+        'status' => TaskStatus::Todo,
+        'priority' => TaskPriority::Low,
+        'position' => 1,
+    ]);
+
+    Task::factory()->create([
+        'project_id' => $project->id,
+        'title' => 'Doing Medium Task',
+        'status' => TaskStatus::Doing,
+        'priority' => TaskPriority::Medium,
+        'position' => 1,
+    ]);
+
+    Task::factory()->create([
+        'project_id' => $project->id,
+        'title' => 'Done High Task',
+        'status' => TaskStatus::Done,
+        'priority' => TaskPriority::High,
+        'position' => 1,
+    ]);
+
+    Livewire::actingAs($user)
+        ->test('projects.tasks.⚡task-board', ['project' => $project])
+        ->assertOk()
+        ->assertSee('Todo')
+        ->assertSee('Doing')
+        ->assertSee('Done')
+        ->assertSee('Low')
+        ->assertSee('Medium')
+        ->assertSee('High')
+        ->assertSee('Todo Low Task')
+        ->assertSee('Doing Medium Task')
+        ->assertSee('Done High Task');
+
+    Livewire::actingAs($user)
+        ->test('projects.tasks.⚡slider-tasks', ['project' => $project])
+        ->assertOk()
+        ->assertSee('Low')
+        ->assertSee('Medium')
+        ->assertSee('High')
+        ->assertSee('Todo Low Task')
+        ->assertSee('Doing Medium Task')
+        ->assertSee('Done High Task');
+
+    Livewire::actingAs($user)
+        ->test('projects.tasks.⚡show-tasks', ['project' => $project])
+        ->assertOk()
+        ->assertSee('Low')
+        ->assertSee('Medium')
+        ->assertSee('High')
+        ->assertSee('Todo Low Task')
+        ->assertSee('Doing Medium Task')
+        ->assertSee('Done High Task');
 });

@@ -1,6 +1,7 @@
 <?php
 
 use Livewire\Component;
+use App\Enums\TaskStatus;
 use App\Models\Task;
 use App\Models\Project;
 use Livewire\Attributes\On;
@@ -38,9 +39,9 @@ new class extends Component
 
 @php
     $countClasses = match ($status) {
-        'Todo' => 'bg-orange-500',
-        'Doing' => 'bg-yellow-500',
-        'Done' => 'bg-green-500',
+        TaskStatus::Todo->value => 'bg-orange-500',
+        TaskStatus::Doing->value => 'bg-yellow-500',
+        TaskStatus::Done->value => 'bg-green-500',
         default => 'bg-gray-500',
     };
 @endphp

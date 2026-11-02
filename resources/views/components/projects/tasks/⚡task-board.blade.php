@@ -1,6 +1,7 @@
 <?php
 
 use Livewire\Component;
+use App\Enums\TaskStatus;
 use App\Models\Project;
 use App\Models\Task;
 use App\Livewire\Actions\ReorderTasks;
@@ -19,9 +20,9 @@ new class extends Component {
         $this->projectId = $project->id;
 
         $this->columns = [
-            ['key' => 'Todo', 'title' => 'Todo', 'dot' => 'bg-orange-500', 'border' => 'border-[rgba(255,128,64,0.48)]', 'bg' => 'bg-[rgba(255,128,64,0.16)]'],
-            ['key' => 'Doing', 'title' => 'Doing', 'dot' => 'bg-yellow-500', 'border' => 'border-[rgba(255,220,70,0.38)]', 'bg' => 'bg-[rgba(255,220,70,0.17)]'],
-            ['key' => 'Done', 'title' => 'Done', 'dot' => 'bg-green-500', 'border' => 'border-[rgba(38,186,112,0.33)]', 'bg' => 'bg-[rgba(38,186,112,0.13)]'],
+            ['key' => TaskStatus::Todo->value, 'title' => TaskStatus::Todo->value, 'dot' => 'bg-orange-500', 'border' => 'border-[rgba(255,128,64,0.48)]', 'bg' => 'bg-[rgba(255,128,64,0.16)]'],
+            ['key' => TaskStatus::Doing->value, 'title' => TaskStatus::Doing->value, 'dot' => 'bg-yellow-500', 'border' => 'border-[rgba(255,220,70,0.38)]', 'bg' => 'bg-[rgba(255,220,70,0.17)]'],
+            ['key' => TaskStatus::Done->value, 'title' => TaskStatus::Done->value, 'dot' => 'bg-green-500', 'border' => 'border-[rgba(38,186,112,0.33)]', 'bg' => 'bg-[rgba(38,186,112,0.13)]'],
         ];
     }
 
@@ -74,16 +75,16 @@ new class extends Component {
             $hiddenCount = max(0, $count - 3);
 
             $countClass = match ($status) {
-                'Todo' => 'bg-orange-500',
-                'Doing' => 'bg-yellow-500',
-                'Done' => 'bg-green-500',
+                TaskStatus::Todo->value => 'bg-orange-500',
+                TaskStatus::Doing->value => 'bg-yellow-500',
+                TaskStatus::Done->value => 'bg-green-500',
                 default => 'bg-gray-500',
             };
 
             $indicatorClass = match ($status) {
-                'Todo' => 'border-orange-200 bg-orange-50 hover:bg-orange-200 text-orange-500',
-                'Doing' => 'border-yellow-200 bg-yellow-50 hover:bg-yellow-200 text-yellow-600',
-                'Done' => 'border-green-200 bg-green-50 hover:bg-green-200 text-green-600',
+                TaskStatus::Todo->value => 'border-orange-200 bg-orange-50 hover:bg-orange-200 text-orange-500',
+                TaskStatus::Doing->value => 'border-yellow-200 bg-yellow-50 hover:bg-yellow-200 text-yellow-600',
+                TaskStatus::Done->value => 'border-green-200 bg-green-50 hover:bg-green-200 text-green-600',
                 default => 'border-gray-200 bg-gray-50 hover:bg-gray-200 text-gray-500',
             };
 
@@ -144,7 +145,7 @@ new class extends Component {
                             >
                                 <div class="flex items-center justify-between">
                                     <flux:badge size="lg" class="uppercase" color="orange">
-                                        {{ $task->priority }}
+                                        {{ $task->priority->value }}
                                     </flux:badge>
 
                                     <flux:icon.arrows-pointing-out x-sort:handle x-on:click.stop/>

@@ -2,10 +2,12 @@
 
 namespace App\Livewire\Actions;
 
+use App\Enums\TaskStatus;
 use App\Models\Project;
 use App\Models\Task;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Reorders tasks across columns after a drag-and-drop operation.
@@ -20,8 +22,18 @@ class ReorderTasks
         $project = Project::findOrFail($projectId);
         Gate::authorize('update', $project);
 
+        foreach (array_keys($payload) as $statusKey) {
+            if (TaskStatus::tryFrom((string) $statusKey) === null) {
+                throw ValidationException::withMessages([
+                    'status' => ["Invalid task status: {$statusKey}."],
+                ]);
+            }
+        }
+
         DB::transaction(function () use ($payload, $projectId) {
-            foreach ($payload as $status => $orderedIds) {
+            foreach ($payload as $statusKey => $orderedIds) {
+                $status = TaskStatus::from((string) $statusKey);
+
                 foreach ($orderedIds as $index => $id) {
                     $task = Task::where('project_id', $projectId)
                         ->where('id', $id)

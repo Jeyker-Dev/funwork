@@ -1,6 +1,8 @@
 <?php
 
 use Livewire\Component;
+use App\Enums\TaskPriority;
+use App\Enums\TaskStatus;
 use App\Livewire\Forms\TaskForm;
 use App\Models\Task;
 use App\Models\Project;
@@ -52,16 +54,16 @@ new class extends Component
     $modalName = 'create-task-'.$projectId.'-'.($status ?? 'all');
 
     $buttonClasses = match ($status) {
-        'Todo' => 'border-[rgba(255,128,64,0.48)] bg-[rgba(255,128,64,0.23)] hover:bg-[rgba(255,128,64,0.33)]',
-        'Doing' => 'border-[rgba(255,220,70,0.38)] bg-[rgba(255,220,70,0.17)] hover:bg-[rgba(255,220,70,0.27)]',
-        'Done' => 'border-[rgba(38,186,112,0.33)] bg-[rgba(38,186,112,0.13)] hover:bg-[rgba(38,186,112,0.23)]',
+        TaskStatus::Todo->value => 'border-[rgba(255,128,64,0.48)] bg-[rgba(255,128,64,0.23)] hover:bg-[rgba(255,128,64,0.33)]',
+        TaskStatus::Doing->value => 'border-[rgba(255,220,70,0.38)] bg-[rgba(255,220,70,0.17)] hover:bg-[rgba(255,220,70,0.27)]',
+        TaskStatus::Done->value => 'border-[rgba(38,186,112,0.33)] bg-[rgba(38,186,112,0.13)] hover:bg-[rgba(38,186,112,0.23)]',
         default => 'border-gray-200 bg-gray-50 hover:bg-gray-100',
     };
 
     $iconClasses = match ($status) {
-        'Todo' => 'text-orange-500',
-        'Doing' => 'text-yellow-500',
-        'Done' => 'text-green-500',
+        TaskStatus::Todo->value => 'text-orange-500',
+        TaskStatus::Doing->value => 'text-yellow-500',
+        TaskStatus::Done->value => 'text-green-500',
         default => 'text-gray-500',
     };
 @endphp
@@ -91,15 +93,15 @@ new class extends Component
                 <div class="flex justify-between items-center w-full gap-4 my-6">
                     <div class="w-1/2">
                         <flux:select variant="listbox" label="Status" placeholder="Choose status..." wire:model="form.status">
-                            <flux:select.option>Todo</flux:select.option>
-                            <flux:select.option>Doing</flux:select.option>
-                            <flux:select.option>Done</flux:select.option>
+                            <flux:select.option>{{ TaskStatus::Todo->value }}</flux:select.option>
+                            <flux:select.option>{{ TaskStatus::Doing->value }}</flux:select.option>
+                            <flux:select.option>{{ TaskStatus::Done->value }}</flux:select.option>
                         </flux:select>
                     </div>
 
                     <div class="w-1/2">
                         <flux:select variant="listbox" label="Priority" placeholder="Choose priority..." wire:model="form.priority">
-                            <flux:select.option>Low</flux:select.option>
+                            <flux:select.option>{{ TaskPriority::Low->value }}</flux:select.option>
                         </flux:select>
                     </div>
                 </div>

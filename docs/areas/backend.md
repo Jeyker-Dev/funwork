@@ -30,7 +30,7 @@ Laravel 13. Skills de referencia: `laravel-clean-architecture` y `pest-laravel-t
 
 ### Tareas
 - Varios asignados por tarea (pivot `task_user`); el selector solo ofrece al usuario autenticado y `TaskForm` valida `assignedUserIds.*` contra `auth()->id()`.
-- Estados: el tablero usa `Todo/Doing/Done`, pero el dashboard filtra por `'completed'` (bug conocido). No hay Enums: estado y prioridad se validan solo como `required`.
+- Estados y prioridades usan obligatoriamente los Backed Enums `App\Enums\TaskStatus` (`Todo`, `Doing`, `Done`) y `App\Enums\TaskPriority` (`Low`, `Medium`, `High`), casteados en `Task`, validados con `Rule::enum` en `TaskForm` y `ConvertInboxToTaskForm`, y verificados con `TaskStatus::tryFrom` antes de la transacción en `ReorderTasks`. El dashboard aún filtra por `'completed'` (pendiente de unificar con `TaskStatus::Done`).
 
 ### Inbox
 - Los ítems se convierten a otros elementos mediante modales.

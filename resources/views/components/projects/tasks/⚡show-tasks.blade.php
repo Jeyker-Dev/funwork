@@ -89,7 +89,7 @@ new class extends Component {
             >
                 <div class="flex items-center justify-between">
                     <flux:badge size="lg" class="uppercase" color="orange">
-                        {{ $task->priority }}
+                        {{ $task->priority->value }}
                     </flux:badge>
 
                     <flux:icon.arrows-pointing-out x-sort:handle x-on:click.stop/>

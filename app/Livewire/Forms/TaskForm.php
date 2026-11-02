@@ -2,6 +2,8 @@
 
 namespace App\Livewire\Forms;
 
+use App\Enums\TaskPriority;
+use App\Enums\TaskStatus;
 use App\Models\Project;
 use App\Models\Task;
 use Flux\Flux;
@@ -18,10 +20,8 @@ class TaskForm extends Form
     #[Validate('required')]
     public string $description = '';
 
-    #[Validate('required')]
     public string $status = '';
 
-    #[Validate('required')]
     public string $priority = '';
 
     #[Validate('nullable|date_format:Y-m-d')]
@@ -39,6 +39,8 @@ class TaskForm extends Form
     protected function rules(): array
     {
         return [
+            'status' => ['required', Rule::enum(TaskStatus::class)],
+            'priority' => ['required', Rule::enum(TaskPriority::class)],
             'assignedUserIds.*' => ['integer', Rule::in([auth()->id()])],
         ];
     }

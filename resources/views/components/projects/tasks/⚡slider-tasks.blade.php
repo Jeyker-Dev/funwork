@@ -2,6 +2,7 @@
 
 use Livewire\Component;
 use Livewire\Attributes\On;
+use App\Enums\TaskStatus;
 use App\Models\Task;
 use App\Models\Project;
 
@@ -69,16 +70,16 @@ new class extends Component {
     @forelse($tasks as $task)
         @php
             $accentBar = match ($task->status) {
-                'Todo' => 'bg-orange-400',
-                'Doing' => 'bg-yellow-400',
-                'Done' => 'bg-green-400',
+                TaskStatus::Todo => 'bg-orange-400',
+                TaskStatus::Doing => 'bg-yellow-400',
+                TaskStatus::Done => 'bg-green-400',
                 default => 'bg-gray-300',
             };
 
             $badgeColor = match ($task->status) {
-                'Todo' => 'orange',
-                'Doing' => 'yellow',
-                'Done' => 'green',
+                TaskStatus::Todo => 'orange',
+                TaskStatus::Doing => 'yellow',
+                TaskStatus::Done => 'green',
                 default => 'gray',
             };
 
@@ -94,7 +95,7 @@ new class extends Component {
                 <div class="flex items-center justify-between gap-4">
 
                     <flux:badge size="xs" class="uppercase" color="{{ $badgeColor }}">
-                        {{ $task->priority }}
+                        {{ $task->priority->value }}
                     </flux:badge>
 
                     <flux:avatar tooltip="Assigned user" size="sm" class="shrink-0"

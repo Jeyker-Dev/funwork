@@ -2,10 +2,13 @@
 
 namespace App\Livewire\Forms;
 
+use App\Enums\TaskPriority;
+use App\Enums\TaskStatus;
 use App\Models\InboxItem;
 use App\Models\Project;
 use App\Models\Task;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 
@@ -20,7 +23,19 @@ class ConvertInboxToTaskForm extends Form
     #[Validate('nullable|string')]
     public string $description = '';
 
+    public string $status = TaskStatus::Todo->value;
+
+    public string $priority = TaskPriority::Low->value;
+
     public ?InboxItem $item = null;
+
+    protected function rules(): array
+    {
+        return [
+            'status' => ['required', Rule::enum(TaskStatus::class)],
+            'priority' => ['required', Rule::enum(TaskPriority::class)],
+        ];
+    }
 
     public function setItem(InboxItem $item): void
     {
@@ -28,6 +43,8 @@ class ConvertInboxToTaskForm extends Form
         $this->title = $item->content;
         $this->description = '';
         $this->projectId = null;
+        $this->status = TaskStatus::Todo->value;
+        $this->priority = TaskPriority::Low->value;
     }
 
     public function store(): Task
@@ -46,9 +63,9 @@ class ConvertInboxToTaskForm extends Form
             'project_id' => $this->projectId,
             'title' => $this->title,
             'description' => $this->description,
-            'status' => 'Todo',
+            'status' => $this->status,
             'position' => $position,
-            'priority' => 'Low',
+            'priority' => $this->priority,
         ]);
 
         $this->item->delete();
