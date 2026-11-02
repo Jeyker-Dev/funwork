@@ -6,12 +6,11 @@ Tareas tomadas del backlog para ejecutar ahora. Las grandes abren un documento `
 
 ## En curso
 
-Cierre de la Fase 0: los hallazgos de los tests de aislamiento (`368c132`). Se hacen juntos porque comparten patrón y test.
-
-- [ ] [BACKEND] Autorizar ítems ajenos en `projects.files.move-items-modal::move` (`MoveSelectionAction`) y en `pages::projects.files.index::downloadFolderAsync` (`DownloadFilesZipAction`) — el usuario B recibe 403/404 y los 3 tests de `PoliciesTest` pasan sin `skip` — depende de: -
+*(Sprint completado — Fase 0 cerrada)*
 
 ## Hechas en este sprint
 
+- [x] [BACKEND] Autorizar ítems ajenos en `projects.files.move-items-modal::move` (`MoveSelectionAction`) y en `pages::projects.files.index::downloadFolderAsync` (`DownloadFilesZipAction`) — el usuario B recibe 403/404 y los 3 tests de `PoliciesTest` pasan sin `skip` — depende de: - (commit `7d91ec7`)
 - [x] [QA] Tests de aislamiento entre usuarios — Pest en verde: el usuario B recibe 403/404 al editar, archivar o borrar proyectos, al reordenar tareas (drag & drop) y al renombrar, mover o descargar en ZIP archivos y carpetas del usuario A; revisar antes qué cubre `PoliciesTest` (inbox y scoped bindings ya cubiertos; búsqueda global y dashboard van en su propia tarea de Fase 1) — depende de: Policies, arreglar los 5 tests (commit `368c132`)
 - [x] [QA] Arreglar los 5 tests que ya fallaban (ShowProjects, UploadFileForm, Files/Index upload, ProfileUpdate ×2) — suite de Pest en verde — depende de: - (commit `2b29862`)
 - [x] [BACKEND] Limitar la asignación de tareas y el selector de dueño al usuario actual — los formularios no listan otros usuarios (consulta `User::` en `components/projects/tasks/⚡create-task.blade.php`) — depende de: - (commit `0e5baee`)

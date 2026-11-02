@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-02
+
+- Validación de pertenencia al proyecto (`abort_unless(..., 404)`) en `MoveSelectionAction` (incluyendo `targetFolderId` antes de mutar y cada ítem de `selectedIds`) y en `DownloadFilesZipAction` (todos los `selectedIds`: archivos individuales, múltiples y carpetas); se quitan los 3 `skip` en `tests/Feature/Authorization/PoliciesTest.php` y se suman tests para destino ajeno y descarga ZIP propia en disco local (commit `7d91ec7`).
+
 ## 2026-11-01
 
 - Extensión de pruebas de aislamiento en `tests/Feature/Authorization/PoliciesTest.php` para mover archivos y carpetas ajenos (`projects.files.move-items-modal::move`) y descargar carpetas ajenas en ZIP (`pages::projects.files.index::downloadFolderAsync`); los 3 escenarios quedan marcados con `skip` por hallazgos abiertos donde las acciones ignoran silenciosamente ítems de otro proyecto y devuelven 200 (o fallan con `FileNotFoundException` en el ZIP vacío) en lugar de responder 403/404 (commit `368c132`).
