@@ -8,12 +8,12 @@ Tareas tomadas del backlog para ejecutar ahora. Las grandes abren un documento `
 
 Orden de ejecución: de arriba hacia abajo. Las tareas 2 y 3 dependen de los enums.
 
-- [ ] [FRONTEND] Dashboard filtra por TaskStatus::Done en lugar de `'completed'` — las tareas Done no aparecen como urgentes ni en los contadores — depende de: Enums
 - [ ] [FRONTEND] Unificar el mapa de colores de estado de tareas — una sola fuente usada por los 5 componentes — depende de: Enums
 - [ ] [FRONTEND] Página de detalle de tarea + rutas de tareas con `Route::livewire` — `/projects/{p}/tasks/{t}` muestra la tarea y permite editarla — depende de: Policies
 
 ## Hechas en este sprint
 
+- [x] [FRONTEND] Dashboard filtra por TaskStatus::Done en lugar de `'completed'` — las tareas Done no aparecen como urgentes ni en los contadores — depende de: Enums (commit `1a42a81`)
 - [x] [BACKEND] Enums TaskStatus y TaskPriority validados en TaskForm y ReorderTasks — no se guarda un estado o prioridad inválidos; migración que normaliza `todo`/`low` en minúscula — depende de: - (commit `bb637b5`)
 
 ## Sprint anterior: Fase 0 — Seguridad (cerrado el 2026-11-02)
