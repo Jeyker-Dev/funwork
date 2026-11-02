@@ -2,13 +2,23 @@
 
 Tareas tomadas del backlog para ejecutar ahora. Las grandes abren un documento `odd/tasks/<feature>.md`.
 
-**Sprint:** Fase 0 — Seguridad (aprobado el 2026-10-31)
+**Sprint:** Fase 1 — Integridad (aprobado el 2026-11-02)
 
 ## En curso
 
-*(Sprint completado — Fase 0 cerrada)*
+Orden de ejecución: de arriba hacia abajo. Las tareas 2 y 3 dependen de los enums.
+
+- [ ] [BACKEND] Enums TaskStatus y TaskPriority validados en TaskForm y ReorderTasks — no se guarda un estado o prioridad inválidos; migración que normaliza `todo`/`low` en minúscula — depende de: -
+- [ ] [FRONTEND] Dashboard filtra por TaskStatus::Done en lugar de `'completed'` — las tareas Done no aparecen como urgentes ni en los contadores — depende de: Enums
+- [ ] [FRONTEND] Unificar el mapa de colores de estado de tareas — una sola fuente usada por los 5 componentes — depende de: Enums
+- [ ] [FRONTEND] Página de detalle de tarea + rutas de tareas con `Route::livewire` — `/projects/{p}/tasks/{t}` muestra la tarea y permite editarla — depende de: Policies
 
 ## Hechas en este sprint
+
+*(Ninguna todavía)*
+
+## Sprint anterior: Fase 0 — Seguridad (cerrado el 2026-11-02)
+
 
 - [x] [BACKEND] Autorizar ítems ajenos en `projects.files.move-items-modal::move` (`MoveSelectionAction`) y en `pages::projects.files.index::downloadFolderAsync` (`DownloadFilesZipAction`) — el usuario B recibe 403/404 y los 3 tests de `PoliciesTest` pasan sin `skip` — depende de: - (commit `7d91ec7`)
 - [x] [QA] Tests de aislamiento entre usuarios — Pest en verde: el usuario B recibe 403/404 al editar, archivar o borrar proyectos, al reordenar tareas (drag & drop) y al renombrar, mover o descargar en ZIP archivos y carpetas del usuario A; revisar antes qué cubre `PoliciesTest` (inbox y scoped bindings ya cubiertos; búsqueda global y dashboard van en su propia tarea de Fase 1) — depende de: Policies, arreglar los 5 tests (commit `368c132`)
