@@ -22,6 +22,8 @@ Livewire v4 SFC + Flux / Flux Pro + Alpine v3 + Tailwind. Skill de referencia: `
 
 ### Tareas
 - Tablero por estados con drag & drop entre columnas, contador por columna, slider con filtros, paginación e indicador "ver más".
+- Vistas full-page registradas bajo componentes Livewire `pages::projects.tasks.*` (`pages/projects/tasks/⚡index.blade.php` para `'project.tasks'` y `pages/projects/tasks/⚡show.blade.php` para `'show.task'`) usando el layout `layouts.app` con `:project`.
+- Página de detalle de tarea (`pages::projects.tasks.show`): visualización con insignias consumiendo los métodos del enum `TaskStatus`, prioridad, vencimiento y asignados; formulario de edición persistido mediante `TaskForm::update` con botón explícito "Save changes".
 - Historial: bugs de duplicación y de contadores al arrastrar entre columnas (ya corregidos). Es la zona más frágil: cualquier cambio necesita tests.
 
 ### Notebooks
@@ -35,4 +37,5 @@ Livewire v4 SFC + Flux / Flux Pro + Alpine v3 + Tailwind. Skill de referencia: `
 
 ## Deuda técnica / pendientes
 
-- [ ] Revisar si `/projects/{project}/tasks` debe migrar a `Route::livewire` como el resto de los módulos.
+- [x] Migrar `/projects/{project}/tasks` y `/projects/{project}/tasks/{task}` a `Route::livewire` bajo `pages::projects.tasks.*`.
+- [ ] Borrar tarea desde la página de detalle (modal de confirmación, `TaskPolicy::delete`, redirección al tablero).

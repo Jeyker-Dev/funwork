@@ -1,8 +1,6 @@
 <?php
 
 use App\Http\Controllers\ProjectFilePreviewController;
-use App\Models\Project;
-use App\Models\Task;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', static function () {
@@ -24,13 +22,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->can('view', 'project')
         ->name('project.inbox');
 
-    Route::get('projects/{project}/tasks', static function (Project $project) {
-        return view('app.projects.tasks.index', compact('project'));
-    })->can('view', 'project')->name('project.tasks');
+    Route::livewire('/projects/{project}/tasks', 'pages::projects.tasks.index')
+        ->name('project.tasks')
+        ->can('view', 'project');
 
-    Route::get('projects/{project}/tasks/{task}', static function (Project $project, Task $task) {
-        return view('app.projects.tasks.show', compact('project', 'task'));
-    })->scopeBindings()->can('view', 'project')->can('view', 'task')->name('show.task');
+    Route::livewire('/projects/{project}/tasks/{task}', 'pages::projects.tasks.show')
+        ->name('show.task')
+        ->scopeBindings()
+        ->can('view', 'project')
+        ->can('view', 'task');
 
     Route::livewire('/projects/{project}/notebooks', 'pages::projects.notebooks.index')
         ->can('view', 'project')

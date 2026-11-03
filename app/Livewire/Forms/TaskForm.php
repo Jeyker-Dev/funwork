@@ -77,4 +77,40 @@ class TaskForm extends Form
 
         Flux::modals()->close();
     }
+
+    public function setTask(Task $task): void
+    {
+        $this->title = $task->title;
+        $this->description = $task->description;
+        $this->status = $task->status instanceof TaskStatus ? $task->status->value : (string) $task->status;
+        $this->priority = $task->priority instanceof TaskPriority ? $task->priority->value : (string) $task->priority;
+        $this->dueDate = $task->due_date?->format('Y-m-d');
+        $this->assignedUserIds = $task->users->pluck('id')->all();
+        $this->projectId = $task->project_id;
+        $this->position = $task->position;
+    }
+
+    public function update(Task $task): void
+    {
+        Gate::authorize('update', $task);
+
+        $this->validate();
+
+        $task->update([
+            'title' => $this->title,
+            'description' => $this->description,
+            'status' => $this->status,
+            'priority' => $this->priority,
+            'due_date' => $this->dueDate ?: null,
+        ]);
+
+        $task->users()->sync($this->assignedUserIds);
+
+        Flux::toast(
+            heading: 'Task Updated',
+            text: 'The task has been successfully updated.',
+            variant: 'success',
+            duration: 3000,
+        );
+    }
 }
