@@ -23,7 +23,7 @@ Orden y motivos: ver [`../roadmap.md`](../roadmap.md).
 - [ ] [FRONTEND] Página de detalle de tarea + rutas de tareas con `Route::livewire` — `/projects/{p}/tasks/{t}` muestra la tarea y permite editarla — depende de: Policies
 - [ ] [BACKEND] Arreglar el ZIP de carpetas — se despacha el job, lee del disco real (S3) y el link llega por notificación visible en la UI — depende de: -
 - [ ] [BACKEND] Mover la lógica de las vistas SFC a Actions/Forms (stats del dashboard, guardado del editor, posición de tareas) — las vistas no contienen consultas de negocio — depende de: -
-- [ ] [FRONTEND] Unificar el mapa de colores de estado de tareas — una sola fuente usada por los 5 componentes — depende de: Enums
+- [x] [FRONTEND] Unificar el mapa de colores de estado de tareas — una sola fuente usada por los componentes — depende de: Enums (commit `0b76c24`)
 - [ ] [BACKEND] Tablero: eager loading de asignados y menos queries por columna — sin N+1 en el tablero — depende de: -
 - [ ] [DEVOPS] Deploy: migrar antes de servir y hacer backup de la base de datos antes de migrar — el código nuevo nunca corre sobre un esquema viejo — depende de: -
 - [ ] [BACKEND] Escapar los comodines de `LIKE` en la búsqueda de archivos — buscar `%` o `_` no rompe los resultados — depende de: -
