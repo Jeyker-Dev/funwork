@@ -120,3 +120,127 @@ test('it clears selection on items moved event', function () {
         ->dispatch('items-moved')
         ->assertSet('selectedIds', []);
 });
+
+test('searching for percent wildcard returns only file with literal percent in name', function () {
+    $this->actingAs($this->user);
+
+    ProjectFile::factory()->create([
+        'project_id' => $this->project->id,
+        'created_by' => $this->user->id,
+        'name' => 'documento.pdf',
+    ]);
+    ProjectFile::factory()->create([
+        'project_id' => $this->project->id,
+        'created_by' => $this->user->id,
+        'name' => 'descuento_10%.pdf',
+    ]);
+
+    Livewire::test('pages::projects.files.index', ['project' => $this->project])
+        ->set('searchQuery', '%')
+        ->assertSee('descuento_10%.pdf')
+        ->assertDontSee('documento.pdf');
+});
+
+test('searching for underscore wildcard returns only test_file.pdf and not testfile.pdf', function () {
+    $this->actingAs($this->user);
+
+    ProjectFile::factory()->create([
+        'project_id' => $this->project->id,
+        'created_by' => $this->user->id,
+        'name' => 'test_file.pdf',
+    ]);
+    ProjectFile::factory()->create([
+        'project_id' => $this->project->id,
+        'created_by' => $this->user->id,
+        'name' => 'testfile.pdf',
+    ]);
+
+    Livewire::test('pages::projects.files.index', ['project' => $this->project])
+        ->set('searchQuery', '_')
+        ->assertSee('test_file.pdf')
+        ->assertDontSee('testfile.pdf');
+});
+
+test('searching for underscore wildcard also filters folders with and without underscore', function () {
+    $this->actingAs($this->user);
+
+    Folder::factory()->create([
+        'project_id' => $this->project->id,
+        'created_by' => $this->user->id,
+        'name' => 'folder_one',
+    ]);
+    Folder::factory()->create([
+        'project_id' => $this->project->id,
+        'created_by' => $this->user->id,
+        'name' => 'folderone',
+    ]);
+
+    Livewire::test('pages::projects.files.index', ['project' => $this->project])
+        ->set('searchQuery', '_')
+        ->assertSee('folder_one')
+        ->assertDontSee('folderone');
+});
+
+test('regression: searching for normal text continues to return matching files and folders', function () {
+    $this->actingAs($this->user);
+
+    Folder::factory()->create([
+        'project_id' => $this->project->id,
+        'created_by' => $this->user->id,
+        'name' => 'reportes_anuales',
+    ]);
+    Folder::factory()->create([
+        'project_id' => $this->project->id,
+        'created_by' => $this->user->id,
+        'name' => 'otra_carpeta',
+    ]);
+    ProjectFile::factory()->create([
+        'project_id' => $this->project->id,
+        'created_by' => $this->user->id,
+        'name' => 'reporte_mensual.pdf',
+    ]);
+    ProjectFile::factory()->create([
+        'project_id' => $this->project->id,
+        'created_by' => $this->user->id,
+        'name' => 'documento.pdf',
+    ]);
+
+    Livewire::test('pages::projects.files.index', ['project' => $this->project])
+        ->set('searchQuery', 'reporte')
+        ->assertSee('reportes_anuales')
+        ->assertSee('reporte_mensual.pdf')
+        ->assertDontSee('otra_carpeta')
+        ->assertDontSee('documento.pdf');
+});
+
+test('searching for exclamation mark does not break query and returns only items with exclamation mark', function () {
+    $this->actingAs($this->user);
+
+    Folder::factory()->create([
+        'project_id' => $this->project->id,
+        'created_by' => $this->user->id,
+        'name' => 'urgente!',
+    ]);
+    Folder::factory()->create([
+        'project_id' => $this->project->id,
+        'created_by' => $this->user->id,
+        'name' => 'general',
+    ]);
+    ProjectFile::factory()->create([
+        'project_id' => $this->project->id,
+        'created_by' => $this->user->id,
+        'name' => 'importante!.pdf',
+    ]);
+    ProjectFile::factory()->create([
+        'project_id' => $this->project->id,
+        'created_by' => $this->user->id,
+        'name' => 'normal.pdf',
+    ]);
+
+    Livewire::test('pages::projects.files.index', ['project' => $this->project])
+        ->set('searchQuery', '!')
+        ->assertSee('urgente!')
+        ->assertSee('importante!.pdf')
+        ->assertDontSee('general')
+        ->assertDontSee('normal.pdf');
+});

@@ -3,6 +3,7 @@
 use Livewire\Component;
 use App\Models\Project;
 use App\Models\Folder;
+use App\Support\QueryHelper;
 use App\Actions\Files\DeleteSelectionAction;
 use App\Actions\Files\DownloadFilesZipAction;
 use Livewire\Attributes\Layout;
@@ -206,8 +207,9 @@ class extends Component {
         $isSearching = !empty($this->searchQuery);
 
         if ($isSearching) {
-            $foldersQuery = $this->project->folders()->where('name', 'like', '%' . $this->searchQuery . '%');
-            $filesQuery = $this->project->files()->where('name', 'like', '%' . $this->searchQuery . '%')->latest();
+            $escaped = QueryHelper::escapeLike($this->searchQuery);
+            $foldersQuery = $this->project->folders()->whereRaw("name LIKE ? ESCAPE '!'", ['%'.$escaped.'%']);
+            $filesQuery = $this->project->files()->whereRaw("name LIKE ? ESCAPE '!'", ['%'.$escaped.'%'])->latest();
         } else {
             $foldersQuery = $this->project->folders()->where('parent_id', $this->currentFolderId);
             $filesQuery = $this->project->files()->where('folder_id', $this->currentFolderId)->latest();
