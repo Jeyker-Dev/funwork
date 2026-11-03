@@ -36,6 +36,7 @@ Orden y motivos: ver [`../roadmap.md`](../roadmap.md).
 - [ ] [DATABASE] Áreas por proyecto (frontend, backend, database, design; configurables) y etiqueta de área en tareas y notas — se puede filtrar el tablero por área — depende de: Fase 1
 - [ ] [BACKEND] Importador de tareas desde NotebookLM (formato fijo pegado en un textarea) — pegar N líneas crea N tareas con área y criterio — depende de: Áreas
 - [ ] [BACKEND] Export "Project pack" en Markdown (notebooks, tareas, decisiones) — se descarga un `.md` listo para subir a NotebookLM — depende de: -
+- [ ] [BACKEND] Sincronizar el "Project pack" con un Google Doc (OAuth con Google, API de Docs/Drive) — desde FunWork se actualiza el Google Doc y en NotebookLM basta con "Sync" para refrescar la fuente — depende de: Export "Project pack"
 
 ## Fase 3 — MCP para Antigravity
 
