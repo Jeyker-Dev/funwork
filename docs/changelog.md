@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-03
+
+- Borrado de tareas desde la página de detalle (`pages::projects.tasks.show`): botón "Delete task" con modal de confirmación Flux (`<flux:modal>` y `<flux:modal.trigger>`), método `delete()` con autorización `TaskPolicy::delete`, eliminación en cascada de asignaciones y redirección con `navigate` a `project.tasks`; cobertura de tests en `tests/Feature/Livewire/Projects/Tasks/ShowTaskTest.php` (commit `5981fda`).
+
 ## 2026-11-02
 
 - Backlog: nueva tarea en Fase 2 para sincronizar el "Project pack" con un Google Doc y refrescar la fuente de NotebookLM con "Sync".
