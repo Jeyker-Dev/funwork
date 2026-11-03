@@ -8,6 +8,7 @@ Livewire v4 SFC + Flux / Flux Pro + Alpine v3 + Tailwind. Skill de referencia: `
 - Crear componentes con `php artisan make:livewire`.
 - Feedback con toasts de Flux; los modales se abren y cierran desde el componente.
 - Comunicación entre componentes por eventos (`project-created`, `notebook-created`, `search-updated`).
+- Colores y clases CSS por estado de tarea: se consumen exclusivamente a través de los métodos del enum `app/Enums/TaskStatus.php` (`dot()`, `columnBorder()`, `columnBg()`, `badge()`, `cardClasses()`, `text()`, `accent()`, `fluxColor()`). En `resources/css/app.css` se mantiene `@source '../../app/Enums';` para el escaneo de Tailwind CSS v4.
 
 ## Estado actual por módulo
 

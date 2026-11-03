@@ -53,19 +53,9 @@ new class extends Component
 @php
     $modalName = 'create-task-'.$projectId.'-'.($status ?? 'all');
 
-    $buttonClasses = match ($status) {
-        TaskStatus::Todo->value => 'border-[rgba(255,128,64,0.48)] bg-[rgba(255,128,64,0.23)] hover:bg-[rgba(255,128,64,0.33)]',
-        TaskStatus::Doing->value => 'border-[rgba(255,220,70,0.38)] bg-[rgba(255,220,70,0.17)] hover:bg-[rgba(255,220,70,0.27)]',
-        TaskStatus::Done->value => 'border-[rgba(38,186,112,0.33)] bg-[rgba(38,186,112,0.13)] hover:bg-[rgba(38,186,112,0.23)]',
-        default => 'border-gray-200 bg-gray-50 hover:bg-gray-100',
-    };
-
-    $iconClasses = match ($status) {
-        TaskStatus::Todo->value => 'text-orange-500',
-        TaskStatus::Doing->value => 'text-yellow-500',
-        TaskStatus::Done->value => 'text-green-500',
-        default => 'text-gray-500',
-    };
+    $taskStatus = $status ? TaskStatus::tryFrom($status) : null;
+    $buttonClasses = $taskStatus?->cardClasses() ?? 'border-gray-200 bg-gray-50 hover:bg-gray-100';
+    $iconClasses = $taskStatus?->text() ?? 'text-gray-500';
 @endphp
 
 <div class="w-full">

@@ -69,19 +69,9 @@ new class extends Component {
 <div class="grid grid-cols-2 gap-7 max-w-lg">
     @forelse($tasks as $task)
         @php
-            $accentBar = match ($task->status) {
-                TaskStatus::Todo => 'bg-orange-400',
-                TaskStatus::Doing => 'bg-yellow-400',
-                TaskStatus::Done => 'bg-green-400',
-                default => 'bg-gray-300',
-            };
-
-            $badgeColor = match ($task->status) {
-                TaskStatus::Todo => 'orange',
-                TaskStatus::Doing => 'yellow',
-                TaskStatus::Done => 'green',
-                default => 'gray',
-            };
+            $statusEnum = $task->status instanceof TaskStatus ? $task->status : TaskStatus::tryFrom((string) $task->status);
+            $accentBar = $statusEnum?->accent() ?? 'bg-gray-300';
+            $badgeColor = $statusEnum?->fluxColor() ?? 'gray';
 
             $hasDueDate = !empty($task->due_date);
         @endphp

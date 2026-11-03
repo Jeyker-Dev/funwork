@@ -19,11 +19,13 @@ new class extends Component {
         $this->project = $project;
         $this->projectId = $project->id;
 
-        $this->columns = [
-            ['key' => TaskStatus::Todo->value, 'title' => TaskStatus::Todo->value, 'dot' => 'bg-orange-500', 'border' => 'border-[rgba(255,128,64,0.48)]', 'bg' => 'bg-[rgba(255,128,64,0.16)]'],
-            ['key' => TaskStatus::Doing->value, 'title' => TaskStatus::Doing->value, 'dot' => 'bg-yellow-500', 'border' => 'border-[rgba(255,220,70,0.38)]', 'bg' => 'bg-[rgba(255,220,70,0.17)]'],
-            ['key' => TaskStatus::Done->value, 'title' => TaskStatus::Done->value, 'dot' => 'bg-green-500', 'border' => 'border-[rgba(38,186,112,0.33)]', 'bg' => 'bg-[rgba(38,186,112,0.13)]'],
-        ];
+        $this->columns = array_map(fn (TaskStatus $status) => [
+            'key' => $status->value,
+            'title' => $status->value,
+            'dot' => $status->dot(),
+            'border' => $status->columnBorder(),
+            'bg' => $status->columnBg(),
+        ], TaskStatus::cases());
     }
 
     public function with(): array
@@ -74,19 +76,9 @@ new class extends Component {
             $count = $countsByStatus[$status];
             $hiddenCount = max(0, $count - 3);
 
-            $countClass = match ($status) {
-                TaskStatus::Todo->value => 'bg-orange-500',
-                TaskStatus::Doing->value => 'bg-yellow-500',
-                TaskStatus::Done->value => 'bg-green-500',
-                default => 'bg-gray-500',
-            };
-
-            $indicatorClass = match ($status) {
-                TaskStatus::Todo->value => 'border-orange-200 bg-orange-50 hover:bg-orange-200 text-orange-500',
-                TaskStatus::Doing->value => 'border-yellow-200 bg-yellow-50 hover:bg-yellow-200 text-yellow-600',
-                TaskStatus::Done->value => 'border-green-200 bg-green-50 hover:bg-green-200 text-green-600',
-                default => 'border-gray-200 bg-gray-50 hover:bg-gray-200 text-gray-500',
-            };
+            $taskStatus = TaskStatus::tryFrom($status);
+            $countClass = $taskStatus?->dot() ?? 'bg-gray-500';
+            $indicatorClass = $taskStatus?->badge() ?? 'border-gray-200 bg-gray-50 hover:bg-gray-200 text-gray-500';
 
             $modalName = 'show-more-tasks-'.$projectId.'-'.$status;
         @endphp
