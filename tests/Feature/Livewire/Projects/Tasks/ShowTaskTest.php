@@ -161,3 +161,46 @@ test('task detail HTTP route renders successfully with project sidebar', functio
         ->assertSee(route('project.notebooks', ['project' => $project]))
         ->assertSee(route('project.files', ['project' => $project]));
 });
+
+test('owner can delete task, cascades task_user rows and redirects to project tasks', function () {
+    $user = User::factory()->create();
+    $project = Project::factory()->create(['owner_id' => $user->id]);
+    $task = Task::factory()->create([
+        'project_id' => $project->id,
+        'title' => 'Task to be deleted',
+    ]);
+    $assignedUser = User::factory()->create();
+    $task->users()->attach([$user->id, $assignedUser->id]);
+
+    $this->assertDatabaseHas('tasks', ['id' => $task->id]);
+    $this->assertDatabaseHas('task_user', ['task_id' => $task->id, 'user_id' => $user->id]);
+    $this->assertDatabaseHas('task_user', ['task_id' => $task->id, 'user_id' => $assignedUser->id]);
+
+    Livewire::actingAs($user)
+        ->test('pages::projects.tasks.show', ['project' => $project, 'task' => $task])
+        ->assertSee('Delete task')
+        ->call('delete')
+        ->assertRedirect(route('project.tasks', $project));
+
+    $this->assertDatabaseMissing('tasks', ['id' => $task->id]);
+    $this->assertDatabaseMissing('task_user', ['task_id' => $task->id]);
+});
+
+test('unauthorized user receives 403 forbidden when mounting component and task persists in database', function () {
+    $owner = User::factory()->create();
+    $intruder = User::factory()->create();
+    $project = Project::factory()->create(['owner_id' => $owner->id]);
+    $task = Task::factory()->create([
+        'project_id' => $project->id,
+        'title' => 'Intruder Cannot Touch',
+    ]);
+
+    Livewire::actingAs($intruder)
+        ->test('pages::projects.tasks.show', ['project' => $project, 'task' => $task])
+        ->assertForbidden();
+
+    $this->assertDatabaseHas('tasks', [
+        'id' => $task->id,
+        'title' => 'Intruder Cannot Touch',
+    ]);
+});

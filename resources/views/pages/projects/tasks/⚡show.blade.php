@@ -36,8 +36,21 @@ class extends Component {
         $this->form->update($this->task);
         $this->task->refresh();
     }
+
+    public function delete(): void
+    {
+        $this->authorize('delete', $this->task);
+
+        $this->task->delete();
+
+        $this->redirect(route('project.tasks', $this->project), navigate: true);
+    }
 };
 ?>
+
+@php
+    $modalName = 'delete-task-'.$task->id;
+@endphp
 
 <div class="max-w-4xl mx-auto w-full py-6 space-y-6">
     <!-- Breadcrumb / Back Navigation -->
@@ -132,11 +145,35 @@ class extends Component {
                 </flux:select>
             </div>
 
-            <div class="flex items-center justify-end pt-4 border-t border-zinc-200 dark:border-zinc-800">
+            <div class="flex items-center justify-between pt-4 border-t border-zinc-200 dark:border-zinc-800">
+                <flux:modal.trigger name="{{ $modalName }}">
+                    <flux:button type="button" variant="danger">Delete task</flux:button>
+                </flux:modal.trigger>
+
                 <flux:button type="submit" variant="primary">Save changes</flux:button>
             </div>
         </form>
     </flux:card>
+
+    <!-- Delete Task Confirmation Modal -->
+    <flux:modal name="{{ $modalName }}" class="min-w-[22rem]">
+        <div class="space-y-6">
+            <div>
+                <flux:heading size="lg">Delete Task</flux:heading>
+                <flux:text class="mt-2">
+                    Are you sure you want to delete this task? This action cannot be undone.
+                </flux:text>
+            </div>
+
+            <div class="flex justify-end gap-2">
+                <flux:modal.close>
+                    <flux:button variant="ghost">Cancel</flux:button>
+                </flux:modal.close>
+
+                <flux:button variant="danger" wire:click="delete">Delete</flux:button>
+            </div>
+        </div>
+    </flux:modal>
 
     @persist('toast')
         <flux:toast />
