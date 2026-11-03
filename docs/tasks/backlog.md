@@ -20,7 +20,8 @@ Orden y motivos: ver [`../roadmap.md`](../roadmap.md).
 - [x] [BACKEND] Enums TaskStatus y TaskPriority validados en TaskForm y ReorderTasks — no se guarda un estado o prioridad inválidos — depende de: - (commit `bb637b5`)
 - [x] [FRONTEND] Dashboard filtra por TaskStatus::Done en lugar de `'completed'` — las tareas Done no aparecen como urgentes ni en los contadores — depende de: Enums (commit `1a42a81`)
 - [ ] [BACKEND] Usar `users.timezone` en vencimientos — una tarea no aparece vencida antes de tiempo en zonas UTC-x — depende de: -
-- [ ] [FRONTEND] Página de detalle de tarea + rutas de tareas con `Route::livewire` — `/projects/{p}/tasks/{t}` muestra la tarea y permite editarla — depende de: Policies
+- [x] [FRONTEND] Página de detalle de tarea + rutas de tareas con `Route::livewire` — `/projects/{p}/tasks/{t}` muestra la tarea y permite editarla — depende de: Policies (commit `bc10ad8`)
+- [ ] [FRONTEND] Borrar tarea desde la página de detalle (modal de confirmación, TaskPolicy::delete, redirección al tablero) — depende de: Página de detalle
 - [ ] [BACKEND] Arreglar el ZIP de carpetas — se despacha el job, lee del disco real (S3) y el link llega por notificación visible en la UI — depende de: -
 - [ ] [BACKEND] Mover la lógica de las vistas SFC a Actions/Forms (stats del dashboard, guardado del editor, posición de tareas) — las vistas no contienen consultas de negocio — depende de: -
 - [x] [FRONTEND] Unificar el mapa de colores de estado de tareas — una sola fuente usada por los componentes — depende de: Enums (commit `0b76c24`)

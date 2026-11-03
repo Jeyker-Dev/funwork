@@ -23,6 +23,8 @@ Avance: **100% completada y cerrada** — registro cerrado (`0d4c87b`), Policies
 
 ## Fase 1 — Integridad de lo existente
 
+Avance: **Sprint 1 de Fase 1 cerrado** — enums de tareas validados, filtro del dashboard corregido, mapa de colores unificado, página de detalle de tarea y rutas de tareas migradas a `Route::livewire`. Quedan tareas pendientes en el backlog de la fase.
+
 - Enums `TaskStatus` (Todo/Doing/Done) y `TaskPriority`, validados en `TaskForm` y `ReorderTasks`. Corregir el filtro `'completed'` del dashboard (`pages/projects/⚡show.blade.php:33,38-39`).
 - Usar `users.timezone` en vencimientos y en "hoy".
 - Página de detalle de tarea (hoy la vista está vacía) y rutas de tareas con `Route::livewire`.
