@@ -2,15 +2,20 @@
 
 Tareas tomadas del backlog para ejecutar ahora. Las grandes abren un documento `odd/tasks/<feature>.md`.
 
-**Sprint:** Fase 1 — Integridad (aprobado el 2026-11-02)
+**Sprint:** Fase 1 — Integridad, sprint 2 (aprobado el 2026-11-03)
 
 ## En curso
 
-(Ninguna tarea en curso)
+- [ ] [BACKEND] Usar `users.timezone` en vencimientos — una tarea no aparece vencida antes de tiempo en zonas UTC-x — depende de: -
+- [ ] [BACKEND] Escapar los comodines de `LIKE` en la búsqueda de archivos — buscar `%` o `_` no rompe los resultados — depende de: -
+- [ ] [BACKEND] Tablero: eager loading de asignados y menos queries por columna — sin N+1 en el tablero — depende de: -
 
 ## Hechas en este sprint
 
 - [x] [FRONTEND] Borrar tarea desde la página de detalle (modal de confirmación, TaskPolicy::delete, redirección al tablero) — depende de: Página de detalle (commit `5981fda`)
+
+## Sprint anterior: Fase 1 — Integridad, sprint 1 (cerrado el 2026-11-02)
+
 - [x] [FRONTEND] Página de detalle de tarea + rutas de tareas con `Route::livewire` — `/projects/{p}/tasks/{t}` muestra la tarea y permite editarla — depende de: Policies (commit `bc10ad8`)
 - [x] [FRONTEND] Unificar el mapa de colores de estado de tareas — una sola fuente usada por los componentes — depende de: Enums (commit `0b76c24`)
 - [x] [FRONTEND] Dashboard filtra por TaskStatus::Done en lugar de `'completed'` — las tareas Done no aparecen como urgentes ni en los contadores — depende de: Enums (commit `1a42a81`)
