@@ -2,6 +2,7 @@
 
 ## 2026-11-03
 
+- Escapar los comodines de `LIKE` en la búsqueda de archivos y carpetas (`pages::projects.files.index`): creación del helper reutilizable `App\Support\QueryHelper::escapeLike` para escapar `!`, `%` y `_` (usando `!` como carácter de escape y `whereRaw("name LIKE ? ESCAPE '!'", ...)` compatible con SQLite y MySQL); cobertura con tests unitarios en `tests/Unit/Support/QueryHelperTest.php` y pruebas en `tests/Feature/Livewire/Projects/Files/IndexTest.php` para `%`, `_` (archivos y carpetas), regresión de texto normal y `!` (commit `0cd9d7e`).
 - Borrado de tareas desde la página de detalle (`pages::projects.tasks.show`): botón "Delete task" con modal de confirmación Flux (`<flux:modal>` y `<flux:modal.trigger>`), método `delete()` con autorización `TaskPolicy::delete`, eliminación en cascada de asignaciones y redirección con `navigate` a `project.tasks`; cobertura de tests en `tests/Feature/Livewire/Projects/Tasks/ShowTaskTest.php` (commit `5981fda`).
 
 ## 2026-11-02

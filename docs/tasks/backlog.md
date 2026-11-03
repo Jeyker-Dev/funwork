@@ -27,7 +27,8 @@ Orden y motivos: ver [`../roadmap.md`](../roadmap.md).
 - [x] [FRONTEND] Unificar el mapa de colores de estado de tareas — una sola fuente usada por los componentes — depende de: Enums (commit `0b76c24`)
 - [ ] [BACKEND] Tablero: eager loading de asignados y menos queries por columna — sin N+1 en el tablero — depende de: -
 - [ ] [DEVOPS] Deploy: migrar antes de servir y hacer backup de la base de datos antes de migrar — el código nuevo nunca corre sobre un esquema viejo — depende de: -
-- [ ] [BACKEND] Escapar los comodines de `LIKE` en la búsqueda de archivos — buscar `%` o `_` no rompe los resultados — depende de: -
+- [x] [BACKEND] Escapar los comodines de `LIKE` en la búsqueda de archivos — buscar `%` o `_` no rompe los resultados — depende de: - (commit `0cd9d7e`)
+- [ ] [BACKEND] Escapar los comodines de `LIKE` en la búsqueda de proyectos (`⚡project-finder`, `⚡show-projects`) usando el helper de escape — buscar `%` o `_` no devuelve todos los proyectos — depende de: Escapar LIKE en archivos
 - [ ] [QA] Verificar la cobertura de tests de búsqueda global y del dashboard — tests de Pest en verde para ambos — depende de: -
 - [x] [QA] Arreglar los 5 tests que ya fallaban (ShowProjects, UploadFileForm, Files/Index upload, ProfileUpdate ×2) — suite de Pest en verde — depende de: - (traída al sprint de Fase 0, commit `2b29862`)
 

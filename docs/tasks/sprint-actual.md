@@ -7,11 +7,11 @@ Tareas tomadas del backlog para ejecutar ahora. Las grandes abren un documento `
 ## En curso
 
 - [ ] [BACKEND] Usar `users.timezone` en vencimientos — una tarea no aparece vencida antes de tiempo en zonas UTC-x — depende de: -
-- [ ] [BACKEND] Escapar los comodines de `LIKE` en la búsqueda de archivos — buscar `%` o `_` no rompe los resultados — depende de: -
 - [ ] [BACKEND] Tablero: eager loading de asignados y menos queries por columna — sin N+1 en el tablero — depende de: -
 
 ## Hechas en este sprint
 
+- [x] [BACKEND] Escapar los comodines de `LIKE` en la búsqueda de archivos — buscar `%` o `_` no rompe los resultados — depende de: - (commit `0cd9d7e`)
 - [x] [FRONTEND] Borrar tarea desde la página de detalle (modal de confirmación, TaskPolicy::delete, redirección al tablero) — depende de: Página de detalle (commit `5981fda`)
 
 ## Sprint anterior: Fase 1 — Integridad, sprint 1 (cerrado el 2026-11-02)
