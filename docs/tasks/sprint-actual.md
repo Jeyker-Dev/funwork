@@ -7,7 +7,7 @@ Tareas tomadas del backlog para ejecutar ahora. Las grandes abren un documento `
 ## En curso
 
 - [ ] [BACKEND] Usar `users.timezone` en vencimientos — una tarea no aparece vencida antes de tiempo en zonas UTC-x — depende de: -
-- [ ] [BACKEND] Tablero: eager loading de asignados y menos queries por columna — sin N+1 en el tablero — depende de: -
+- [ ] [QA] Test que fija la cantidad de queries del tablero (`⚡task-board`) — la cantidad de queries no crece con la cantidad de tareas ni de asignados — depende de: -
 
 ## Hechas en este sprint
 

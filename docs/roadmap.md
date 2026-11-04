@@ -30,7 +30,7 @@ Avance: **Sprint 1 de Fase 1 cerrado** — enums de tareas validados, filtro del
 - Página de detalle de tarea (hoy la vista está vacía) y rutas de tareas con `Route::livewire`.
 - Arreglar el ZIP de carpetas: despachar `CreateFolderZipJob`, leer del disco real (S3) y mostrar las notificaciones en la UI.
 - Mover las consultas y reglas de las vistas SFC a Actions o Forms. Unificar el mapa de colores de estado (hoy está repetido en 5 componentes).
-- Tablero: eager loading de asignados, menos queries por columna.
+- ~~Tablero: eager loading de asignados, menos queries por columna.~~ Descartada: sin N+1 real; se reemplaza por un test que fija la cantidad de queries.
 - Deploy: correr `migrate --force` antes de servir la nueva versión y hacer backup de la base de datos antes de migrar.
 - Escapar los comodines de `LIKE` en la búsqueda de archivos.
 
