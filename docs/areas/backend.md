@@ -32,6 +32,7 @@ Laravel 13. Skills de referencia: `laravel-clean-architecture` y `pest-laravel-t
 ### Tareas
 - Varios asignados por tarea (pivot `task_user`); el selector solo ofrece al usuario autenticado y `TaskForm` valida `assignedUserIds.*` contra `auth()->id()`.
 - Estados y prioridades usan obligatoriamente los Backed Enums `App\Enums\TaskStatus` (`Todo`, `Doing`, `Done`) y `App\Enums\TaskPriority` (`Low`, `Medium`, `High`), casteados en `Task`, validados con `Rule::enum` en `TaskForm` y `ConvertInboxToTaskForm`, y verificados con `TaskStatus::tryFrom` antes de la transacción en `ReorderTasks`. El dashboard aún filtra por `'completed'` (pendiente de unificar con `TaskStatus::Done`).
+- Vencimientos y fecha local: `tasks.due_date` es `dateTime` (almacenado como `'Y-m-d 00:00:00'`) y se compara siempre por fecha (`whereDate`), nunca contra `now()`. La fecha local del usuario se calcula como `now(auth()->user()->timezone ?? config('app.timezone'))->toDateString()` centralizada en `App\Support\DateHelper::userToday()` y en `$user->localDate()`. Regla de vencimiento: una tarea se considera vencida ("Overdue") si su fecha es anterior al día local del usuario (`due_date < localToday`), y "de hoy" ("Due today") si coincide con el día local del usuario (`due_date == localToday`) (commit `ba699d3`).
 
 ### Inbox
 - Los ítems se convierten a otros elementos mediante modales.
