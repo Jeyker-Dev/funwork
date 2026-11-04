@@ -38,6 +38,8 @@ Orden y motivos: ver [`../roadmap.md`](../roadmap.md).
 
 - [ ] [DATABASE] Áreas por proyecto (frontend, backend, database, design; configurables) y etiqueta de área en tareas y notas — se puede filtrar el tablero por área — depende de: Fase 1
 - [ ] [BACKEND] Importador de tareas desde NotebookLM (formato fijo pegado en un textarea) — pegar N líneas crea N tareas con área y criterio — depende de: Áreas
+- [ ] [BACKEND] Comando `funwork:sync-docs {project}` — espeja `docs/` del repo (sin `docs/archive/`) en el notebook "Docs" del proyecto: una página por archivo, upsert por ruta y borrado de las páginas cuyo archivo ya no existe — depende de: -
+- [ ] [DEVOPS] Workflow de GitHub que ejecuta `funwork:sync-docs` en el VPS en cada push que toca `docs/**` (reusa los secrets SSH del deploy) — un cambio en `docs/` aparece en FunWork sin pasos manuales — depende de: Comando sync-docs
 - [ ] [BACKEND] Export "Project pack" en Markdown (notebooks, tareas, decisiones) — se descarga un `.md` listo para subir a NotebookLM — depende de: -
 - [ ] [BACKEND] Sincronizar el "Project pack" con un Google Doc (OAuth con Google, API de Docs/Drive) — desde FunWork se actualiza el Google Doc y en NotebookLM basta con "Sync" para refrescar la fuente — depende de: Export "Project pack"
 

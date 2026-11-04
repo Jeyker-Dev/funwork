@@ -2,11 +2,20 @@
 
 Tareas tomadas del backlog para ejecutar ahora. Las grandes abren un documento `odd/tasks/<feature>.md`.
 
-**Sprint:** Fase 1 — Integridad, sprint 2 (aprobado el 2026-11-03)
+**Sprint:** Fase 2 adelantada — Flujo NotebookLM (aprobado el 2026-11-04). Se adelanta respecto de la Fase 1 para eliminar el reemplazo manual de fuentes en NotebookLM.
 
 ## En curso
 
+- [ ] [BACKEND] Comando `funwork:sync-docs {project}` — espeja `docs/` del repo (sin `docs/archive/`) en el notebook "Docs" del proyecto: una página por archivo, upsert por ruta y borrado de las páginas cuyo archivo ya no existe — depende de: -
+- [ ] [DEVOPS] Workflow de GitHub que ejecuta `funwork:sync-docs` en el VPS en cada push que toca `docs/**` (reusa los secrets SSH del deploy) — un cambio en `docs/` aparece en FunWork sin pasos manuales — depende de: Comando sync-docs
+- [ ] [BACKEND] Export "Project pack" en Markdown (notebooks, tareas, decisiones) — se descarga un `.md` listo para subir a NotebookLM — depende de: -
+- [ ] [BACKEND] Sincronizar el "Project pack" con un Google Doc (OAuth con Google, API de Docs/Drive) — desde FunWork se actualiza el Google Doc y en NotebookLM basta con "Sync" para refrescar la fuente — depende de: Export "Project pack"
+
 ## Hechas en este sprint
+
+(Ninguna todavía)
+
+## Sprint anterior: Fase 1 — Integridad, sprint 2 (cerrado el 2026-11-04)
 
 - [x] [BACKEND] Usar `users.timezone` en vencimientos — una tarea no aparece vencida antes de tiempo en zonas UTC-x — depende de: - (commit `ba699d3`)
 - [x] [QA] Test que fija la cantidad de queries del tablero (`⚡task-board`) — la cantidad de queries no crece con la cantidad de tareas ni de asignados — depende de: - (commit `6fee098`)

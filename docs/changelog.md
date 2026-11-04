@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-04
+
+- Sprint 2 de la Fase 1 cerrado. Se adelanta el flujo NotebookLM de la Fase 2: espejo de `docs/` en el notebook "Docs" del proyecto FunWork (comando `funwork:sync-docs` + workflow de GitHub por SSH, sin API tokens), Export "Project pack" y sync con Google Docs.
+
 ## 2026-11-03
 
 - Vencimientos según zona horaria del usuario (`App\Support\DateHelper::userToday`): cálculo de fecha local `now(auth()->user()->timezone ?? config('app.timezone'))->toDateString()` centralizado en helper reutilizable y método `$user->localDate()`; consultas de `urgentTasks` (`whereDate('due_date', '<=', $localToday)`) y `today_tasks_count` (`whereDate('due_date', $localToday)`) en `resources/views/pages/projects/⚡show.blade.php`; corrección del widget de urgentes (`resources/views/components/projects/dashboard/urgent-tasks.blade.php`) mostrando `$task->title` (antes `$task->name`) y etiquetas "Overdue" si la fecha es anterior al día local y "Due today" si es igual; cobertura con tests unitarios en `tests/Unit/Support/DateHelperTest.php` y de feature en `tests/Feature/Livewire/Pages/Projects/ShowDashboardTest.php` (commit `ba699d3`).

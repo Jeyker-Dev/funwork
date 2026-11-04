@@ -39,6 +39,7 @@ Avance: **Sprint 1 de Fase 1 cerrado** — enums de tareas validados, filtro del
 - **Áreas como dato** (`frontend`, `backend`, `database`, `design`, configurables por proyecto) para etiquetar tareas y notas.
 - **Importador de tareas:** pegar la salida de NotebookLM en el formato `- [ ] [AREA] Título — criterio — depende de: X` y crear las tareas en lote.
 - **Project pack:** exportar a Markdown los notebooks, las tareas y las decisiones del proyecto para subirlo a NotebookLM. Las páginas ya son JSON `{title, body}` en texto plano.
+- **Espejo de `docs/` (adelantado, sprint del 2026-11-04):** el repo sigue siendo la fuente de verdad; un workflow de GitHub ejecuta `funwork:sync-docs` en el VPS por SSH y copia `docs/` al notebook "Docs" del proyecto FunWork. Así el Project pack incluye los docs y NotebookLM se refresca con "Sync" en Google Docs.
 
 ## Fase 3 — FunWork como servidor MCP para Antigravity
 
