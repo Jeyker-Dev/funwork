@@ -3,6 +3,7 @@
 use App\Enums\TaskStatus;
 use App\Livewire\Forms\QuickCaptureForm;
 use App\Models\Project;
+use App\Support\DateHelper;
 use Flux\Flux;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -31,19 +32,21 @@ class extends Component {
 
     public function with(): array
     {
+        $localToday = DateHelper::userToday();
+
         return [
             'recentActivities' => $this->project->getRecentActivities()->take(5),
             'urgentTasks' => $this->project->tasks()
-                ->where('due_date', '<=', now())
+                ->whereDate('due_date', '<=', $localToday)
                 ->where('status', '!=', TaskStatus::Done->value)
                 ->orderBy('due_date', 'asc')
                 ->take(5)
                 ->get(),
             'stats' => [
                 'tasks_count' => $this->project->tasks()->where('status', '!=', TaskStatus::Done->value)->count(),
-                'today_tasks_count' => $this->project->tasks()->where('status', '!=', TaskStatus::Done->value)->whereDate('due_date', now()->toDateString())->count(),
+                'today_tasks_count' => $this->project->tasks()->where('status', '!=', TaskStatus::Done->value)->whereDate('due_date', $localToday)->count(),
                 'inbox_count' => \App\Models\InboxItem::where('project_id', $this->project->id)->count(),
-            ]
+            ],
         ];
     }
 };
