@@ -7,10 +7,10 @@ Tareas tomadas del backlog para ejecutar ahora. Las grandes abren un documento `
 ## En curso
 
 - [ ] [BACKEND] Usar `users.timezone` en vencimientos — una tarea no aparece vencida antes de tiempo en zonas UTC-x — depende de: -
-- [ ] [QA] Test que fija la cantidad de queries del tablero (`⚡task-board`) — la cantidad de queries no crece con la cantidad de tareas ni de asignados — depende de: -
 
 ## Hechas en este sprint
 
+- [x] [QA] Test que fija la cantidad de queries del tablero (`⚡task-board`) — la cantidad de queries no crece con la cantidad de tareas ni de asignados — depende de: - (commit `6fee098`)
 - [x] [BACKEND] Escapar los comodines de `LIKE` en la búsqueda de archivos — buscar `%` o `_` no rompe los resultados — depende de: - (commit `0cd9d7e`)
 - [x] [FRONTEND] Borrar tarea desde la página de detalle (modal de confirmación, TaskPolicy::delete, redirección al tablero) — depende de: Página de detalle (commit `5981fda`)
 

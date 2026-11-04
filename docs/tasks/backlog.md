@@ -26,7 +26,8 @@ Orden y motivos: ver [`../roadmap.md`](../roadmap.md).
 - [ ] [BACKEND] Mover la lógica de las vistas SFC a Actions/Forms (stats del dashboard, guardado del editor, posición de tareas) — las vistas no contienen consultas de negocio — depende de: -
 - [x] [FRONTEND] Unificar el mapa de colores de estado de tareas — una sola fuente usada por los componentes — depende de: Enums (commit `0b76c24`)
 - [~] [BACKEND] Tablero: eager loading de asignados y menos queries por columna — DESCARTADA el 2026-11-03: el tablero no muestra asignados y ya hace 6 queries fijas (`limit(3)` + `count()` por columna); se reemplaza por el test de cantidad de queries
-- [ ] [QA] Test que fija la cantidad de queries del tablero (`⚡task-board`) — la cantidad de queries no crece con la cantidad de tareas ni de asignados — depende de: -
+- [x] [QA] Test que fija la cantidad de queries del tablero (`⚡task-board`) — la cantidad de queries no crece con la cantidad de tareas ni de asignados — depende de: - (commit `6fee098`)
+- [ ] [FRONTEND] Montar el slider de tareas ocultas solo al abrir el modal (lazy) — el tablero no ejecuta las queries del slider hasta que el usuario abre el modal — depende de: -
 - [ ] [DEVOPS] Deploy: migrar antes de servir y hacer backup de la base de datos antes de migrar — el código nuevo nunca corre sobre un esquema viejo — depende de: -
 - [x] [BACKEND] Escapar los comodines de `LIKE` en la búsqueda de archivos — buscar `%` o `_` no rompe los resultados — depende de: - (commit `0cd9d7e`)
 - [ ] [BACKEND] Escapar los comodines de `LIKE` en la búsqueda de proyectos (`⚡project-finder`, `⚡show-projects`) usando el helper de escape — buscar `%` o `_` no devuelve todos los proyectos — depende de: Escapar LIKE en archivos
