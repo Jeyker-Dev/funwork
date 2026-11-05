@@ -2,7 +2,7 @@
 # Usage: docker compose -f compose.prod.yml up -d
 
 x-app: &app
-    image: '${APP_IMAGE:-ghcr.io/jeyker-dev/funwork:latest}'
+    image: '${APP_IMAGE:-funwork:latest}'
     restart: unless-stopped
     env_file: .env
     volumes:

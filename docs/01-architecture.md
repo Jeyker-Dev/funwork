@@ -10,6 +10,7 @@
 - **Testing:** Pest v4 + pest-plugin-laravel. **Lint:** Laravel Pint.
 - **CI:** GitHub Actions (`lint.yml`, `tests.yml`).
 - **CD:** `deploy.yml` construye la imagen y despliega al VPS en cada push a `master`. `sync-docs.yml` espeja `docs/` en el notebook "Docs" del proyecto FunWork en cada push a `develop` o `master` que toca `docs/**`: copia `docs/` al contenedor `app` y corre `funwork:sync-docs`. Requiere los secrets `VPS_HOST`, `VPS_USERNAME`, `VPS_SSH_KEY` y `FUNWORK_DOCS_PROJECT_ID` (ID del proyecto FunWork en producción). Ambos workflows comparten el grupo de concurrencia `deploy-production`, así una sincronización nunca corre mientras se recrea el contenedor.
+- **Deploy manual (`scripts/deploy.sh`):** alternativa a Actions mientras la cuenta de GitHub está bloqueada por facturación (2026-11-05). Corre Pest y Pint en local y después, por SSH: actualiza un clon en `~/funwork/src`, construye la imagen `funwork:<sha>` en el VPS (sin GHCR), levanta el stack, migra y espeja `docs/` con `funwork:sync-docs`. Se configura con `FUNWORK_DEPLOY_HOST`, `FUNWORK_DOCS_PROJECT_ID` y `FUNWORK_DEPLOY_BRANCH` (por defecto `master`), en el entorno o en un `.deploy.env` que está en `.gitignore`. En el VPS necesita git, `~/funwork/.env` y `~/funwork/auth.json` (credenciales de Flux Pro). `compose.prod.yml` toma por defecto la imagen local `funwork:latest`.
 
 ## Capas y responsabilidades
 

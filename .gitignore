@@ -23,3 +23,6 @@ yarn-error.log
 /.vscode
 /.zed
 AGENTS.md
+
+# Local deploy settings (scripts/deploy.sh)
+.deploy.env

@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-05
+
+- Deploy manual con `scripts/deploy.sh`: tests y lint en local, y por SSH build de la imagen en el VPS, `up`, `migrate` y `funwork:sync-docs`, sin GitHub Actions ni GHCR. La cuenta de GitHub quedó bloqueada por un pago de US$1,29 que no se pudo cobrar. `compose.prod.yml` pasa a usar por defecto la imagen local `funwork:latest` (`deploy.yml` sigue pasando `APP_IMAGE`, así que no le afecta). Se agrega `.deploy.env` a `.gitignore` (commit pendiente).
+
 ## 2026-11-04
 
 - CI: se quita PHP 8.3 de la matriz de `tests.yml` y `composer.json` pasa a `"php": "^8.4.1"`. El `composer.lock` usa Symfony 8 (PHP >= 8.4.1) desde `d6c9f05`, así que el job `ci (8.3)` fallaba al instalar dependencias en cada push. Producción ya corre PHP 8.4 (FrankenPHP).
