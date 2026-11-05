@@ -9,6 +9,7 @@
 - **Notificaciones:** `DatabaseNotification` (por ejemplo, el link de descarga del ZIP).
 - **Testing:** Pest v4 + pest-plugin-laravel. **Lint:** Laravel Pint.
 - **CI:** GitHub Actions (`lint.yml`, `tests.yml`).
+- **CD:** `deploy.yml` construye la imagen y despliega al VPS en cada push a `master`. `sync-docs.yml` espeja `docs/` en el notebook "Docs" del proyecto FunWork en cada push a `develop` o `master` que toca `docs/**`: copia `docs/` al contenedor `app` y corre `funwork:sync-docs`. Requiere los secrets `VPS_HOST`, `VPS_USERNAME`, `VPS_SSH_KEY` y `FUNWORK_DOCS_PROJECT_ID` (ID del proyecto FunWork en producción). Ambos workflows comparten el grupo de concurrencia `deploy-production`, así una sincronización nunca corre mientras se recrea el contenedor.
 
 ## Capas y responsabilidades
 

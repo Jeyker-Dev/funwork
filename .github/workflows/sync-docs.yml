@@ -1,0 +1,63 @@
+name: Sincronizar docs en FunWork
+
+on:
+  push:
+    branches:
+      - develop
+      - master
+    paths:
+      - 'docs/**'
+  workflow_dispatch:
+
+# Shares the deploy group so a sync never runs while the app container is being recreated.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check project ID secret
+        env:
+          PROJECT_ID: ${{ secrets.FUNWORK_DOCS_PROJECT_ID }}
+        run: |
+          if [ -z "$PROJECT_ID" ]; then
+            echo "::error::FUNWORK_DOCS_PROJECT_ID is empty. Add it as a repository secret."
+            exit 1
+          fi
+
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      # The image only rebuilds on master, so the docs/ baked into the container can be stale.
+      - name: Copy docs to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          source: docs
+          target: funwork/docs-sync
+          strip_components: 1
+          rm: true
+
+      - name: Mirror docs into the Docs notebook
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          PROJECT_ID: ${{ secrets.FUNWORK_DOCS_PROJECT_ID }}
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          envs: PROJECT_ID
+          script: |
+            set -e
+            cd ~/funwork
+            docker compose -f compose.prod.yml exec -T app rm -rf /tmp/funwork-docs
+            docker compose -f compose.prod.yml cp docs-sync/. app:/tmp/funwork-docs
+            docker compose -f compose.prod.yml exec -T app php artisan funwork:sync-docs "$PROJECT_ID" --path=/tmp/funwork-docs
+            docker compose -f compose.prod.yml exec -T app rm -rf /tmp/funwork-docs
+            rm -rf ~/funwork/docs-sync
