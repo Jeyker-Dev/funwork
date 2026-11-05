@@ -2,7 +2,7 @@
 
 ## 2026-11-05
 
-- Deploy manual con `scripts/deploy.sh`: tests y lint en local, y por SSH build de la imagen en el VPS, `up`, `migrate` y `funwork:sync-docs`, sin GitHub Actions ni GHCR. La cuenta de GitHub quedó bloqueada por un pago de US$1,29 que no se pudo cobrar. `compose.prod.yml` pasa a usar por defecto la imagen local `funwork:latest` (`deploy.yml` sigue pasando `APP_IMAGE`, así que no le afecta). Se agrega `.deploy.env` a `.gitignore` (commit pendiente).
+- Deploy manual con `scripts/deploy.sh`: tests y lint en local, y por SSH build de la imagen en el VPS, `up`, `migrate` y `funwork:sync-docs`, sin GitHub Actions ni GHCR. La cuenta de GitHub quedó bloqueada por un pago de US$1,29 que no se pudo cobrar. `compose.prod.yml` pasa a usar por defecto la imagen local `funwork:latest` (`deploy.yml` sigue pasando `APP_IMAGE`, así que no le afecta). Se agrega `.deploy.env` a `.gitignore` (commit 49897e6).
 
 ## 2026-11-04
 
