@@ -97,12 +97,13 @@ main() {
     docker compose -f compose.prod.yml exec -T app php artisan migrate --force </dev/null
 
     # docs/ is excluded from the image (.dockerignore), so it is copied in from the checkout.
+    # docker compose cp keeps the host uid, which appuser cannot delete in /tmp, so cleanup runs as root.
     if [[ -n "$PROJECT_ID" ]]; then
         echo "==> Syncing docs into project $PROJECT_ID"
-        docker compose -f compose.prod.yml exec -T app rm -rf /tmp/funwork-docs </dev/null
+        docker compose -f compose.prod.yml exec -T -u root app rm -rf /tmp/funwork-docs </dev/null
         docker compose -f compose.prod.yml cp src/docs/. app:/tmp/funwork-docs
         docker compose -f compose.prod.yml exec -T app php artisan funwork:sync-docs "$PROJECT_ID" --path=/tmp/funwork-docs </dev/null
-        docker compose -f compose.prod.yml exec -T app rm -rf /tmp/funwork-docs </dev/null
+        docker compose -f compose.prod.yml exec -T -u root app rm -rf /tmp/funwork-docs </dev/null
     else
         echo "==> FUNWORK_DOCS_PROJECT_ID is empty, skipping docs sync"
     fi

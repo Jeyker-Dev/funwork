@@ -3,7 +3,8 @@
 ## 2026-11-05
 
 - Deploy manual con `scripts/deploy.sh`: tests y lint en local, y por SSH build de la imagen en el VPS, `up`, `migrate` y `funwork:sync-docs`, sin GitHub Actions ni GHCR. La cuenta de GitHub quedó bloqueada por un pago de US$1,29 que no se pudo cobrar. `compose.prod.yml` pasa a usar por defecto la imagen local `funwork:latest` (`deploy.yml` sigue pasando `APP_IMAGE`, así que no le afecta). Se agrega `.deploy.env` a `.gitignore` (commit 49897e6).
-- Fix en `scripts/deploy.sh`: el bloque remoto se ejecuta dentro de una función `main`. Antes `docker compose exec` leía el resto del script desde stdin (`bash -s`), así que después de `migrate` el deploy terminaba sin error y sin sincronizar los docs ni limpiar las imágenes viejas (commit pendiente).
+- Fix en `scripts/deploy.sh`: el bloque remoto se ejecuta dentro de una función `main`. Antes `docker compose exec` leía el resto del script desde stdin (`bash -s`), así que después de `migrate` el deploy terminaba sin error y sin sincronizar los docs ni limpiar las imágenes viejas (commit 81f027d).
+- Fix en `scripts/deploy.sh`: la limpieza de `/tmp/funwork-docs` dentro del contenedor corre como root. `docker compose cp` deja los archivos con el uid del host y `appuser` no los podía borrar, así que el deploy fallaba después de sincronizar y el siguiente se cortaba antes de la sync (commit pendiente).
 
 ## 2026-11-04
 
