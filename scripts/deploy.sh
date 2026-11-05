@@ -63,51 +63,58 @@ echo "==> Deploying origin/$branch to $host"
 ssh "$host" "BRANCH=$(printf %q "$branch") REPO_URL=$(printf %q "$repo_url") PROJECT_ID=$(printf %q "$project_id") bash -s" <<'REMOTE'
 set -euo pipefail
 
-cd ~/funwork
+# bash -s reads this script from stdin as it runs, and docker compose exec
+# keeps stdin attached, so it would swallow the remaining lines. Wrapping
+# everything in a function makes bash parse it all before running anything.
+main() {
+    cd ~/funwork
 
-if [[ ! -f auth.json ]]; then
-    echo "~/funwork/auth.json is missing (Flux Pro credentials for composer)." >&2
-    exit 1
-fi
+    if [[ ! -f auth.json ]]; then
+        echo "~/funwork/auth.json is missing (Flux Pro credentials for composer)." >&2
+        exit 1
+    fi
 
-# Dedicated checkout used only for builds; local edits there are discarded.
-if [[ ! -d src/.git ]]; then
-    git clone --quiet "$REPO_URL" src
-fi
-git -C src fetch --quiet origin "$BRANCH"
-git -C src reset --quiet --hard "origin/$BRANCH"
+    # Dedicated checkout used only for builds; local edits there are discarded.
+    if [[ ! -d src/.git ]]; then
+        git clone --quiet "$REPO_URL" src
+    fi
+    git -C src fetch --quiet origin "$BRANCH"
+    git -C src reset --quiet --hard "origin/$BRANCH"
 
-sha="$(git -C src rev-parse --short HEAD)"
-echo "==> Building funwork:$sha"
+    sha="$(git -C src rev-parse --short HEAD)"
+    echo "==> Building funwork:$sha"
 
-cp src/compose.prod.yml compose.prod.yml
+    cp src/compose.prod.yml compose.prod.yml
 
-DOCKER_BUILDKIT=1 docker build \
-    --secret id=composer_auth,src="$HOME/funwork/auth.json" \
-    -t "funwork:$sha" \
-    -t funwork:latest \
-    src
+    DOCKER_BUILDKIT=1 docker build \
+        --secret id=composer_auth,src="$HOME/funwork/auth.json" \
+        -t "funwork:$sha" \
+        -t funwork:latest \
+        src
 
-export APP_IMAGE="funwork:$sha"
-docker compose -f compose.prod.yml up -d --remove-orphans
-docker compose -f compose.prod.yml exec -T app php artisan migrate --force
+    export APP_IMAGE="funwork:$sha"
+    docker compose -f compose.prod.yml up -d --remove-orphans
+    docker compose -f compose.prod.yml exec -T app php artisan migrate --force </dev/null
 
-# docs/ is excluded from the image (.dockerignore), so it is copied in from the checkout.
-if [[ -n "$PROJECT_ID" ]]; then
-    echo "==> Syncing docs into project $PROJECT_ID"
-    docker compose -f compose.prod.yml exec -T app rm -rf /tmp/funwork-docs
-    docker compose -f compose.prod.yml cp src/docs/. app:/tmp/funwork-docs
-    docker compose -f compose.prod.yml exec -T app php artisan funwork:sync-docs "$PROJECT_ID" --path=/tmp/funwork-docs
-    docker compose -f compose.prod.yml exec -T app rm -rf /tmp/funwork-docs
-else
-    echo "==> FUNWORK_DOCS_PROJECT_ID is empty, skipping docs sync"
-fi
+    # docs/ is excluded from the image (.dockerignore), so it is copied in from the checkout.
+    if [[ -n "$PROJECT_ID" ]]; then
+        echo "==> Syncing docs into project $PROJECT_ID"
+        docker compose -f compose.prod.yml exec -T app rm -rf /tmp/funwork-docs </dev/null
+        docker compose -f compose.prod.yml cp src/docs/. app:/tmp/funwork-docs
+        docker compose -f compose.prod.yml exec -T app php artisan funwork:sync-docs "$PROJECT_ID" --path=/tmp/funwork-docs </dev/null
+        docker compose -f compose.prod.yml exec -T app rm -rf /tmp/funwork-docs </dev/null
+    else
+        echo "==> FUNWORK_DOCS_PROJECT_ID is empty, skipping docs sync"
+    fi
 
-# Keep only the running build and latest; images still in use are skipped.
-docker images funwork --format '{{.Tag}}' \
-    | grep -vxE "latest|$sha" \
-    | xargs -r -I{} docker rmi "funwork:{}" >/dev/null 2>&1 || true
-docker image prune -f >/dev/null
+    # Keep only the running build and latest; images still in use are skipped.
+    docker images funwork --format '{{.Tag}}' \
+        | grep -vxE "latest|$sha" \
+        | xargs -r -I{} docker rmi "funwork:{}" >/dev/null 2>&1 || true
+    docker image prune -f >/dev/null
 
-echo "==> Deployed funwork:$sha"
+    echo "==> Deployed funwork:$sha"
+}
+
+main
 REMOTE
