@@ -9,6 +9,7 @@ class NotebookPage extends Model
 {
     protected $fillable = [
         'notebook_id',
+        'source_path',
         'content',
         'order',
         'created_by',
