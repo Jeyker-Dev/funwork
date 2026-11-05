@@ -22,8 +22,21 @@ Laravel 13. Skills de referencia: `laravel-clean-architecture` y `pest-laravel-t
 
 ### Project pack (`project.pack`)
 - `GET /projects/{project}/pack` (`ProjectPackController`, middleware `can:view,project`) descarga `<slug>-project-pack.md`.
-- El Markdown lo arma `App\Actions\Projects\BuildProjectPackAction::execute(Project)`. No autoriza: quien la llama verifica el acceso. La va a reutilizar la sincronización con Google Docs, para que el Doc y el `.md` tengan el mismo contenido.
+- El Markdown lo arma `App\Actions\Projects\BuildProjectPackAction::execute(Project)`. No autoriza: quien la llama verifica el acceso. La reutiliza la sincronización con Google Docs, para que el Doc y el `.md` tengan el mismo contenido.
 - Contenido: tareas agrupadas por `TaskStatus` (orden del enum, por `position`), y notebooks no archivados por nombre con sus páginas por `order`. Una página sin título sale como "Página N".
+
+### Sincronización del Project pack con Google Docs
+- Cada usuario conecta su cuenta de Google en Settings → Integrations (`settings/integrations`). `GoogleAuthController` usa Socialite con el scope `drive.file` (solo los archivos que crea la app), `access_type=offline` y `prompt=consent` para recibir un refresh token. Si el usuario no concede Drive, la conexión se rechaza.
+- `google.callback` vuelve a `session('google_return_to')` solo si es una ruta relativa del mismo sitio; si no, va a Integrations.
+- `App\Services\Google\GoogleDriveClient` habla con Drive mediante el cliente `Http`, sin `google/apiclient`. Renueva el access token cuando vence o ante un 401 (un reintento). Crea el Doc subiendo Markdown con `mimeType` de Google Docs y lo actualiza con `PATCH ...?uploadType=media`, que reemplaza todo el contenido y conserva el ID.
+- `App\Actions\Projects\SyncProjectPackToGoogleDocAction` exige `ProjectPolicy::update` y arma el contenido con `BuildProjectPackAction`. Si el Doc guardado no existe o está en la papelera, crea uno nuevo. Ante `GoogleAuthorizationException` (sin conexión o refresh token revocado) borra la cuenta y la página del proyecto manda al usuario a conectar.
+- Configuración: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` y `GOOGLE_REDIRECT_URI` (por defecto `/auth/google/callback`, relativo a `APP_URL`).
+- Puesta en marcha en Google Cloud:
+  1. Crear un proyecto y habilitar la **Google Drive API**.
+  2. Configurar la pantalla de consentimiento OAuth (tipo External) con el scope `.../auth/drive.file`, que no es sensible y no requiere verificación de Google.
+  3. **Publicar la app ("In production")**. En modo Testing, Google vence los refresh tokens a los 7 días.
+  4. Crear credenciales "OAuth client ID" (Web application) con la URI de redirección `https://<dominio>/auth/google/callback` (y `http://localhost:8000/auth/google/callback` para desarrollo).
+  5. Cargar el client ID y el secret en el `.env` del VPS y volver a desplegar.
 
 ### Sincronización de documentación (`funwork:sync-docs`)
 - Comando `funwork:sync-docs {project : ID del proyecto} {--path= : carpeta de docs, por defecto base_path('docs')}` (`App\Console\Commands\SyncDocsCommand`): espeja archivos `*.md` del repo en el notebook "Docs" del proyecto dentro de una transacción `DB::transaction` (commit `1d782a3`).

@@ -5,7 +5,8 @@
 | Tabla | Notas |
 |---|---|
 | `users` | Incluye columnas de 2FA, `username`, `profile_photo_path` y `timezone`. |
-| `projects` | Usa `archived_at` (no `archive_at`). |
+| `projects` | Usa `archived_at` (no `archive_at`). `google_doc_id` y `google_doc_synced_at` (nullable) guardan el Google Doc del Project pack. |
+| `google_accounts` | Una cuenta de Google por usuario (`user_id` único). `access_token` y `refresh_token` se guardan con el cast `encrypted` (dependen de `APP_KEY`). |
 | `tasks` | `due_date` es una columna `date`. |
 | `task_user` | Pivot para varios asignados por tarea. |
 | `inbox_items` | Capturas rápidas por proyecto. |
