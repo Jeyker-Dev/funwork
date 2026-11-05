@@ -20,6 +20,11 @@ Laravel 13. Skills de referencia: `laravel-clean-architecture` y `pest-laravel-t
 ### Notebooks (`NotebookForm`)
 - Requeridos: `project_id`, `created_by`. Al crear: toast, cierre del modal, reset del formulario y evento `notebook-created`.
 
+### Project pack (`project.pack`)
+- `GET /projects/{project}/pack` (`ProjectPackController`, middleware `can:view,project`) descarga `<slug>-project-pack.md`.
+- El Markdown lo arma `App\Actions\Projects\BuildProjectPackAction::execute(Project)`. No autoriza: quien la llama verifica el acceso. La va a reutilizar la sincronización con Google Docs, para que el Doc y el `.md` tengan el mismo contenido.
+- Contenido: tareas agrupadas por `TaskStatus` (orden del enum, por `position`), y notebooks no archivados por nombre con sus páginas por `order`. Una página sin título sale como "Página N".
+
 ### Sincronización de documentación (`funwork:sync-docs`)
 - Comando `funwork:sync-docs {project : ID del proyecto} {--path= : carpeta de docs, por defecto base_path('docs')}` (`App\Console\Commands\SyncDocsCommand`): espeja archivos `*.md` del repo en el notebook "Docs" del proyecto dentro de una transacción `DB::transaction` (commit `1d782a3`).
 - Si el proyecto no existe: emite error y termina con código de salida 1 sin modificaciones.

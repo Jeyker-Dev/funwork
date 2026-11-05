@@ -58,7 +58,11 @@ class extends Component {
     <div class="mb-8">
         <h1 class="text-3xl font-bold text-orange-500 break-words">¡Buenos días, {{ auth()->user()->display_name ?? 'Alex' }}!</h1>
         <p class="text-gray-500 dark:text-zinc-400 mt-1">Aquí tienes un resumen de tu espacio de trabajo.</p>
-        
+
+        <flux:button :href="route('project.pack', $project)" icon="arrow-down-tray" size="sm" class="mt-4">
+            Descargar Project pack
+        </flux:button>
+
         <div class="grid grid-cols-2 gap-4 sm:max-w-md my-6">
             <!-- Metric 1: Tareas -->
             <div class="bg-white dark:bg-zinc-900 rounded-xl p-4 border border-gray-100 dark:border-zinc-800 shadow-sm flex items-center gap-4">

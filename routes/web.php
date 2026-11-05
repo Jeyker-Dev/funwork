@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProjectFilePreviewController;
+use App\Http\Controllers\ProjectPackController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', static function () {
@@ -17,6 +18,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::livewire('projects/{project}', 'pages::projects.show')
         ->can('view', 'project')
         ->name('projects.show');
+
+    Route::get('/projects/{project}/pack', ProjectPackController::class)
+        ->can('view', 'project')
+        ->name('project.pack');
 
     Route::livewire('/projects/{project}/inbox', 'pages::projects.inbox')
         ->can('view', 'project')
