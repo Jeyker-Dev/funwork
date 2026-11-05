@@ -11,7 +11,7 @@ Tareas tomadas del backlog para ejecutar ahora. Las grandes abren un documento `
 
 ## Hechas en este sprint
 
-- [x] [DEVOPS] Workflow de GitHub que ejecuta `funwork:sync-docs` en el VPS en cada push que toca `docs/**` (reusa los secrets SSH del deploy) — un cambio en `docs/` aparece en FunWork sin pasos manuales — depende de: Comando sync-docs (commit pendiente)
+- [x] [DEVOPS] Workflow de GitHub que ejecuta `funwork:sync-docs` en el VPS en cada push que toca `docs/**` (reusa los secrets SSH del deploy) — un cambio en `docs/` aparece en FunWork sin pasos manuales — depende de: Comando sync-docs (commit `e2a5f96`)
 - [x] [BACKEND] Comando `funwork:sync-docs {project}` — espeja `docs/` del repo (sin `docs/archive/`) en el notebook "Docs" del proyecto: una página por archivo, upsert por ruta y borrado de las páginas cuyo archivo ya no existe — depende de: - (commit `1d782a3`)
 
 ## Sprint anterior: Fase 1 — Integridad, sprint 2 (cerrado el 2026-11-04)
