@@ -2,7 +2,7 @@
 
 ## Stack
 
-- **Backend:** Laravel 13, PHP 8.3+, Fortify (auth y 2FA).
+- **Backend:** Laravel 13, PHP 8.4.1+, Fortify (auth y 2FA).
 - **UI:** Livewire v4 (Single File Components nativos, sin Volt), Flux / Flux Pro, Alpine v3, TailwindCSS, Vite.
 - **Storage:** discos de Laravel; S3 para avatares y archivos de proyecto (URLs temporales firmadas para buckets privados).
 - **Colas:** jobs en base de datos (por ejemplo `CreateFolderZipJob`).
