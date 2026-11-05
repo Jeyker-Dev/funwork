@@ -6,14 +6,13 @@ Tareas tomadas del backlog para ejecutar ahora. Las grandes abren un documento `
 
 ## En curso
 
-- [ ] [BACKEND] Comando `funwork:sync-docs {project}` — espeja `docs/` del repo (sin `docs/archive/`) en el notebook "Docs" del proyecto: una página por archivo, upsert por ruta y borrado de las páginas cuyo archivo ya no existe — depende de: -
 - [ ] [DEVOPS] Workflow de GitHub que ejecuta `funwork:sync-docs` en el VPS en cada push que toca `docs/**` (reusa los secrets SSH del deploy) — un cambio en `docs/` aparece en FunWork sin pasos manuales — depende de: Comando sync-docs
 - [ ] [BACKEND] Export "Project pack" en Markdown (notebooks, tareas, decisiones) — se descarga un `.md` listo para subir a NotebookLM — depende de: -
 - [ ] [BACKEND] Sincronizar el "Project pack" con un Google Doc (OAuth con Google, API de Docs/Drive) — desde FunWork se actualiza el Google Doc y en NotebookLM basta con "Sync" para refrescar la fuente — depende de: Export "Project pack"
 
 ## Hechas en este sprint
 
-(Ninguna todavía)
+- [x] [BACKEND] Comando `funwork:sync-docs {project}` — espeja `docs/` del repo (sin `docs/archive/`) en el notebook "Docs" del proyecto: una página por archivo, upsert por ruta y borrado de las páginas cuyo archivo ya no existe — depende de: - (commit `1d782a3`)
 
 ## Sprint anterior: Fase 1 — Integridad, sprint 2 (cerrado el 2026-11-04)
 

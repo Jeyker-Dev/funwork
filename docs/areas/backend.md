@@ -20,6 +20,15 @@ Laravel 13. Skills de referencia: `laravel-clean-architecture` y `pest-laravel-t
 ### Notebooks (`NotebookForm`)
 - Requeridos: `project_id`, `created_by`. Al crear: toast, cierre del modal, reset del formulario y evento `notebook-created`.
 
+### Sincronización de documentación (`funwork:sync-docs`)
+- Comando `funwork:sync-docs {project : ID del proyecto} {--path= : carpeta de docs, por defecto base_path('docs')}` (`App\Console\Commands\SyncDocsCommand`): espeja archivos `*.md` del repo en el notebook "Docs" del proyecto dentro de una transacción `DB::transaction` (commit `1d782a3`).
+- Si el proyecto no existe: emite error y termina con código de salida 1 sin modificaciones.
+- Busca o crea el notebook "Docs" asociado al proyecto con `firstOrCreate`, asignando `created_by` con el ID del dueño del proyecto (`$project->owner_id`).
+- Escanea recursivamente los archivos `*.md` excluyendo `archive/`, normalizando la ruta relativa con prefijo `docs/` en `source_path` (ej. `docs/areas/backend.md`).
+- Upsert por `(notebook_id, source_path)` ordenado alfabéticamente por `source_path`: `content = ['title' => source_path, 'body' => file_get_contents]`, `created_by` = dueño y `order` = posición correlativa (1-indexada).
+- Borrado seguro: elimina únicamente las páginas de ese notebook cuyo `source_path` no sea nulo y cuyo archivo ya no exista en disco. Las páginas creadas a mano (`source_path` null) nunca se tocan ni se eliminan.
+- Idempotencia: ejecuciones consecutivas sin cambios en disco no modifican registros y reportan 0 creadas, 0 actualizadas y 0 borradas.
+
 ### Archivos y carpetas
 - Crear carpeta: el nombre es obligatorio y se valida.
 - Borrado: prohibido si el archivo está en uso o en un proceso activo; en ese caso se devuelve un error explicativo.

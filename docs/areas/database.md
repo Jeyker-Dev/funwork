@@ -9,7 +9,7 @@
 | `tasks` | `due_date` es una columna `date`. |
 | `task_user` | Pivot para varios asignados por tarea. |
 | `inbox_items` | Capturas rápidas por proyecto. |
-| `notebooks` / `notebook_pages` | Un notebook tiene muchas páginas; pertenece a un proyecto y a su creador. |
+| `notebooks` / `notebook_pages` | Un notebook tiene muchas páginas; pertenece a un proyecto y a su creador. `notebook_pages` cuenta con la columna nullable `source_path` y un índice único compuesto `(notebook_id, source_path)` para el espejado de docs vía `funwork:sync-docs` (commit `1d782a3`). |
 | `folders` / `project_files` | Jerarquía de carpetas y archivos por proyecto. |
 | `notifications` | Notificaciones en base de datos (por ejemplo, la descarga de ZIP). |
 | `jobs` / `cache` | Infraestructura de Laravel. |

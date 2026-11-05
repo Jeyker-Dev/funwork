@@ -2,6 +2,7 @@
 
 ## 2026-11-04
 
+- Comando `funwork:sync-docs {project}` (`App\Console\Commands\SyncDocsCommand`): espejado de `docs/` (excluyendo `archive/`) en el notebook "Docs" del proyecto (obtenido/creado con `firstOrCreate`), upsert por `(notebook_id, source_path)` con orden alfabético y contenido `['title' => source_path, 'body' => file_get_contents]`, eliminación de páginas obsoletas con `source_path` no nulo y preservación de páginas manuales (`source_path` nulo); nueva migración para la columna `source_path` nullable con índice único compuesto en `notebook_pages`; cobertura con tests en `tests/Feature/Console/SyncDocsCommandTest.php` (commit `1d782a3`).
 - Sprint 2 de la Fase 1 cerrado. Se adelanta el flujo NotebookLM de la Fase 2: espejo de `docs/` en el notebook "Docs" del proyecto FunWork (comando `funwork:sync-docs` + workflow de GitHub por SSH, sin API tokens), Export "Project pack" y sync con Google Docs.
 
 ## 2026-11-03
