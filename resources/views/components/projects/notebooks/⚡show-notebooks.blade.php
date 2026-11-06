@@ -1,9 +1,14 @@
 <?php
 
-use Livewire\Component;
+use App\Actions\Notebooks\SyncNotebookToGoogleDocAction;
 use App\Models\Notebook;
-use Livewire\Attributes\On;
 use App\Models\Project;
+use App\Services\Google\GoogleAuthorizationException;
+use Flux\Flux;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\RequestException;
+use Livewire\Attributes\On;
+use Livewire\Component;
 use Livewire\WithPagination;
 
 new class extends Component
@@ -89,6 +94,29 @@ new class extends Component
             'page' => $page,
         ], navigate: true);
     }
+
+    public function syncGoogleDoc(int $notebookId, SyncNotebookToGoogleDocAction $syncNotebook)
+    {
+        $notebook = $this->project->notebooks()->findOrFail($notebookId);
+
+        try {
+            $syncNotebook->execute($notebook, auth()->user());
+        } catch (GoogleAuthorizationException) {
+            session()->put('google_return_to', route('project.notebooks', $this->project, absolute: false));
+
+            return $this->redirectRoute('google.redirect');
+        } catch (RequestException|ConnectionException $e) {
+            report($e);
+            Flux::toast('No se pudo sincronizar con Google Docs. Intentá de nuevo.', variant: 'danger');
+
+            return null;
+        }
+
+        $this->project->refresh();
+        Flux::toast('Project pack sincronizado con Google Docs.', variant: 'success');
+
+        return null;
+    }
 }
 ?>
 
@@ -100,7 +128,30 @@ new class extends Component
                 <div class="flex items-center justify-between">
                     <flux:heading size="lg">{{ $notebook->name }}</flux:heading>
 
-                    <flux:icon.ellipsis-vertical class="size-7" />
+                    <div wire:click.stop x-on:click.stop>
+                        <flux:dropdown position="bottom" align="end">
+                            <flux:button variant="ghost" size="sm" icon="ellipsis-vertical" class="text-gray-500 hover:text-gray-900" />
+                            <flux:menu>
+                                <flux:menu.item :href="route('project.notebooks.export', [$project, $notebook])" icon="arrow-down-tray">
+                                    Descargar .md
+                                </flux:menu.item>
+                                <flux:menu.item wire:click.stop="syncGoogleDoc({{ $notebook->id }})" icon="arrow-path">
+                                    Sincronizar con Google Docs
+                                </flux:menu.item>
+                                @if ($notebook->google_doc_id)
+                                    <flux:menu.separator />
+                                    <flux:menu.item :href="'https://docs.google.com/document/d/'.$notebook->google_doc_id.'/edit'" target="_blank" icon="arrow-top-right-on-square">
+                                        Abrir Google Doc
+                                    </flux:menu.item>
+                                    @if ($notebook->google_doc_synced_at)
+                                        <flux:text class="px-2 py-1.5 text-xs text-zinc-500">
+                                            Última sincronización: {{ $notebook->google_doc_synced_at->timezone(auth()->user()->timezone ?? config('app.timezone'))->format('Y-m-d H:i') }}
+                                        </flux:text>
+                                    @endif
+                                @endif
+                            </flux:menu>
+                        </flux:dropdown>
+                    </div>
                 </div>
 
                 <div>

@@ -1,8 +1,8 @@
 <?php
 
 use App\Http\Controllers\GoogleAuthController;
+use App\Http\Controllers\NotebookExportController;
 use App\Http\Controllers\ProjectFilePreviewController;
-use App\Http\Controllers\ProjectPackController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', static function () {
@@ -23,9 +23,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirect'])->name('google.redirect');
     Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])->name('google.callback');
 
-    Route::get('/projects/{project}/pack', ProjectPackController::class)
+    Route::get('/projects/{project}/notebooks/{notebook}/export', NotebookExportController::class)
+        ->scopeBindings()
         ->can('view', 'project')
-        ->name('project.pack');
+        ->can('view', 'notebook')
+        ->name('project.notebooks.export');
 
     Route::livewire('/projects/{project}/inbox', 'pages::projects.inbox')
         ->can('view', 'project')

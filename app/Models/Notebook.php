@@ -22,6 +22,13 @@ class Notebook extends Model
         'is_shared',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'google_doc_synced_at' => 'datetime',
+        ];
+    }
+
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);

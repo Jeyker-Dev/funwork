@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-06
+
+- Reemplazo de "Project pack" por exportación y sincronización con Google Docs por notebook: descarga `.md` por notebook (`GET /projects/{project}/notebooks/{notebook}/export`, `NotebookExportController`) y sincronización individual a su propio Google Doc desde el menú contextual de cada tarjeta de notebook (`⚡show-notebooks`). Migración de `google_doc_id` y `google_doc_synced_at` de `projects` a `notebooks`. Se eliminan las acciones y botones globales de Project pack. Ver ADR-004.
+
 ## 2026-11-05
 
 - Visión a largo plazo: FunWork como hub de contexto con módulos de IA (Cerebro, Código, Diseño de UI y Diseño de base de datos), principios (app local no es modelo local, el servidor nunca usa la suscripción de un usuario, puertos y adaptadores, BYOK o agentes locales) y orden de construcción (MCP, `AiProvider` con BYOK, companion local). Nueva Fase 5 en el backlog.

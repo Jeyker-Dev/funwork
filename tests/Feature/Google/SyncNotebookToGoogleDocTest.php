@@ -1,9 +1,11 @@
 <?php
 
+use App\Actions\Notebooks\SyncNotebookToGoogleDocAction;
 use App\Models\GoogleAccount;
+use App\Models\Notebook;
 use App\Models\Project;
-use App\Models\Task;
 use App\Models\User;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use Livewire\Livewire;
@@ -31,27 +33,36 @@ beforeEach(function () {
     ]);
 });
 
-test('the first sync creates a Google Doc with the project pack', function () {
+test('the first sync creates a Google Doc with the notebook export', function () {
     Http::fake(['www.googleapis.com/upload/drive/v3/files*' => Http::response(['id' => 'doc-1'])]);
 
     $owner = connectedOwner();
     $project = Project::factory()->for($owner, 'owner')->create(['name' => 'Fun Work']);
-    Task::factory()->for($project)->create(['title' => 'Write the pack']);
+    $notebook = Notebook::factory()->for($project)->create([
+        'name' => 'My Notebook',
+        'created_by' => $owner->id,
+    ]);
+    $notebook->pages()->create([
+        'content' => ['title' => 'Page One', 'body' => 'Page content here'],
+        'order' => 1,
+        'created_by' => $owner->id,
+    ]);
 
     $this->actingAs($owner);
 
-    Livewire::test('pages::projects.show', ['project' => $project])
-        ->call('syncGoogleDoc')
+    Livewire::test('projects.notebooks.⚡show-notebooks', ['project' => $project])
+        ->call('syncGoogleDoc', $notebook->id)
         ->assertHasNoErrors()
         ->assertSee('https://docs.google.com/document/d/doc-1/edit');
 
-    expect($project->fresh())
+    expect($notebook->fresh())
         ->google_doc_id->toBe('doc-1')
-        ->and($project->fresh()->google_doc_synced_at)->not->toBeNull();
+        ->and($notebook->fresh()->google_doc_synced_at)->not->toBeNull();
 
     Http::assertSent(fn (Request $request) => $request->method() === 'POST'
-        && str_contains($request->body(), '"name":"Fun Work \\u2014 Project pack (FunWork)"')
-        && str_contains($request->body(), 'Write the pack'));
+        && str_contains($request->body(), '"name":"My Notebook \\u2014 Fun Work (FunWork)"')
+        && str_contains($request->body(), 'Page One')
+        && str_contains($request->body(), 'Page content here'));
 });
 
 test('a later sync replaces the content of the same Doc', function () {
@@ -59,13 +70,17 @@ test('a later sync replaces the content of the same Doc', function () {
 
     $owner = connectedOwner();
     $project = Project::factory()->for($owner, 'owner')->create();
-    $project->forceFill(['google_doc_id' => 'doc-1'])->save();
+    $notebook = Notebook::factory()->for($project)->create([
+        'created_by' => $owner->id,
+    ]);
+    $notebook->forceFill(['google_doc_id' => 'doc-1'])->save();
 
     $this->actingAs($owner);
 
-    Livewire::test('pages::projects.show', ['project' => $project])->call('syncGoogleDoc');
+    Livewire::test('projects.notebooks.⚡show-notebooks', ['project' => $project])
+        ->call('syncGoogleDoc', $notebook->id);
 
-    expect($project->fresh()->google_doc_id)->toBe('doc-1');
+    expect($notebook->fresh()->google_doc_id)->toBe('doc-1');
 
     Http::assertSentCount(1);
     Http::assertSent(fn (Request $request) => $request->method() === 'PATCH');
@@ -79,13 +94,17 @@ test('a deleted Doc is created again', function () {
 
     $owner = connectedOwner();
     $project = Project::factory()->for($owner, 'owner')->create();
-    $project->forceFill(['google_doc_id' => 'doc-1'])->save();
+    $notebook = Notebook::factory()->for($project)->create([
+        'created_by' => $owner->id,
+    ]);
+    $notebook->forceFill(['google_doc_id' => 'doc-1'])->save();
 
     $this->actingAs($owner);
 
-    Livewire::test('pages::projects.show', ['project' => $project])->call('syncGoogleDoc');
+    Livewire::test('projects.notebooks.⚡show-notebooks', ['project' => $project])
+        ->call('syncGoogleDoc', $notebook->id);
 
-    expect($project->fresh()->google_doc_id)->toBe('doc-2');
+    expect($notebook->fresh()->google_doc_id)->toBe('doc-2');
 });
 
 test('a user without a Google connection is sent to connect and comes back', function () {
@@ -93,14 +112,17 @@ test('a user without a Google connection is sent to connect and comes back', fun
 
     $owner = User::factory()->create();
     $project = Project::factory()->for($owner, 'owner')->create();
+    $notebook = Notebook::factory()->for($project)->create([
+        'created_by' => $owner->id,
+    ]);
 
     $this->actingAs($owner);
 
-    Livewire::test('pages::projects.show', ['project' => $project])
-        ->call('syncGoogleDoc')
+    Livewire::test('projects.notebooks.⚡show-notebooks', ['project' => $project])
+        ->call('syncGoogleDoc', $notebook->id)
         ->assertRedirect(route('google.redirect'));
 
-    expect(session('google_return_to'))->toBe(route('projects.show', $project, absolute: false));
+    expect(session('google_return_to'))->toBe(route('project.notebooks', $project, absolute: false));
     Http::assertNothingSent();
 });
 
@@ -110,11 +132,14 @@ test('a revoked Google connection is removed and the user is sent to connect aga
     $owner = connectedOwner();
     $owner->googleAccount->update(['expires_at' => now()->subMinute()]);
     $project = Project::factory()->for($owner, 'owner')->create();
+    $notebook = Notebook::factory()->for($project)->create([
+        'created_by' => $owner->id,
+    ]);
 
     $this->actingAs($owner);
 
-    Livewire::test('pages::projects.show', ['project' => $project])
-        ->call('syncGoogleDoc')
+    Livewire::test('projects.notebooks.⚡show-notebooks', ['project' => $project])
+        ->call('syncGoogleDoc', $notebook->id)
         ->assertRedirect(route('google.redirect'));
 
     expect($owner->fresh()->googleAccount)->toBeNull();
@@ -125,27 +150,38 @@ test('a Google error keeps the stored Doc and shows an error', function () {
 
     $owner = connectedOwner();
     $project = Project::factory()->for($owner, 'owner')->create();
-    $project->forceFill(['google_doc_id' => 'doc-1'])->save();
+    $notebook = Notebook::factory()->for($project)->create([
+        'created_by' => $owner->id,
+    ]);
+    $notebook->forceFill(['google_doc_id' => 'doc-1'])->save();
 
     $this->actingAs($owner);
 
-    Livewire::test('pages::projects.show', ['project' => $project])
-        ->call('syncGoogleDoc')
+    Livewire::test('projects.notebooks.⚡show-notebooks', ['project' => $project])
+        ->call('syncGoogleDoc', $notebook->id)
         ->assertNoRedirect();
 
-    expect($project->fresh())
+    expect($notebook->fresh())
         ->google_doc_id->toBe('doc-1')
         ->google_doc_synced_at->toBeNull();
 });
 
-test('another user cannot sync the project', function () {
+test('another user cannot sync the notebook', function () {
     Http::fake();
 
-    $project = Project::factory()->create();
+    $owner = User::factory()->create();
+    $project = Project::factory()->for($owner, 'owner')->create();
+    $notebook = Notebook::factory()->for($project)->create([
+        'created_by' => $owner->id,
+    ]);
 
-    $this->actingAs(connectedOwner());
+    $otherUser = connectedOwner();
+    $this->actingAs($otherUser);
 
-    Livewire::test('pages::projects.show', ['project' => $project])->assertForbidden();
+    Livewire::test('projects.notebooks.⚡show-notebooks', ['project' => $project])->assertForbidden();
+
+    expect(fn () => app(SyncNotebookToGoogleDocAction::class)->execute($notebook, $otherUser))
+        ->toThrow(AuthorizationException::class);
 
     Http::assertNothingSent();
 });

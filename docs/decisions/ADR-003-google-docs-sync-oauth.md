@@ -23,3 +23,7 @@ Según la guía "Manage uploads" de la API de Drive, la importación a Google Do
 - Rotar `APP_KEY` invalida los tokens guardados: los usuarios tienen que volver a conectar Google.
 - Si el dueño del proyecto conecta otra cuenta de Google, el Doc anterior queda inaccesible (`drive.file`) y se crea uno nuevo.
 - La alternativa con service account era más simple (sin pantalla de login ni tokens por usuario), pero no escala a varios usuarios.
+
+> [!NOTE]
+> **Actualización (2026-11-06):** Ver [ADR-004](ADR-004-notebook-export-google-docs-sync.md). Se reemplazó la sincronización global del proyecto (`projects.google_doc_id`) por sincronización granular por notebook (`notebooks.google_doc_id`).
+

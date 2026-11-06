@@ -20,16 +20,16 @@ Laravel 13. Skills de referencia: `laravel-clean-architecture` y `pest-laravel-t
 ### Notebooks (`NotebookForm`)
 - Requeridos: `project_id`, `created_by`. Al crear: toast, cierre del modal, reset del formulario y evento `notebook-created`.
 
-### Project pack (`project.pack`)
-- `GET /projects/{project}/pack` (`ProjectPackController`, middleware `can:view,project`) descarga `<slug>-project-pack.md`.
-- El Markdown lo arma `App\Actions\Projects\BuildProjectPackAction::execute(Project)`. No autoriza: quien la llama verifica el acceso. La reutiliza la sincronización con Google Docs, para que el Doc y el `.md` tengan el mismo contenido.
-- Contenido: tareas agrupadas por `TaskStatus` (orden del enum, por `position`), y notebooks no archivados por nombre con sus páginas por `order`. Una página sin título sale como "Página N".
+### Exportación de notebook (`project.notebooks.export`)
+- `GET /projects/{project}/notebooks/{notebook}/export` (`NotebookExportController`, `scopeBindings()`, middleware `can:view,project` y `can:view,notebook`) descarga `{notebook-slug}.md`.
+- El Markdown lo arma `App\Actions\Notebooks\BuildNotebookExportAction::execute(Notebook)`. No autoriza: quien la llama verifica el acceso. Lo reutiliza la sincronización con Google Docs, para que el Doc y el `.md` tengan el mismo contenido.
+- Contenido: título `# {notebook name}`, generado por FunWork el Y-m-d H:i UTC, descripción si existe, y cada página en orden (`order` luego `id`) como `## {title}` más su cuerpo. Una página sin título sale como "Página N". Si no tiene páginas, emite `_Sin páginas._`.
 
-### Sincronización del Project pack con Google Docs
+### Sincronización de notebook con Google Docs
 - Cada usuario conecta su cuenta de Google en Settings → Integrations (`settings/integrations`). `GoogleAuthController` usa Socialite con el scope `drive.file` (solo los archivos que crea la app), `access_type=offline` y `prompt=consent` para recibir un refresh token. Si el usuario no concede Drive, la conexión se rechaza.
 - `google.callback` vuelve a `session('google_return_to')` solo si es una ruta relativa del mismo sitio; si no, va a Integrations.
 - `App\Services\Google\GoogleDriveClient` habla con Drive mediante el cliente `Http`, sin `google/apiclient`. Renueva el access token cuando vence o ante un 401 (un reintento). Crea el Doc subiendo Markdown con `mimeType` de Google Docs y lo actualiza con `PATCH ...?uploadType=media`, que reemplaza todo el contenido y conserva el ID.
-- `App\Actions\Projects\SyncProjectPackToGoogleDocAction` exige `ProjectPolicy::update` y arma el contenido con `BuildProjectPackAction`. Si el Doc guardado no existe o está en la papelera, crea uno nuevo. Ante `GoogleAuthorizationException` (sin conexión o refresh token revocado) borra la cuenta y la página del proyecto manda al usuario a conectar.
+- `App\Actions\Notebooks\SyncNotebookToGoogleDocAction` exige `NotebookPolicy::update` y arma el contenido con `BuildNotebookExportAction`. El nombre del documento creado es `"{notebook name} — {project name} (FunWork)"`. Si el Doc guardado no existe o está en la papelera, crea uno nuevo. Guarda `google_doc_id` y `google_doc_synced_at` en el notebook. Ante `GoogleAuthorizationException` (sin conexión o refresh token revocado) borra la cuenta y redirige al flujo de conexión guardando `google_return_to` apuntando al listado de notebooks (`project.notebooks`).
 - Configuración: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` y `GOOGLE_REDIRECT_URI` (por defecto `/auth/google/callback`, relativo a `APP_URL`).
 - Puesta en marcha en Google Cloud:
   1. Crear un proyecto y habilitar la **Google Drive API**.

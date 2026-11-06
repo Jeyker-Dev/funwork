@@ -1,10 +1,6 @@
 <?php
 
-use App\Actions\Projects\SyncProjectPackToGoogleDocAction;
 use App\Enums\TaskStatus;
-use App\Services\Google\GoogleAuthorizationException;
-use Illuminate\Http\Client\ConnectionException;
-use Illuminate\Http\Client\RequestException;
 use App\Livewire\Forms\QuickCaptureForm;
 use App\Models\Project;
 use App\Support\DateHelper;
@@ -32,27 +28,6 @@ class extends Component {
 
         $this->captureForm->save();
         Flux::toast('Item captured to Inbox');
-    }
-
-    public function syncGoogleDoc(SyncProjectPackToGoogleDocAction $syncPack)
-    {
-        try {
-            $syncPack->execute($this->project, auth()->user());
-        } catch (GoogleAuthorizationException) {
-            session()->put('google_return_to', route('projects.show', $this->project, absolute: false));
-
-            return $this->redirectRoute('google.redirect');
-        } catch (RequestException|ConnectionException $e) {
-            report($e);
-            Flux::toast('No se pudo sincronizar con Google Docs. Intentá de nuevo.', variant: 'danger');
-
-            return null;
-        }
-
-        $this->project->refresh();
-        Flux::toast('Project pack sincronizado con Google Docs.', variant: 'success');
-
-        return null;
     }
 
     public function with(): array
@@ -83,28 +58,6 @@ class extends Component {
     <div class="mb-8">
         <h1 class="text-3xl font-bold text-orange-500 break-words">¡Buenos días, {{ auth()->user()->display_name ?? 'Alex' }}!</h1>
         <p class="text-gray-500 dark:text-zinc-400 mt-1">Aquí tienes un resumen de tu espacio de trabajo.</p>
-
-        <div class="mt-4 flex flex-wrap items-center gap-3">
-            <flux:button :href="route('project.pack', $project)" icon="arrow-down-tray" size="sm">
-                Descargar Project pack
-            </flux:button>
-
-            <flux:button wire:click="syncGoogleDoc" icon="arrow-path" size="sm">
-                Sincronizar con Google Docs
-            </flux:button>
-
-            @if ($project->google_doc_id)
-                <flux:link :href="'https://docs.google.com/document/d/'.$project->google_doc_id.'/edit'" target="_blank" class="text-sm">
-                    Abrir Google Doc
-                </flux:link>
-
-                @if ($project->google_doc_synced_at)
-                    <flux:text class="text-xs">
-                        Última sincronización: {{ $project->google_doc_synced_at->timezone(auth()->user()->timezone ?? config('app.timezone'))->format('Y-m-d H:i') }}
-                    </flux:text>
-                @endif
-            @endif
-        </div>
 
         <div class="grid grid-cols-2 gap-4 sm:max-w-md my-6">
             <!-- Metric 1: Tareas -->

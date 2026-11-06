@@ -23,13 +23,6 @@ class Project extends Model
         'due_at',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'google_doc_synced_at' => 'datetime',
-        ];
-    }
-
     public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'owner_id');

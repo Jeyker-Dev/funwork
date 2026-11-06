@@ -10,6 +10,7 @@ _Sin tareas en curso._
 
 ## Hechas en este sprint
 
+- [x] [BACKEND] Reemplazar el "Project pack" por exportación y sincronización con Google Docs por notebook — descarga `.md` por notebook y sync individual desde el menú de cada tarjeta para elegir granularmente qué notas van a NotebookLM — depende de: Sincronizar el "Project pack" (commit pendiente)
 - [x] [BACKEND] Sincronizar el "Project pack" con un Google Doc (OAuth con Google, API de Docs/Drive) — desde FunWork se actualiza el Google Doc y en NotebookLM basta con "Sync" para refrescar la fuente — depende de: Export "Project pack" (commit `bcbc03b`)
 - [x] [BACKEND] Export "Project pack" en Markdown (notebooks, tareas, decisiones) — se descarga un `.md` listo para subir a NotebookLM — depende de: - (commit `c02c650`)
 - [x] [DEVOPS] Workflow de GitHub que ejecuta `funwork:sync-docs` en el VPS en cada push que toca `docs/**` (reusa los secrets SSH del deploy) — un cambio en `docs/` aparece en FunWork sin pasos manuales — depende de: Comando sync-docs (commit `e2a5f96`)
