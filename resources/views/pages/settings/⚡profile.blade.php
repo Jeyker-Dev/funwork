@@ -18,6 +18,7 @@ new #[Title('Profile settings')] class extends Component {
     public string $name = '';
     public string $username = '';
     public string $email = '';
+    public string $timezone = 'UTC';
 
     /**
      * Mount the component.
@@ -27,6 +28,7 @@ new #[Title('Profile settings')] class extends Component {
         $this->name = Auth::user()->name;
         $this->username = Auth::user()->username ?? '';
         $this->email = Auth::user()->email;
+        $this->timezone = Auth::user()->timezone ?? 'UTC';
     }
 
     /**
@@ -135,6 +137,29 @@ new #[Title('Profile settings')] class extends Component {
                         @endif
                     </div>
                 @endif
+            </div>
+
+            <div x-data="{
+                browserTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                autoDetected: false,
+                init() {
+                    if ('{{ auth()->user()->timezone }}' === 'UTC' && this.browserTimezone && this.browserTimezone !== 'UTC') {
+                        $wire.set('timezone', this.browserTimezone);
+                        this.autoDetected = true;
+                    }
+                }
+            }">
+                <flux:select variant="listbox" searchable wire:model="timezone" :label="__('Timezone')" :placeholder="__('Choose timezone...')">
+                    @foreach (DateTimeZone::listIdentifiers() as $tz)
+                        <flux:select.option value="{{ $tz }}">{{ $tz }}</flux:select.option>
+                    @endforeach
+                </flux:select>
+
+                <template x-if="autoDetected">
+                    <flux:text class="mt-2 text-xs text-zinc-500">
+                        {{ __('Timezone detected from your browser. Click Save to apply.') }}
+                    </flux:text>
+                </template>
             </div>
 
             <div class="flex items-center gap-4">

@@ -2,7 +2,9 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\SyncNotebookToGoogleDocJob;
 use App\Models\Notebook;
+use App\Models\NotebookPage;
 use App\Models\Project;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -82,44 +84,46 @@ class SyncDocsCommand extends Command
             $order = 1;
             $syncedSourcePaths = [];
 
-            foreach ($files as $sourcePath => $filePath) {
-                $syncedSourcePaths[] = $sourcePath;
-                $body = file_get_contents($filePath);
-                $content = [
-                    'title' => $sourcePath,
-                    'body' => $body,
-                ];
+            NotebookPage::withoutEvents(function () use ($files, $notebook, $project, &$created, &$updated, &$order, &$syncedSourcePaths) {
+                foreach ($files as $sourcePath => $filePath) {
+                    $syncedSourcePaths[] = $sourcePath;
+                    $body = file_get_contents($filePath);
+                    $content = [
+                        'title' => $sourcePath,
+                        'body' => $body,
+                    ];
 
-                $page = $notebook->pages()->where('source_path', $sourcePath)->first();
+                    $page = $notebook->pages()->where('source_path', $sourcePath)->first();
 
-                if (! $page) {
-                    $notebook->pages()->create([
-                        'source_path' => $sourcePath,
-                        'content' => $content,
-                        'created_by' => $project->owner_id,
-                        'order' => $order,
-                    ]);
-                    $created++;
-                } else {
-                    $isContentDifferent = ! is_array($page->content)
-                        || ($page->content['title'] ?? null) !== $content['title']
-                        || ($page->content['body'] ?? null) !== $content['body'];
-
-                    $isOrderDifferent = (int) $page->order !== $order;
-                    $isOwnerDifferent = (int) $page->created_by !== (int) $project->owner_id;
-
-                    if ($isContentDifferent || $isOrderDifferent || $isOwnerDifferent) {
-                        $page->update([
+                    if (! $page) {
+                        $notebook->pages()->create([
+                            'source_path' => $sourcePath,
                             'content' => $content,
                             'created_by' => $project->owner_id,
                             'order' => $order,
                         ]);
-                        $updated++;
-                    }
-                }
+                        $created++;
+                    } else {
+                        $isContentDifferent = ! is_array($page->content)
+                            || ($page->content['title'] ?? null) !== $content['title']
+                            || ($page->content['body'] ?? null) !== $content['body'];
 
-                $order++;
-            }
+                        $isOrderDifferent = (int) $page->order !== $order;
+                        $isOwnerDifferent = (int) $page->created_by !== (int) $project->owner_id;
+
+                        if ($isContentDifferent || $isOrderDifferent || $isOwnerDifferent) {
+                            $page->update([
+                                'content' => $content,
+                                'created_by' => $project->owner_id,
+                                'order' => $order,
+                            ]);
+                            $updated++;
+                        }
+                    }
+
+                    $order++;
+                }
+            });
 
             $deleteQuery = $notebook->pages()->whereNotNull('source_path');
 
@@ -128,6 +132,16 @@ class SyncDocsCommand extends Command
             }
 
             $deleted = $deleteQuery->delete();
+
+            if ($created + $updated + $deleted > 0) {
+                $notebook->forceFill([
+                    'content_changed_at' => now(),
+                ])->save();
+
+                if ($notebook->google_doc_id) {
+                    SyncNotebookToGoogleDocJob::dispatch($notebook)->delay(now()->addMinutes(2));
+                }
+            }
 
             $this->info("Docs sincronizados: {$created} creadas, {$updated} actualizadas, {$deleted} borradas.");
 

@@ -2,6 +2,9 @@
 
 ## 2026-11-06
 
+- Ajuste de zona horaria en el perfil de usuario (`⚡profile`): selector buscable de `DateTimeZone::listIdentifiers()` con detección y preselección automática de la zona horaria del navegador mediante Alpine e `Intl.DateTimeFormat` cuando el valor almacenado es UTC.
+- Sincronización automática a Google Docs con debounce de 2 minutos (`SyncNotebookToGoogleDocJob`): encolado único por notebook ante modificaciones de páginas (`NotebookPage`) o reflejo de docs (`funwork:sync-docs`), actualizando `notebooks.content_changed_at` y limitándose a notebooks con Doc existente.
+- Badge "Cambios sin sincronizar" en tarjetas de notebook (`⚡show-notebooks`): indicador visual en ámbar junto a la última sincronización cuando un notebook con Google Doc tiene cambios posteriores a su sincronización, desapareciendo al sincronizar.
 - Página pública `/privacy` (ruta `privacy`) con la política de privacidad que exige la pantalla de consentimiento de Google para publicar la app: datos que guarda FunWork, uso del scope `drive.file` solo para los Docs que crea la app, tokens cifrados, Limited Use y cómo desconectar Google. Con la app publicada, el refresh token ya no vence a los 7 días.
 
 ## 2026-11-06

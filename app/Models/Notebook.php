@@ -26,6 +26,7 @@ class Notebook extends Model
     {
         return [
             'google_doc_synced_at' => 'datetime',
+            'content_changed_at' => 'datetime',
         ];
     }
 
@@ -53,5 +54,18 @@ class Notebook extends Model
     public function scopeArchived($query)
     {
         return $query->where('is_archived', true);
+    }
+
+    public function hasUnsyncedChanges(): bool
+    {
+        if (! $this->google_doc_id) {
+            return false;
+        }
+
+        if ($this->google_doc_synced_at === null) {
+            return true;
+        }
+
+        return $this->content_changed_at !== null && $this->content_changed_at->gt($this->google_doc_synced_at);
     }
 }

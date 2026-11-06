@@ -29,6 +29,40 @@ test('profile information can be updated', function () {
     expect($user->email_verified_at)->toBeNull();
 });
 
+test('valid timezone can be saved', function () {
+    $user = User::factory()->create(['username' => 'testuser', 'timezone' => 'UTC']);
+
+    $this->actingAs($user);
+
+    $response = Livewire::test('pages::settings.profile')
+        ->set('name', $user->name)
+        ->set('username', $user->username)
+        ->set('email', $user->email)
+        ->set('timezone', 'America/Argentina/Buenos_Aires')
+        ->call('updateProfileInformation');
+
+    $response->assertHasNoErrors();
+
+    expect($user->fresh()->timezone)->toEqual('America/Argentina/Buenos_Aires');
+});
+
+test('invalid timezone is rejected', function () {
+    $user = User::factory()->create(['username' => 'testuser', 'timezone' => 'UTC']);
+
+    $this->actingAs($user);
+
+    $response = Livewire::test('pages::settings.profile')
+        ->set('name', $user->name)
+        ->set('username', $user->username)
+        ->set('email', $user->email)
+        ->set('timezone', 'Invalid/Timezone_Name')
+        ->call('updateProfileInformation');
+
+    $response->assertHasErrors(['timezone']);
+
+    expect($user->fresh()->timezone)->toEqual('UTC');
+});
+
 test('email verification status is unchanged when email address is unchanged', function () {
     $user = User::factory()->create();
 

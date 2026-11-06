@@ -143,11 +143,16 @@ new class extends Component
                                     <flux:menu.item :href="'https://docs.google.com/document/d/'.$notebook->google_doc_id.'/edit'" target="_blank" icon="arrow-top-right-on-square">
                                         Abrir Google Doc
                                     </flux:menu.item>
-                                    @if ($notebook->google_doc_synced_at)
-                                        <flux:text class="px-2 py-1.5 text-xs text-zinc-500">
-                                            Última sincronización: {{ $notebook->google_doc_synced_at->timezone(auth()->user()->timezone ?? config('app.timezone'))->format('Y-m-d H:i') }}
-                                        </flux:text>
-                                    @endif
+                                    <div class="px-2 py-1.5 flex items-center gap-2">
+                                        @if ($notebook->google_doc_synced_at)
+                                            <flux:text class="text-xs text-zinc-500">
+                                                Última sincronización: {{ $notebook->google_doc_synced_at->timezone(auth()->user()->timezone ?? config('app.timezone'))->format('Y-m-d H:i') }}
+                                            </flux:text>
+                                        @endif
+                                        @if ($notebook->hasUnsyncedChanges())
+                                            <flux:badge color="amber" size="sm">Cambios sin sincronizar</flux:badge>
+                                        @endif
+                                    </div>
                                 @endif
                             </flux:menu>
                         </flux:dropdown>
