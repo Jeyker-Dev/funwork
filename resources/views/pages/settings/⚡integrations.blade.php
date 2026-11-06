@@ -26,6 +26,7 @@ new #[Title('Integrations settings')] class extends Component
 
         unset($this->googleAccount);
 
+        Flux::modal('disconnect-google')->close();
         Flux::toast(__('Google account disconnected.'));
     }
 };
@@ -58,10 +59,29 @@ new #[Title('Integrations settings')] class extends Component
                     <div class="flex items-center justify-between gap-4">
                         <flux:text>{{ __('Connected as') }} <strong>{{ $this->googleAccount->email }}</strong></flux:text>
 
-                        <flux:button variant="danger" size="sm" wire:click="disconnectGoogle" wire:confirm="{{ __('Disconnect your Google account?') }}">
-                            {{ __('Disconnect') }}
-                        </flux:button>
+                        <flux:modal.trigger name="disconnect-google">
+                            <flux:button variant="danger" size="sm">{{ __('Disconnect') }}</flux:button>
+                        </flux:modal.trigger>
                     </div>
+
+                    <flux:modal name="disconnect-google" class="min-w-[22rem]">
+                        <div class="space-y-6">
+                            <div>
+                                <flux:heading size="lg">{{ __('Disconnect Google account') }}</flux:heading>
+                                <flux:text class="mt-2">
+                                    {{ __('FunWork will lose access to the Google Docs it created. The Docs stay in your Drive, but they will not be synced until you connect Google again.') }}
+                                </flux:text>
+                            </div>
+
+                            <div class="flex justify-end gap-2">
+                                <flux:modal.close>
+                                    <flux:button variant="ghost">{{ __('Cancel') }}</flux:button>
+                                </flux:modal.close>
+
+                                <flux:button variant="danger" wire:click="disconnectGoogle">{{ __('Disconnect') }}</flux:button>
+                            </div>
+                        </div>
+                    </flux:modal>
                 @else
                     <flux:button :href="route('google.redirect')" icon="link" size="sm">
                         {{ __('Connect Google account') }}
