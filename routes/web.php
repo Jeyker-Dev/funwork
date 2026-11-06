@@ -13,6 +13,9 @@ Route::get('/', static function () {
     return redirect(route('login'));
 });
 
+// Public: Google's OAuth consent screen links here.
+Route::view('/privacy', 'privacy')->name('privacy');
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::livewire('/projects', 'pages::projects.index')->name('projects');
 

@@ -2,6 +2,10 @@
 
 ## 2026-11-06
 
+- Página pública `/privacy` (ruta `privacy`) con la política de privacidad que exige la pantalla de consentimiento de Google para publicar la app: datos que guarda FunWork, uso del scope `drive.file` solo para los Docs que crea la app, tokens cifrados, Limited Use y cómo desconectar Google. Con la app publicada, el refresh token ya no vence a los 7 días.
+
+## 2026-11-06
+
 - Reemplazo de "Project pack" por exportación y sincronización con Google Docs por notebook: descarga `.md` por notebook (`GET /projects/{project}/notebooks/{notebook}/export`, `NotebookExportController`) y sincronización individual a su propio Google Doc desde el menú contextual de cada tarjeta de notebook (`⚡show-notebooks`). Migración de `google_doc_id` y `google_doc_synced_at` de `projects` a `notebooks`. Se eliminan las acciones y botones globales de Project pack. Ver ADR-004.
 
 ## 2026-11-05

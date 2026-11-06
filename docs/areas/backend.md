@@ -35,6 +35,7 @@ Laravel 13. Skills de referencia: `laravel-clean-architecture` y `pest-laravel-t
   1. Crear un proyecto y habilitar la **Google Drive API**.
   2. Configurar la pantalla de consentimiento OAuth (tipo External) con el scope `.../auth/drive.file`, que no es sensible y no requiere verificación de Google.
   3. **Publicar la app ("In production")**. En modo Testing, Google vence los refresh tokens a los 7 días.
+     Para publicar, Branding pide la página principal (`https://funwork-app.duckdns.org`), la política de privacidad (`/privacy`, ruta pública `privacy`, vista `resources/views/privacy.blade.php`) y el dominio autorizado `funwork-app.duckdns.org`. `duckdns.org` está en la Public Suffix List, así que el subdominio cuenta como dominio raíz.
   4. Crear credenciales "OAuth client ID" (Web application) con la URI de redirección `https://<dominio>/auth/google/callback` (y `http://localhost:8000/auth/google/callback` para desarrollo).
   5. Cargar el client ID y el secret en el `.env` del VPS y volver a desplegar.
 
