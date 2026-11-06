@@ -41,7 +41,7 @@ Orden y motivos: ver [`../roadmap.md`](../roadmap.md).
 - [x] [BACKEND] Comando `funwork:sync-docs {project}` — espeja `docs/` del repo (sin `docs/archive/`) en el notebook "Docs" del proyecto: una página por archivo, upsert por ruta y borrado de las páginas cuyo archivo ya no existe — depende de: - (commit `1d782a3`)
 - [x] [DEVOPS] Workflow de GitHub que ejecuta `funwork:sync-docs` en el VPS en cada push que toca `docs/**` (reusa los secrets SSH del deploy) — un cambio en `docs/` aparece en FunWork sin pasos manuales — depende de: Comando sync-docs (commit `e2a5f96`)
 - [x] [BACKEND] Export "Project pack" en Markdown (notebooks, tareas, decisiones) — se descarga un `.md` listo para subir a NotebookLM — depende de: - (commit `c02c650`)
-- [x] [BACKEND] Sincronizar el "Project pack" con un Google Doc (OAuth con Google, API de Docs/Drive) — desde FunWork se actualiza el Google Doc y en NotebookLM basta con "Sync" para refrescar la fuente — depende de: Export "Project pack" (commit pendiente)
+- [x] [BACKEND] Sincronizar el "Project pack" con un Google Doc (OAuth con Google, API de Docs/Drive) — desde FunWork se actualiza el Google Doc y en NotebookLM basta con "Sync" para refrescar la fuente — depende de: Export "Project pack" (commit `bcbc03b`)
 
 ## Fase 3 — MCP para Antigravity
 
@@ -55,6 +55,12 @@ Orden y motivos: ver [`../roadmap.md`](../roadmap.md).
 - [ ] [DESIGN] Módulo Diseño: links de Stitch y `DESIGN.md` por pantalla — cada pantalla del proyecto tiene su referencia — depende de: -
 - [ ] [FRONTEND] Captura rápida global con atajo de teclado — desde cualquier vista se manda una idea al inbox de un proyecto — depende de: -
 - [ ] [BACKEND] Digest diario con el scheduler — mail o notificación con los vencimientos del día — depende de: Timezone
+
+## Fase 5 — Hub de IA (ver "Visión a largo plazo" en `../00-vision.md`)
+
+- [ ] [BACKEND] Puerto `AiProvider` con adaptadores y BYOK (API key por usuario, cifrada) — el módulo Cerebro responde con la Gemini API usando la key del usuario, y los tests usan un fake del puerto — depende de: Módulo Brain, verificar la capa gratuita de la Gemini API
+- [ ] [DATABASE] Módulo Diseño de base de datos — cada proyecto guarda su modelo de datos (tablas y relaciones) y se puede ver como diagrama — depende de: -
+- [ ] [DEVOPS] Companion local al estilo T3 Code — una app local lanza los agentes del usuario (Claude Code, Codex, Antigravity) con su propio login y se conecta a FunWork por MCP — depende de: MCP
 
 ## Documentación
 
