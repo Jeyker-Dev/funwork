@@ -1,6 +1,6 @@
 # Backend
 
-Laravel 13. Skills de referencia: `laravel-clean-architecture` y `pest-laravel-testing`.
+Laravel 13. Skills de referencia: `laravel-conventions` y `testing-strategy`.
 
 ## Convenciones
 

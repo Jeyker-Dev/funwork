@@ -23,7 +23,6 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
-AGENTS.md
 
 # Local deploy settings (scripts/deploy.sh)
 .deploy.env
