@@ -55,6 +55,13 @@ new class extends Component {
 
                 <flux:textarea label="Description" placeholder="Add details..." wire:model="form.description"/>
 
+                <flux:select variant="listbox" label="Area" placeholder="No area" wire:model="form.areaId">
+                    <flux:select.option :value="null">No area</flux:select.option>
+                    @foreach($project->areas as $area)
+                        <flux:select.option :value="$area->id">{{ $area->name }}</flux:select.option>
+                    @endforeach
+                </flux:select>
+
                 <div class="flex">
                     <flux:spacer/>
 

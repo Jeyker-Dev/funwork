@@ -21,6 +21,7 @@ class Task extends Model
         'status',
         'due_date',
         'priority',
+        'area_id',
     ];
 
     protected function casts(): array
@@ -35,6 +36,11 @@ class Task extends Model
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);
+    }
+
+    public function area(): BelongsTo
+    {
+        return $this->belongsTo(Area::class);
     }
 
     public function users(): BelongsToMany

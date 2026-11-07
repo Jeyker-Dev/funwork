@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class Project extends Model
 {
@@ -26,6 +27,18 @@ class Project extends Model
     public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'owner_id');
+    }
+
+    public function areas(): HasMany
+    {
+        return $this->hasMany(Area::class)->orderBy('position');
+    }
+
+    public function areaByKey(string $key): ?Area
+    {
+        $normalized = strtolower(Str::slug($key));
+
+        return $this->areas()->whereRaw('LOWER(slug) = ?', [$normalized])->first();
     }
 
     public function tasks(): HasMany

@@ -52,11 +52,20 @@ new class extends Component {
                 </flux:text>
             </div>
 
-            <flux:select variant="listbox" label="Project" placeholder="Choose project..." wire:model="form.projectId">
+            <flux:select variant="listbox" label="Project" placeholder="Choose project..." wire:model.live="form.projectId">
                 @foreach($projects as $project)
                     <flux:select.option value="{{ $project->id }}">{{ $project->name }}</flux:select.option>
                 @endforeach
             </flux:select>
+
+            @if($selectedProject = $projects->firstWhere('id', $form->projectId))
+                <flux:select variant="listbox" label="Area" placeholder="No area" wire:model="form.areaId">
+                    <flux:select.option :value="null">No area</flux:select.option>
+                    @foreach($selectedProject->areas as $area)
+                        <flux:select.option :value="$area->id">{{ $area->name }}</flux:select.option>
+                    @endforeach
+                </flux:select>
+            @endif
 
             <flux:input label="Name" wire:model="form.name" />
 

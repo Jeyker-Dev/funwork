@@ -29,11 +29,14 @@ class ConvertInboxToTaskForm extends Form
 
     public ?InboxItem $item = null;
 
+    public ?int $areaId = null;
+
     protected function rules(): array
     {
         return [
             'status' => ['required', Rule::enum(TaskStatus::class)],
             'priority' => ['required', Rule::enum(TaskPriority::class)],
+            'areaId' => ['nullable', 'integer', Rule::exists('areas', 'id')->where('project_id', $this->projectId)],
         ];
     }
 
@@ -43,6 +46,7 @@ class ConvertInboxToTaskForm extends Form
         $this->title = $item->content;
         $this->description = '';
         $this->projectId = null;
+        $this->areaId = null;
         $this->status = TaskStatus::Todo->value;
         $this->priority = TaskPriority::Low->value;
     }
@@ -66,6 +70,7 @@ class ConvertInboxToTaskForm extends Form
             'status' => $this->status,
             'position' => $position,
             'priority' => $this->priority,
+            'area_id' => $this->areaId ?: null,
         ]);
 
         $this->item->delete();

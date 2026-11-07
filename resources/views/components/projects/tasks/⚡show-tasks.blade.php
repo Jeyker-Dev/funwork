@@ -1,34 +1,40 @@
 <?php
 
-use Livewire\Component;
-use App\Models\Task;
-use App\Models\Project;
 use App\Livewire\Actions\ReorderTasks;
+use App\Models\Project;
+use App\Models\Task;
+use App\Support\QueryHelper;
 use Livewire\Attributes\On;
+use Livewire\Component;
 
 new class extends Component {
     public Project $project;
     public ?int $projectId = null;
     public ?string $status = null;
+    public ?string $area = null;
 
-    public function mount(Project $project, ?string $status = null): void
+    public function mount(Project $project, ?string $status = null, ?string $area = null): void
     {
         $this->authorize('view', $project);
 
         $this->project = $project;
         $this->projectId = $project->id;
         $this->status = $status;
+        $this->area = $area;
     }
 
     public function with(): array
     {
-        $query = Task::where('project_id', $this->projectId)
+        $query = Task::with('area')
+            ->where('project_id', $this->projectId)
             ->orderBy('position')
             ->orderByDesc('created_at');
 
         if ($this->status) {
             $query->where('status', $this->status);
         }
+
+        QueryHelper::applyAreaFilter($query, $this->area);
 
         return [
             'tasks' => $query->limit(3)->get(),
@@ -88,9 +94,16 @@ new class extends Component {
                 x-on:click="window.location='{{ route('show.task', ['project' => $project, 'task' => $task->id]) }}'"
             >
                 <div class="flex items-center justify-between">
-                    <flux:badge size="lg" class="uppercase" color="orange">
-                        {{ $task->priority->value }}
-                    </flux:badge>
+                    <div class="flex items-center gap-2">
+                        <flux:badge size="lg" class="uppercase" color="orange">
+                            {{ $task->priority->value }}
+                        </flux:badge>
+                        @if($task->area)
+                            <flux:badge size="sm" :color="$task->area->color">
+                                {{ $task->area->name }}
+                            </flux:badge>
+                        @endif
+                    </div>
 
                     <flux:icon.arrows-pointing-out x-sort:handle x-on:click.stop/>
                 </div>

@@ -10,10 +10,11 @@ _Sin tareas en curso._
 
 ## Hechas en este sprint
 
+- [x] [DATABASE] Áreas por proyecto (frontend, backend, database, design; configurables) y etiqueta de área en tareas y notas — se puede filtrar el tablero por área — depende de: Fase 1 (commit pendiente)
 - [x] [FRONTEND] Badge "Cambios sin sincronizar" en tarjetas de notebook — etiqueta ámbar junto a la última sincronización cuando un notebook vinculado a Google Docs tiene modificaciones pendientes — depende de: Sincronización automática con debounce (commit `616c1aa`)
 - [x] [BACKEND] Sincronización automática de notebooks con debounce — job `SyncNotebookToGoogleDocJob` encolado con delay de 2 minutos para notebooks con Google Doc, disparado en cambios de página y `sync-docs`, más timestamp `content_changed_at` — depende de: Sincronización individual por notebook (commit `616c1aa`)
 - [x] [FRONTEND] Ajuste de zona horaria en el perfil de usuario — selector Flux listbox con `DateTimeZone::listIdentifiers()` y preselección automática del navegador si el valor guardado es UTC — depende de: - (commit `616c1aa`)
-- [x] [BACKEND] Reemplazar el "Project pack" por exportación y sincronización con Google Docs por notebook — descarga `.md` por notebook y sync individual desde el menú de cada tarjeta para elegir granularmente qué notas van a NotebookLM — depende de: Sincronizar el "Project pack" (commit pendiente)
+- [x] [BACKEND] Reemplazar el "Project pack" por exportación y sincronización con Google Docs por notebook — descarga `.md` por notebook y sync individual desde el menú de cada tarjeta para elegir granularmente qué notas van a NotebookLM — depende de: Sincronizar el "Project pack" (commit `4c94434`)
 - [x] [BACKEND] Sincronizar el "Project pack" con un Google Doc (OAuth con Google, API de Docs/Drive) — desde FunWork se actualiza el Google Doc y en NotebookLM basta con "Sync" para refrescar la fuente — depende de: Export "Project pack" (commit `bcbc03b`)
 - [x] [BACKEND] Export "Project pack" en Markdown (notebooks, tareas, decisiones) — se descarga un `.md` listo para subir a NotebookLM — depende de: - (commit `c02c650`)
 - [x] [DEVOPS] Workflow de GitHub que ejecuta `funwork:sync-docs` en el VPS en cada push que toca `docs/**` (reusa los secrets SSH del deploy) — un cambio en `docs/` aparece en FunWork sin pasos manuales — depende de: Comando sync-docs (commit `e2a5f96`)

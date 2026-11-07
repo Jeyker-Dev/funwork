@@ -36,7 +36,9 @@ Avance: **Sprint 1 de Fase 1 cerrado** — enums de tareas validados, filtro del
 
 ## Fase 2 — Áreas y flujo NotebookLM
 
-- **Áreas como dato** (`frontend`, `backend`, `database`, `design`, configurables por proyecto) para etiquetar tareas y notas.
+Avance en curso: Áreas por proyecto implementadas (gestión CRUD con modal Flux, 4 áreas base por defecto, asignación a tareas, notebooks e inbox, badges y filtro sincronizado en el tablero de tareas). Espejo de `docs/` y exportación/sincronización con Google Docs por notebook ya completados. Pendiente el importador de tareas desde NotebookLM.
+
+- **Áreas como dato:** completado — áreas configurables por proyecto (`frontend`, `backend`, `database`, `design` por defecto con colores de badges Flux), etiquetas en tareas y notebooks, modal de gestión para el dueño y filtro reactivo por área en el tablero.
 - **Importador de tareas:** pegar la salida de NotebookLM en el formato `- [ ] [AREA] Título — criterio — depende de: X` y crear las tareas en lote.
 - **Project pack:** exportar a Markdown los notebooks, las tareas y las decisiones del proyecto para subirlo a NotebookLM. Las páginas ya son JSON `{title, body}` en texto plano.
 - **Espejo de `docs/` (adelantado, sprint del 2026-11-04):** el repo sigue siendo la fuente de verdad; un workflow de GitHub ejecuta `funwork:sync-docs` en el VPS por SSH y copia `docs/` al notebook "Docs" del proyecto FunWork. Así el Project pack incluye los docs y NotebookLM se refresca con "Sync" en Google Docs.

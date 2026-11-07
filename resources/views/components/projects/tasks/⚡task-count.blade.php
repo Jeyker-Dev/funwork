@@ -1,30 +1,42 @@
 <?php
 
-use Livewire\Component;
 use App\Enums\TaskStatus;
-use App\Models\Task;
 use App\Models\Project;
+use App\Models\Task;
+use App\Support\QueryHelper;
 use Livewire\Attributes\On;
+use Livewire\Component;
 
 new class extends Component
 {
     public Project $project;
     public ?int $projectId = null;
     public ?string $status = null;
+    public ?string $area = null;
 
-    public function mount(Project $project, ?string $status = null): void
+    public function mount(Project $project, ?string $status = null, ?string $area = null): void
     {
         $this->project = $project;
         $this->projectId = $project->id;
         $this->status = $status;
+        $this->area = $area;
+    }
+
+    #[On('area-filter-changed')]
+    public function setAreaFilter(?string $area): void
+    {
+        $this->area = $area;
     }
 
     public function with(): array
     {
+        $query = Task::where('project_id', $this->projectId)
+            ->where('status', $this->status);
+
+        QueryHelper::applyAreaFilter($query, $this->area);
+
         return [
-            'count' => Task::where('project_id', $this->projectId)
-                ->where('status', $this->status)
-                ->count(),
+            'count' => $query->count(),
         ];
     }
 

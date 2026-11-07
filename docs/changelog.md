@@ -2,6 +2,7 @@
 
 ## 2026-11-06
 
+- Áreas por proyecto configurables (`Area`, `manage-areas`): cuatro áreas por defecto (Frontend, Backend, Database, Design) con paleta de badges Flux, asignación opcional en tareas, notebooks e inbox, badges en tarjetas y detalle, modal de gestión CRUD y reordenamiento para el dueño, y filtro reactivo por área en el tablero de tareas sin consultas N+1.
 - Ajuste de zona horaria en el perfil de usuario (`⚡profile`): selector buscable de `DateTimeZone::listIdentifiers()` con detección y preselección automática de la zona horaria del navegador mediante Alpine e `Intl.DateTimeFormat` cuando el valor almacenado es UTC.
 - Sincronización automática a Google Docs con debounce de 2 minutos (`SyncNotebookToGoogleDocJob`): encolado único por notebook ante modificaciones de páginas (`NotebookPage`) o reflejo de docs (`funwork:sync-docs`), actualizando `notebooks.content_changed_at` y limitándose a notebooks con Doc existente.
 - Badge "Cambios sin sincronizar" en tarjetas de notebook (`⚡show-notebooks`): indicador visual en ámbar junto a la última sincronización cuando un notebook con Google Doc tiene cambios posteriores a su sincronización, desapareciendo al sincronizar.

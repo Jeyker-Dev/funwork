@@ -98,14 +98,23 @@ new class extends Component
 
                 <div class="flex justify-between items-center w-full gap-4 my-6">
                     <div class="w-1/2">
-                        <flux:input label="Due date" type="date" wire:model="form.dueDate"/>
+                        <flux:select variant="listbox" label="Area" placeholder="No area" wire:model="form.areaId">
+                            <flux:select.option :value="null">No area</flux:select.option>
+                            @foreach($project->areas as $area)
+                                <flux:select.option :value="$area->id">{{ $area->name }}</flux:select.option>
+                            @endforeach
+                        </flux:select>
                     </div>
 
                     <div class="w-1/2">
-                        <flux:select variant="listbox" multiple label="Assigned Users" placeholder="Choose users..." wire:model="form.assignedUserIds">
-                            <flux:select.option value="{{ $user->id }}">{{ $user->display_name }}</flux:select.option>
-                        </flux:select>
+                        <flux:input label="Due date" type="date" wire:model="form.dueDate"/>
                     </div>
+                </div>
+
+                <div class="w-full my-6">
+                    <flux:select variant="listbox" multiple label="Assigned Users" placeholder="Choose users..." wire:model="form.assignedUserIds">
+                        <flux:select.option value="{{ $user->id }}">{{ $user->display_name }}</flux:select.option>
+                    </flux:select>
                 </div>
 
                 <div class="flex">

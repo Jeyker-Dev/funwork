@@ -16,6 +16,15 @@ Laravel 13. Skills de referencia: `laravel-clean-architecture` y `pest-laravel-t
 - Requeridos: `name`, `description`, `icon`, `type`, `status`, `ownerId`.
 - `ownerId` debe coincidir con `auth()->id()` (de lo contrario aborta con 403); el selector de dueño solo ofrece al usuario autenticado.
 - `dueDate` y `archiveDate` se validan como fecha; `archiveDate` se guarda en `archived_at`.
+- Creación de áreas por defecto: `ProjectForm::store()` invoca `App\Actions\Projects\CreateDefaultAreasAction::execute($project)` al crear el proyecto, generando 4 áreas base: Frontend (`blue`, pos 1), Backend (`green`, pos 2), Database (`amber`, pos 3) y Design (`purple`, pos 4). Una migración de datos garantiza estas áreas en proyectos preexistentes.
+
+### Áreas de proyecto (`Area`, `manage-areas`)
+- Relación: `Project::areas()` (`hasMany`, ordenado por `position`).
+- Búsqueda por clave: `Project::areaByKey(string $key): ?Area` busca por coincidencia insensible a mayúsculas sobre `slug` (`LOWER(slug) = LOWER($key)`), permitiendo resolver claves como `BACKEND`, `Backend` o `backend` (preparado para importadores de tareas y herramientas externas).
+- Autorización: únicamente el dueño del proyecto puede gestionar áreas mediante `ProjectPolicy` (403 para usuarios no autorizados).
+- Validación de gestión: `name` requerido (máx 50 caracteres), `slug` generado con `Str::slug($name)` con unicidad por proyecto (`Rule::unique('areas', 'slug')->where('project_id', $project->id)`), y `color` perteneciente a `Area::ALLOWED_COLORS` (`blue`, `green`, `amber`, `purple`, `red`, `cyan`, `pink`, `zinc`).
+- Asignación y validación de áreas: `TaskForm`, `NotebookForm`, `ConvertInboxToTaskForm`, `ConvertInboxToNotebookForm` y el modal de cambio de área en `⚡show-notebooks` validan la pertenencia del `area_id` seleccionado con `Rule::exists('areas', 'id')->where('project_id', $project->id)`. Áreas de otros proyectos son rechazadas.
+- Integridad al eliminar: al borrar un área, las tareas y notebooks asociados permanecen en el sistema con `area_id` seteado en `null` (`nullOnDelete`).
 
 ### Notebooks (`NotebookForm`)
 - Requeridos: `project_id`, `created_by`. Al crear: toast, cierre del modal, reset del formulario y evento `notebook-created`.

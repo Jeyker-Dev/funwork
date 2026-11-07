@@ -36,12 +36,15 @@ class TaskForm extends Form
     #[Validate('nullable|integer')]
     public ?int $position = null;
 
+    public ?int $areaId = null;
+
     protected function rules(): array
     {
         return [
             'status' => ['required', Rule::enum(TaskStatus::class)],
             'priority' => ['required', Rule::enum(TaskPriority::class)],
             'assignedUserIds.*' => ['integer', Rule::in([auth()->id()])],
+            'areaId' => ['nullable', 'integer', Rule::exists('areas', 'id')->where('project_id', $this->projectId)],
         ];
     }
 
@@ -60,6 +63,7 @@ class TaskForm extends Form
             'due_date' => $this->dueDate ?: null,
             'project_id' => $this->projectId,
             'position' => $this->position,
+            'area_id' => $this->areaId ?: null,
         ]);
 
         if (! empty($this->assignedUserIds)) {
@@ -88,6 +92,7 @@ class TaskForm extends Form
         $this->assignedUserIds = $task->users->pluck('id')->all();
         $this->projectId = $task->project_id;
         $this->position = $task->position;
+        $this->areaId = $task->area_id;
     }
 
     public function update(Task $task): void
@@ -102,6 +107,7 @@ class TaskForm extends Form
             'status' => $this->status,
             'priority' => $this->priority,
             'due_date' => $this->dueDate ?: null,
+            'area_id' => $this->areaId ?: null,
         ]);
 
         $task->users()->sync($this->assignedUserIds);

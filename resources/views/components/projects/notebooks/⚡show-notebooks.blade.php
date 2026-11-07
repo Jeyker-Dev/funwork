@@ -17,6 +17,8 @@ new class extends Component
     public string $sort = 'recent';
 
     public ?Project $project = null;
+    public ?int $changingNotebookId = null;
+    public ?int $notebookAreaId = null;
 
     use WithPagination;
 
@@ -28,7 +30,7 @@ new class extends Component
     }
     public function with(): array
 {
-    $base = $this->project->notebooks();
+    $base = $this->project->notebooks()->with('area');
 
     $counts = [
         'all' => $this->project->notebooks()->count(),
@@ -117,6 +119,35 @@ new class extends Component
 
         return null;
     }
+
+    public function openChangeAreaModal(int $notebookId): void
+    {
+        $notebook = $this->project->notebooks()->findOrFail($notebookId);
+        $this->authorize('update', $notebook);
+
+        $this->changingNotebookId = $notebook->id;
+        $this->notebookAreaId = $notebook->area_id;
+
+        Flux::modal('change-notebook-area')->show();
+    }
+
+    public function saveNotebookArea(): void
+    {
+        $notebook = $this->project->notebooks()->findOrFail($this->changingNotebookId);
+        $this->authorize('update', $notebook);
+
+        $this->validate([
+            'notebookAreaId' => ['nullable', 'integer', \Illuminate\Validation\Rule::exists('areas', 'id')->where('project_id', $this->project->id)],
+        ]);
+
+        $notebook->update([
+            'area_id' => $this->notebookAreaId ?: null,
+        ]);
+
+        Flux::modal('change-notebook-area')->close();
+        $this->reset(['changingNotebookId', 'notebookAreaId']);
+        Flux::toast('Notebook area updated.', variant: 'success');
+    }
 }
 ?>
 
@@ -126,7 +157,12 @@ new class extends Component
             <flux:card class="space-y-6 cursor-pointer hover:ring-2 hover:ring-zinc-800/10 dark:hover:ring-white/20 transition" wire:click="openNotebook({{ $notebook->id }})">
 
                 <div class="flex items-center justify-between">
-                    <flux:heading size="lg">{{ $notebook->name }}</flux:heading>
+                    <div class="flex items-center gap-2">
+                        <flux:heading size="lg">{{ $notebook->name }}</flux:heading>
+                        @if($notebook->area)
+                            <flux:badge size="sm" :color="$notebook->area->color">{{ $notebook->area->name }}</flux:badge>
+                        @endif
+                    </div>
 
                     <div wire:click.stop x-on:click.stop>
                         <flux:dropdown position="bottom" align="end">
@@ -134,6 +170,9 @@ new class extends Component
                             <flux:menu>
                                 <flux:menu.item :href="route('project.notebooks.export', [$project, $notebook])" icon="arrow-down-tray">
                                     Descargar .md
+                                </flux:menu.item>
+                                <flux:menu.item wire:click.stop="openChangeAreaModal({{ $notebook->id }})" icon="tag">
+                                    Change area
                                 </flux:menu.item>
                                 <flux:menu.item wire:click.stop="syncGoogleDoc({{ $notebook->id }})" icon="arrow-path">
                                     Sincronizar con Google Docs
@@ -175,4 +214,30 @@ new class extends Component
     </div>
 
     <flux:pagination :paginator="$notebooks" />
+
+    <flux:modal name="change-notebook-area" class="w-md">
+        <form wire:submit.prevent="saveNotebookArea" class="space-y-6">
+            <div>
+                <flux:heading size="lg">Change Area</flux:heading>
+                <flux:text class="mt-1">Select an area for this notebook.</flux:text>
+            </div>
+
+            <flux:select variant="listbox" label="Area" placeholder="No area" wire:model="notebookAreaId">
+                <flux:select.option :value="null">No area</flux:select.option>
+                @foreach($project->areas as $area)
+                    <flux:select.option :value="$area->id">{{ $area->name }}</flux:select.option>
+                @endforeach
+            </flux:select>
+            @error('notebookAreaId')
+                <div class="text-xs text-red-500">{{ $message }}</div>
+            @enderror
+
+            <div class="flex justify-end gap-2">
+                <flux:modal.close>
+                    <flux:button variant="ghost">Cancel</flux:button>
+                </flux:modal.close>
+                <flux:button type="submit" variant="primary">Save</flux:button>
+            </div>
+        </form>
+    </flux:modal>
 </div>

@@ -1,20 +1,22 @@
 <?php
 
-use Livewire\Component;
-use Livewire\Attributes\On;
 use App\Enums\TaskStatus;
-use App\Models\Task;
 use App\Models\Project;
+use App\Models\Task;
+use App\Support\QueryHelper;
+use Livewire\Attributes\On;
+use Livewire\Component;
 
 new class extends Component {
     public Project $project;
     public ?int $projectId = null;
     public string $filter = 'all';
     public ?string $initialFilter = null;
+    public ?string $area = 'all';
     public int $page = 1;
     public int $perPage = 6;
 
-    public function mount(Project $project, ?string $initialFilter = null): void
+    public function mount(Project $project, ?string $initialFilter = null, ?string $area = 'all'): void
     {
         $this->authorize('view', $project);
 
@@ -22,6 +24,7 @@ new class extends Component {
         $this->projectId = $project->id;
         $this->initialFilter = $initialFilter;
         $this->filter = $initialFilter ?: 'all';
+        $this->area = $area ?: 'all';
     }
 
     #[On('slider-filter-changed')]
@@ -37,6 +40,13 @@ new class extends Component {
         $this->page = max(1, $page);
     }
 
+    #[On('area-filter-changed')]
+    public function setAreaFilter(string $area): void
+    {
+        $this->area = $area;
+        $this->page = 1;
+    }
+
     #[On('task-created')]
     public function refreshTasks(): void
     {
@@ -45,7 +55,7 @@ new class extends Component {
 
     public function with(): array
     {
-        $query = Task::query()
+        $query = Task::with('area')
             ->where('project_id', $this->projectId)
             ->orderBy('position')
             ->orderByDesc('created_at');
@@ -53,6 +63,8 @@ new class extends Component {
         if ($this->filter !== 'all') {
             $query->where('status', $this->filter);
         }
+
+        QueryHelper::applyAreaFilter($query, $this->area);
 
         $tasks = $query
             ->skip(($this->page - 1) * $this->perPage)
@@ -84,9 +96,16 @@ new class extends Component {
             <div class="pl-3">
                 <div class="flex items-center justify-between gap-4">
 
-                    <flux:badge size="xs" class="uppercase" color="{{ $badgeColor }}">
-                        {{ $task->priority->value }}
-                    </flux:badge>
+                    <div class="flex items-center gap-2">
+                        <flux:badge size="xs" class="uppercase" color="{{ $badgeColor }}">
+                            {{ $task->priority->value }}
+                        </flux:badge>
+                        @if($task->area)
+                            <flux:badge size="xs" :color="$task->area->color">
+                                {{ $task->area->name }}
+                            </flux:badge>
+                        @endif
+                    </div>
 
                     <flux:avatar tooltip="Assigned user" size="sm" class="shrink-0"
                                  src="https://unavatar.io/x/calebporzio"/>

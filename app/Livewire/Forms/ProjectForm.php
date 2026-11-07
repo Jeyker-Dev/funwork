@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Forms;
 
+use App\Actions\Projects\CreateDefaultAreasAction;
 use App\Models\Project;
 use Flux\Flux;
 use Illuminate\Support\Facades\Gate;
@@ -41,7 +42,7 @@ class ProjectForm extends Form
         Gate::authorize('create', Project::class);
         abort_if($this->ownerId !== auth()->id(), 403);
 
-        Project::create([
+        $project = Project::create([
             'name' => $this->name,
             'description' => $this->description,
             'icon' => $this->icon,
@@ -51,6 +52,8 @@ class ProjectForm extends Form
             'due_at' => $this->dueDate ?: null,
             'owner_id' => $this->ownerId,
         ]);
+
+        app(CreateDefaultAreasAction::class)->execute($project);
 
         $this->reset();
 

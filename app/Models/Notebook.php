@@ -20,6 +20,7 @@ class Notebook extends Model
         'created_by',
         'is_archived',
         'is_shared',
+        'area_id',
     ];
 
     protected function casts(): array
@@ -33,6 +34,11 @@ class Notebook extends Model
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);
+    }
+
+    public function area(): BelongsTo
+    {
+        return $this->belongsTo(Area::class);
     }
 
     public function pages(): HasMany

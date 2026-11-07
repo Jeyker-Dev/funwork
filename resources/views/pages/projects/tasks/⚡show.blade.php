@@ -75,6 +75,12 @@ class extends Component {
                 <flux:badge size="sm" class="uppercase font-semibold">
                     {{ $task->priority->value }}
                 </flux:badge>
+
+                @if($task->area)
+                    <flux:badge size="sm" :color="$task->area->color">
+                        {{ $task->area->name }}
+                    </flux:badge>
+                @endif
             </div>
 
             <div class="flex items-center gap-4 text-sm text-zinc-500 dark:text-zinc-400">
@@ -138,8 +144,17 @@ class extends Component {
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <flux:input label="Due date" type="date" wire:model="form.dueDate" />
+                <flux:select variant="listbox" label="Area" placeholder="No area" wire:model="form.areaId">
+                    <flux:select.option :value="null">No area</flux:select.option>
+                    @foreach($project->areas as $area)
+                        <flux:select.option :value="$area->id">{{ $area->name }}</flux:select.option>
+                    @endforeach
+                </flux:select>
 
+                <flux:input label="Due date" type="date" wire:model="form.dueDate" />
+            </div>
+
+            <div>
                 <flux:select variant="listbox" multiple label="Assigned Users" placeholder="Choose users..." wire:model="form.assignedUserIds">
                     <flux:select.option value="{{ auth()->id() }}">{{ auth()->user()->display_name }}</flux:select.option>
                 </flux:select>

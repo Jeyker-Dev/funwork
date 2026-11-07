@@ -6,6 +6,7 @@ use App\Models\InboxItem;
 use App\Models\Notebook;
 use App\Models\Project;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 
@@ -22,12 +23,22 @@ class ConvertInboxToNotebookForm extends Form
 
     public ?InboxItem $item = null;
 
+    public ?int $areaId = null;
+
+    protected function rules(): array
+    {
+        return [
+            'areaId' => ['nullable', 'integer', Rule::exists('areas', 'id')->where('project_id', $this->projectId)],
+        ];
+    }
+
     public function setItem(InboxItem $item): void
     {
         $this->item = $item;
         $this->name = 'Note from Inbox';
         $this->description = $item->content;
         $this->projectId = null;
+        $this->areaId = null;
     }
 
     public function store(): Notebook
@@ -46,6 +57,7 @@ class ConvertInboxToNotebookForm extends Form
             'created_by' => auth()->id(),
             'is_archived' => false,
             'is_shared' => false,
+            'area_id' => $this->areaId ?: null,
         ]);
 
         $this->item->delete();

@@ -25,6 +25,8 @@
     <div class="flex items-center gap-2">
         <livewire:projects.project-finder :project="$project"/>
 
+        <livewire:projects.manage-areas :project="$project"/>
+
         <flux:button icon="cog-6-tooth" variant="ghost" class="size-10!"/>
 
         <x-desktop-user-menu/>

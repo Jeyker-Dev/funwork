@@ -1,10 +1,11 @@
 <?php
 
-use Livewire\Component;
-use Livewire\Attributes\On;
 use App\Enums\TaskStatus;
-use App\Models\Task;
 use App\Models\Project;
+use App\Models\Task;
+use App\Support\QueryHelper;
+use Livewire\Attributes\On;
+use Livewire\Component;
 
 new class extends Component
 {
@@ -12,8 +13,9 @@ new class extends Component
     public ?int $projectId = null;
     public string $activeFilter = 'all';
     public ?string $initialFilter = null;
+    public ?string $area = 'all';
 
-    public function mount(Project $project, ?string $initialFilter = null): void
+    public function mount(Project $project, ?string $initialFilter = null, ?string $area = 'all'): void
     {
         $this->authorize('view', $project);
 
@@ -21,12 +23,19 @@ new class extends Component
         $this->projectId = $project->id;
         $this->initialFilter = $initialFilter;
         $this->activeFilter = $initialFilter ?: 'all';
+        $this->area = $area ?: 'all';
     }
 
     public function setFilter(string $filter): void
     {
         $this->activeFilter = $filter;
         $this->dispatch('slider-filter-changed', filter: $filter);
+    }
+
+    #[On('area-filter-changed')]
+    public function setAreaFilter(string $area): void
+    {
+        $this->area = $area;
     }
 
     #[On('task-created')]
@@ -38,6 +47,7 @@ new class extends Component
     public function with(): array
     {
         $baseQuery = Task::query()->where('project_id', $this->projectId);
+        QueryHelper::applyAreaFilter($baseQuery, $this->area);
 
         return [
             'counts' => [
