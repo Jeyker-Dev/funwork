@@ -1,6 +1,6 @@
 # Frontend
 
-Livewire v4 SFC + Flux / Flux Pro + Alpine v3 + Tailwind. Skill de referencia: `livewire-flux`.
+Livewire v4 SFC + Flux / Flux Pro + Alpine v3 + Tailwind. Skill de referencia: `laravel-conventions` (`references/livewire.md`).
 
 ## Convenciones
 
