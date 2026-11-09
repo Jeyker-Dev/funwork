@@ -27,3 +27,4 @@ yarn-error.log
 # Local deploy settings (scripts/deploy.sh)
 .deploy.env
 .gga-rules.md
+.vitest/

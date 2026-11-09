@@ -24,6 +24,9 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -35,7 +38,7 @@ jobs:
       - name: Install Dependencies
         run: |
           composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
-          npm install
+          pnpm install --frozen-lockfile
 
       - name: Run Pint
         run: composer lint

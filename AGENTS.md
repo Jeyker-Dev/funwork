@@ -14,8 +14,8 @@ Guía para agentes (humano o IA) que trabajen en este repositorio.
 composer install
 cp .env.example .env
 php artisan key:generate
-npm install
-npm run dev
+pnpm install
+pnpm run dev
 php artisan serve
 composer lint
 ./vendor/bin/pest
