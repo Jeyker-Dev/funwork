@@ -77,6 +77,26 @@ Laravel 13. Skills de referencia: `laravel-conventions` y `testing-strategy`.
 - Estados y prioridades usan obligatoriamente los Backed Enums `App\Enums\TaskStatus` (`Todo`, `Doing`, `Done`) y `App\Enums\TaskPriority` (`Low`, `Medium`, `High`), casteados en `Task`, validados con `Rule::enum` en `TaskForm` y `ConvertInboxToTaskForm`, y verificados con `TaskStatus::tryFrom` antes de la transacción en `ReorderTasks`. El dashboard aún filtra por `'completed'` (pendiente de unificar con `TaskStatus::Done`).
 - Vencimientos y fecha local: `tasks.due_date` es `dateTime` (almacenado como `'Y-m-d 00:00:00'`) y se compara siempre por fecha (`whereDate`), nunca contra `now()`. La fecha local del usuario se calcula como `now(auth()->user()->timezone ?? config('app.timezone'))->toDateString()` centralizada en `App\Support\DateHelper::userToday()` y en `$user->localDate()`. Regla de vencimiento: una tarea se considera vencida ("Overdue") si su fecha es anterior al día local del usuario (`due_date < localToday`), y "de hoy" ("Due today") si coincide con el día local del usuario (`due_date == localToday`) (commit `ba699d3`).
 
+### Importador de tareas desde NotebookLM (`ParseTaskImportAction`, `ImportTasksAction`, `projects.tasks.import-tasks`)
+- Formato de línea Markdown: `- [ ] [AREA] Title — acceptance criterion — depende de: X`
+  - Prefijo opcional: `- [ ]` o `- [x]`. El prefijo `- [x]` importa con estado `Done`; cualquier otra variante o la ausencia de prefijo importa como `Todo`.
+  - Separadores admitidos: raya em `—`, raya en `–` o doble guión con espacios ` -- `.
+  - La cláusula `depende de: X` (o `depends on: X`) es opcional; el valor `depende de: -` indica que no hay dependencia.
+  - Se omiten silenciosamente líneas en blanco y se eliminan espacios sobrantes.
+  - La etiqueta `[AREA]` es opcional y se resuelve mediante `Project::areaByKey()`.
+- Validaciones por línea:
+  - Errores (la línea no se importa): título ausente, criterio de aceptación ausente, o título mayor a 255 caracteres.
+  - Advertencias (la línea sí se importa): etiqueta de área no encontrada (`"Area 'QA' not found — will be imported without area"` asignando `area_id = null`), o título ya existente en el proyecto de manera insensible a mayúsculas.
+  - Máximo de 50 líneas no vacías por importación (error de validación sobre el textarea).
+- Mapeo y persistencia:
+  - `title` ← Title.
+  - `description` ← criterio; si existe dependencia, se añade `\n\nDepende de: X`.
+  - `status` ← `TaskStatus::Todo` o `TaskStatus::Done`; `priority` ← `TaskPriority::Low`.
+  - `area_id` ← ID del área resuelta o `null`.
+  - `position` ← `max(position) + 1` para ese proyecto y estado, incrementado correlativamente para cada tarea importada.
+  - Asignación: el usuario autenticado se sincroniza en la tabla pivot `task_user`.
+  - Ejecución atómica en `DB::transaction` y doble capa de autorización (`Gate::authorize('create', [Task::class, $project])` en la acción y `$this->authorize()` en el componente Livewire).
+
 ### Inbox
 - Los ítems se convierten a otros elementos mediante modales.
 

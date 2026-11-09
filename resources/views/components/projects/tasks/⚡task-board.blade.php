@@ -119,6 +119,10 @@ new class extends Component {
         >
             No area
         </flux:button>
+
+        <flux:spacer />
+
+        <livewire:projects.tasks.import-tasks :project="$project" />
     </div>
 
     <div class="grid grid-cols-3 gap-6">

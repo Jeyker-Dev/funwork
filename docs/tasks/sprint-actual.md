@@ -10,6 +10,7 @@ _Sin tareas en curso._
 
 ## Hechas en este sprint
 
+- [x] [BACKEND] Importador de tareas desde NotebookLM (formato fijo pegado en un textarea) — pegar N líneas crea N tareas con área y criterio — depende de: Áreas
 - [x] [DATABASE] Áreas por proyecto (frontend, backend, database, design; configurables) y etiqueta de área en tareas y notas — se puede filtrar el tablero por área — depende de: Fase 1 (commit `15b568a`)
 - [x] [FRONTEND] Badge "Cambios sin sincronizar" en tarjetas de notebook — etiqueta ámbar junto a la última sincronización cuando un notebook vinculado a Google Docs tiene modificaciones pendientes — depende de: Sincronización automática con debounce (commit `f603437`)
 - [x] [BACKEND] Sincronización automática de notebooks con debounce — job `SyncNotebookToGoogleDocJob` encolado con delay de 2 minutos para notebooks con Google Doc, disparado en cambios de página y `sync-docs`, más timestamp `content_changed_at` — depende de: Sincronización individual por notebook (commit `f603437`)

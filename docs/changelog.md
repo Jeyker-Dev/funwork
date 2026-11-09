@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-08
+
+- Importador de tareas desde NotebookLM en el tablero de tareas (`projects.tasks.import-tasks`, `⚡task-board`): modal Flux accesible desde el botón "Import" en la barra de filtros del tablero para crear tareas en lote a partir del formato Markdown de NotebookLM (`- [ ] [AREA] Título — criterio — depende de: X`). Flujo en dos pasos con validación y vista previa en tabla (inspección de área, título, criterio, dependencia y advertencias de duplicados o áreas desconocidas), importación transaccional de líneas válidas con asignación automática al usuario actual y cálculo de posición por estado.
+
 ## 2026-11-06
 
 - Áreas por proyecto configurables (`Area`, `manage-areas`): cuatro áreas por defecto (Frontend, Backend, Database, Design) con paleta de badges Flux, asignación opcional en tareas, notebooks e inbox, badges en tarjetas y detalle, modal de gestión CRUD y reordenamiento para el dueño, y filtro reactivo por área en el tablero de tareas sin consultas N+1.
