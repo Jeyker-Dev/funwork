@@ -4,6 +4,7 @@ use App\Actions\Auth\CreateApiTokenAction;
 use App\Models\ApiToken;
 use App\Models\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Livewire;
 
 test('an authenticated user can create an API token and sees the plaintext token once', function () {
@@ -145,4 +146,94 @@ test('the MCP HTTP endpoint rejects a revoked Bearer token', function () {
             'method' => 'tools/list',
         ])
         ->assertUnauthorized();
+});
+
+test('the MCP HTTP endpoint throttles requests to 60 per minute and returns 429 on the 61st request', function () {
+    $user = User::factory()->create();
+    $created = app(CreateApiTokenAction::class)->execute($user, 'Rate Limited Client');
+
+    $maxAllowedRequests = 60;
+
+    for ($attempt = 1; $attempt <= $maxAllowedRequests; $attempt++) {
+        Auth::forgetGuards();
+
+        $this->withHeader('Authorization', 'Bearer '.$created->plainTextToken)
+            ->postJson(route('mcp.funwork'), [
+                'jsonrpc' => '2.0',
+                'id' => $attempt,
+                'method' => 'tools/list',
+            ])
+            ->assertSuccessful();
+    }
+
+    Auth::forgetGuards();
+
+    $this->withHeader('Authorization', 'Bearer '.$created->plainTextToken)
+        ->postJson(route('mcp.funwork'), [
+            'jsonrpc' => '2.0',
+            'id' => 61,
+            'method' => 'tools/list',
+        ])
+        ->assertStatus(429);
+});
+
+test('the MCP HTTP endpoint does not rewrite token last_used_at within the same minute', function () {
+    $user = User::factory()->create();
+    $created = app(CreateApiTokenAction::class)->execute($user, 'Antigravity CLI');
+
+    $this->freezeTime();
+
+    $this->withHeader('Authorization', 'Bearer '.$created->plainTextToken)
+        ->postJson(route('mcp.funwork'), [
+            'jsonrpc' => '2.0',
+            'id' => 1,
+            'method' => 'tools/list',
+        ])
+        ->assertSuccessful();
+
+    $firstUsedAt = $created->apiToken->fresh()->last_used_at;
+    expect($firstUsedAt)->not->toBeNull();
+
+    $this->travel(30)->seconds();
+
+    $this->withHeader('Authorization', 'Bearer '.$created->plainTextToken)
+        ->postJson(route('mcp.funwork'), [
+            'jsonrpc' => '2.0',
+            'id' => 2,
+            'method' => 'tools/list',
+        ])
+        ->assertSuccessful();
+
+    $secondUsedAt = $created->apiToken->fresh()->last_used_at;
+    expect($secondUsedAt->equalTo($firstUsedAt))->toBeTrue();
+});
+
+test('the MCP HTTP endpoint updates token last_used_at after a minute has passed', function () {
+    $user = User::factory()->create();
+    $created = app(CreateApiTokenAction::class)->execute($user, 'Antigravity CLI');
+
+    $this->freezeTime();
+
+    $this->withHeader('Authorization', 'Bearer '.$created->plainTextToken)
+        ->postJson(route('mcp.funwork'), [
+            'jsonrpc' => '2.0',
+            'id' => 1,
+            'method' => 'tools/list',
+        ])
+        ->assertSuccessful();
+
+    $firstUsedAt = $created->apiToken->fresh()->last_used_at;
+
+    $this->travel(2)->minutes();
+
+    $this->withHeader('Authorization', 'Bearer '.$created->plainTextToken)
+        ->postJson(route('mcp.funwork'), [
+            'jsonrpc' => '2.0',
+            'id' => 2,
+            'method' => 'tools/list',
+        ])
+        ->assertSuccessful();
+
+    $secondUsedAt = $created->apiToken->fresh()->last_used_at;
+    expect($secondUsedAt->greaterThan($firstUsedAt))->toBeTrue();
 });

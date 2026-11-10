@@ -18,6 +18,8 @@ class ApiToken extends Model
 
     public const TOKEN_PREFIX = 'fw_';
 
+    public const TOUCH_INTERVAL_MINUTES = 1;
+
     protected function casts(): array
     {
         return [
@@ -43,6 +45,10 @@ class ApiToken extends Model
 
     public function markAsUsed(): void
     {
+        if ($this->last_used_at !== null && $this->last_used_at->gte(now()->subMinutes(self::TOUCH_INTERVAL_MINUTES))) {
+            return;
+        }
+
         $this->update([
             'last_used_at' => now(),
         ]);

@@ -5,7 +5,5 @@ use App\Mcp\Servers\FunWorkServer;
 use Laravel\Mcp\Facades\Mcp;
 
 Mcp::web('/mcp/funwork', FunWorkServer::class)
-    ->middleware(AuthenticateMcpWithApiToken::class)
+    ->middleware(['throttle:60,1', AuthenticateMcpWithApiToken::class])
     ->name('mcp.funwork');
-
-Mcp::local('funwork', FunWorkServer::class);

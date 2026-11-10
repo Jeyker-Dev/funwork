@@ -109,8 +109,10 @@ Laravel 13. Skills de referencia: `laravel-conventions` y `testing-strategy`.
   - El usuario gestiona sus tokens en Settings → Integrations (`settings/integrations`).
   - Cada token se genera con prefijo `fw_` + 40 caracteres aleatorios (`ApiToken::TOKEN_PREFIX . Str::random(40)`), se muestra en texto plano una única vez al crearlo y se persiste en `api_tokens.token` únicamente como hash SHA-256 (`ApiToken::hashToken()`).
   - La revocación elimina el registro de `api_tokens` (filtrando por `user_id = auth()->id()`) e invalida el acceso de inmediato.
-- **Autenticación HTTP (`AuthenticateMcpWithApiToken`):**
-  - Protege `POST /mcp/funwork` (`routes/ai.php`). Extrae el header `Authorization: Bearer <token>`, calcula su hash SHA-256, verifica que el token exista y no esté vencido (`expires_at`), actualiza `last_used_at` e inyecta el usuario en `Auth::setUser($user)` y `$request->setUserResolver(...)` de forma segura para Laravel Octane (sin estado estático entre requests). Si falta o es inválido, responde `401 Unauthorized`.
+- **Transporte y autenticación HTTP (`POST /mcp/funwork`, `AuthenticateMcpWithApiToken`):**
+  - El servidor es exclusivamente HTTP; no se habilita transporte local (`stdio`) porque este no transporta tokens de API y dejaría las herramientas desautenticadas.
+  - La ruta en `routes/ai.php` aplica limitación de tasa `throttle:60,1` antes de la autenticación, respondiendo `429 Too Many Requests` a partir de la petición 61 en un minuto.
+  - Extrae el header `Authorization: Bearer <token>`, calcula su hash SHA-256, verifica que el token exista y no esté vencido (`expires_at`), actualiza `last_used_at` (con debounce a un máximo de una actualización por minuto mediante `ApiToken::TOUCH_INTERVAL_MINUTES`) e inyecta el usuario en `Auth::setUser($user)` y `$request->setUserResolver(...)` de forma segura para Laravel Octane (sin estado estático entre requests). Si falta o es inválido, responde `401 Unauthorized`.
 - **Herramientas expuestas en `FunWorkServer` (`app/Mcp/Tools/*`):**
   - `list_projects`: lista los proyectos del usuario autenticado (`$user->projects()`, excluyendo archivados por defecto salvo `include_archived = true`) junto con sus áreas configuradas. Autoriza `ProjectPolicy::viewAny`.
   - `list_tasks`: lista las tareas de un proyecto (`project_id`), con filtros opcionales por `status` (`TaskStatus`) y `area` (slug resuelto con `Project::areaByKey()` o `"none"` para tareas sin área). Autoriza `ProjectPolicy::view`.
