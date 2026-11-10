@@ -136,6 +136,9 @@ main() {
     echo "==> Running migrations with funwork:$sha"
     docker compose -f compose.prod.yml run --rm --no-deps -T app php artisan migrate --force </dev/null
 
+    previous_image="$(docker compose -f compose.prod.yml ps -q app | xargs -r docker inspect --format '{{.Config.Image}}' 2>/dev/null || true)"
+    previous_tag="${previous_image#funwork:}"
+
     echo "==> Starting production stack"
     docker compose -f compose.prod.yml up -d --remove-orphans
 
@@ -151,9 +154,15 @@ main() {
         echo "==> FUNWORK_DOCS_PROJECT_ID is empty, skipping docs sync"
     fi
 
-    # Keep only the running build and latest; images still in use are skipped.
+    # Keep the running build, latest, and the previous image so rollback works (one prior version only).
+    keep_pattern="latest|$sha"
+    if [[ -n "$previous_tag" && "$previous_tag" != "$sha" && "$previous_tag" != "latest" ]]; then
+        keep_pattern="latest|$sha|$previous_tag"
+        echo "==> Previous image kept for rollback: funwork:$previous_tag"
+    fi
+
     docker images funwork --format '{{.Tag}}' \
-        | grep -vxE "latest|$sha" \
+        | grep -vxE "$keep_pattern" \
         | xargs -r -I{} docker rmi "funwork:{}" >/dev/null 2>&1 || true
     docker image prune -f >/dev/null
 

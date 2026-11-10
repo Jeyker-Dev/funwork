@@ -8,7 +8,7 @@
   3. Backup transaccional en `~/funwork/backups/backup_YYYYMMDD_HHMMSS_<sha>.sql.gz` vía `mysqldump` comprimido con gzip directo a archivo temporal `.tmp`, renombrando solo en éxito y conservando únicamente los 10 backups más recientes coincidentes con `backup_*.sql.gz`.
   4. Migración en un contenedor one-off descartable (`run --rm --no-deps -T app php artisan migrate --force </dev/null`) con la nueva imagen.
   5. Recreación del stack solo tras migrar (`up -d --remove-orphans`) y remoción de la migración post-up.
-  6. Sincronización de `docs/` y limpieza de imágenes Docker.
+  6. Sincronización de `docs/` y limpieza de imágenes Docker conservando la versión activa, `latest` y la imagen previa para que el rollback funcione (una única versión previa).
   Documentación del nuevo flujo, comandos de restauración manual de base de datos y rollback de versión en `docs/01-architecture.md`.
 
 ## 2026-11-09
