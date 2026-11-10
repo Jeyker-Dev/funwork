@@ -7,17 +7,21 @@ use App\Models\Project;
 use App\Models\Task;
 use Flux\Flux;
 use Illuminate\Support\Str;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 
 new class extends Component
 {
     public Project $project;
     public string $text = '';
+
+    #[Locked]
     public int $step = 1;
 
     /**
      * @var array<ParsedTaskLineData>
      */
+    #[Locked]
     public array $parsedLines = [];
 
     public function mount(Project $project): void
@@ -31,8 +35,7 @@ new class extends Component
     {
         $this->authorize('view', $this->project);
 
-        $rawLines = preg_split('/\r\n|\r|\n/', $this->text) ?: [];
-        $nonBlank = array_filter(array_map('trim', $rawLines));
+        $nonBlank = $this->nonBlankLines();
 
         if (empty($nonBlank)) {
             $this->addError('text', 'Please enter at least one task line.');
@@ -40,8 +43,8 @@ new class extends Component
             return;
         }
 
-        if (count($nonBlank) > 50) {
-            $this->addError('text', 'The text cannot contain more than 50 tasks.');
+        if (count($nonBlank) > ParseTaskImportAction::MAX_LINES) {
+            $this->addError('text', 'The text cannot contain more than '.ParseTaskImportAction::MAX_LINES.' tasks.');
 
             return;
         }
@@ -56,18 +59,44 @@ new class extends Component
         $this->step = 1;
     }
 
-    public function import(ImportTasksAction $importer): void
+    public function import(ImportTasksAction $importer, ParseTaskImportAction $parser): void
     {
         $this->authorize('create', [Task::class, $this->project]);
 
-        $validCount = count(array_filter($this->parsedLines, fn (ParsedTaskLineData $line): bool => $line->isValid()));
-        $importer->execute($this->project, $this->parsedLines, auth()->user());
+        $nonBlank = $this->nonBlankLines();
+
+        if (empty($nonBlank)) {
+            $this->addError('text', 'Please enter at least one task line.');
+
+            return;
+        }
+
+        if (count($nonBlank) > ParseTaskImportAction::MAX_LINES) {
+            $this->addError('text', 'The text cannot contain more than '.ParseTaskImportAction::MAX_LINES.' tasks.');
+
+            return;
+        }
+
+        $parsedLines = $parser->execute($this->project, $this->text);
+        $validCount = count(array_filter($parsedLines, fn (ParsedTaskLineData $line): bool => $line->isValid()));
+
+        $importer->execute($this->project, $parsedLines, auth()->user());
 
         Flux::toast("{$validCount} tasks imported", variant: 'success');
         Flux::modal('import-tasks-modal-'.$this->project->id)->close();
 
         $this->reset(['text', 'parsedLines', 'step']);
         $this->dispatch('task-created');
+    }
+
+    /**
+     * @return array<string>
+     */
+    private function nonBlankLines(): array
+    {
+        $rawLines = preg_split('/\r\n|\r|\n/', $this->text) ?: [];
+
+        return array_filter(array_map('trim', $rawLines));
     }
 
     public function with(): array
@@ -109,7 +138,7 @@ new class extends Component
                 </flux:field>
 
                 <flux:text size="sm" class="text-zinc-500">
-                    Format: <code>- [ ] [AREA] Title — acceptance criterion — depende de: X</code> (max 50 tasks)
+                    Format: <code>- [ ] [AREA] Title — acceptance criterion — depende de: X</code> (max {{ ParseTaskImportAction::MAX_LINES }} tasks)
                 </flux:text>
 
                 <div class="flex justify-end gap-2 pt-2">

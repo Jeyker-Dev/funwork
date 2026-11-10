@@ -14,6 +14,10 @@ use App\Models\Task;
 
 class ParseTaskImportAction
 {
+    public const MAX_LINES = 50;
+
+    public const MAX_TASKS = self::MAX_LINES;
+
     public const MAX_TITLE_LENGTH = 255;
 
     public const DONE_MARKER = 'x';

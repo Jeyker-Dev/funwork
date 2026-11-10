@@ -1,10 +1,12 @@
 <?php
 
+use App\Actions\Tasks\ParseTaskImportAction;
 use App\Enums\TaskStatus;
 use App\Models\Area;
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;
+use Livewire\Features\SupportLockedProperties\CannotUpdateLockedPropertyException;
 use Livewire\Livewire;
 
 beforeEach(function () {
@@ -181,4 +183,56 @@ test('user can navigate back from preview to edit text', function () {
         ->call('back')
         ->assertSet('step', 1)
         ->assertSet('text', "- [ ] Task 1 — Criterion 1\n");
+});
+
+test('after preview setting parsedLines from the client fails because it is locked and creates no tasks', function () {
+    $component = Livewire::actingAs($this->user)
+        ->test('projects.tasks.⚡import-tasks', ['project' => $this->project])
+        ->set('text', "- [ ] [BACKEND] Valid task — Valid criterion\n")
+        ->call('preview');
+
+    expect(fn () => $component->set('parsedLines', []))
+        ->toThrow(CannotUpdateLockedPropertyException::class);
+
+    expect(fn () => $component->set('step', 1))
+        ->toThrow(CannotUpdateLockedPropertyException::class);
+
+    expect(Task::where('title', 'Valid task')->exists())->toBeFalse();
+});
+
+test('an area tag of another project area is never assigned', function () {
+    $otherProject = Project::factory()->create();
+    Area::factory()->create([
+        'project_id' => $otherProject->id,
+        'name' => 'Frontend',
+        'slug' => 'frontend',
+    ]);
+
+    $text = "- [ ] [FRONTEND] Foreign area task — Valid criterion\n";
+
+    Livewire::actingAs($this->user)
+        ->test('projects.tasks.⚡import-tasks', ['project' => $this->project])
+        ->set('text', $text)
+        ->call('preview')
+        ->assertSee("Area 'FRONTEND' not found — will be imported without area")
+        ->call('import');
+
+    $task = Task::where('title', 'Foreign area task')->first();
+
+    expect($task)->not->toBeNull()
+        ->and($task->area_id)->toBeNull();
+});
+
+test('import with more than 50 lines creates no tasks', function () {
+    $text = collect(range(1, ParseTaskImportAction::MAX_LINES + 1))
+        ->map(fn (int $index): string => "- [ ] Task {$index} — Criterion {$index}")
+        ->implode("\n");
+
+    Livewire::actingAs($this->user)
+        ->test('projects.tasks.⚡import-tasks', ['project' => $this->project])
+        ->set('text', $text)
+        ->call('import')
+        ->assertHasErrors(['text']);
+
+    expect(Task::count())->toBe(0);
 });
