@@ -1,9 +1,14 @@
 #!/usr/bin/env bash
 # Deploys FunWork to the VPS without GitHub Actions or GHCR.
 #
-# Runs Pest and Pint locally, then over SSH: updates a git checkout on the VPS,
-# builds the production image there, restarts the stack, migrates, and mirrors
-# docs/ into the FunWork "Docs" notebook.
+# Runs Pest and Pint locally, then over SSH:
+#   1. Updates the git checkout on the VPS (~/funwork/src) and builds funwork:<sha>.
+#   2. Preflight: ensures MySQL is healthy before touching running containers.
+#   3. Backs up MySQL to ~/funwork/backups (retaining the 10 newest backups).
+#   4. Runs database migrations in a one-off container with the new image.
+#   5. Restarts the stack with the new image (--remove-orphans).
+#   6. Mirrors docs/ into the FunWork "Docs" notebook.
+#   7. Prunes old Docker images.
 #
 # Usage: scripts/deploy.sh [--skip-checks]
 #
@@ -13,8 +18,9 @@
 #   FUNWORK_DEPLOY_BRANCH    Branch to deploy (default: master)
 #   FUNWORK_REPO_URL         Repository to clone on the VPS (default: public GitHub HTTPS URL)
 #
-# One-time VPS setup: git and Docker installed, ~/funwork/.env present, and
-# ~/funwork/auth.json with the Flux Pro credentials for composer.
+# One-time VPS setup: git and Docker installed, ~/funwork/.env present,
+# ~/funwork/auth.json with the Flux Pro credentials for composer, and
+# ~/funwork/backups for database dumps.
 
 set -euo pipefail
 
@@ -93,8 +99,45 @@ main() {
         src
 
     export APP_IMAGE="funwork:$sha"
+
+    echo "==> Ensuring MySQL is healthy"
+    docker compose -f compose.prod.yml up -d mysql
+
+    mysql_ready=false
+    for _ in {1..30}; do
+        if docker compose -f compose.prod.yml exec -T mysql sh -c 'mysqladmin ping -h 127.0.0.1 -u root -p"$MYSQL_ROOT_PASSWORD" --silent' </dev/null >/dev/null 2>&1; then
+            mysql_ready=true
+            break
+        fi
+        sleep 2
+    done
+
+    if [[ "$mysql_ready" != true ]]; then
+        echo "Error: MySQL did not become healthy within 60 seconds. Aborting deploy." >&2
+        exit 1
+    fi
+
+    echo "==> Backing up database"
+    backup_dir="$HOME/funwork/backups"
+    mkdir -p "$backup_dir"
+    backup_file="$backup_dir/backup_$(date -u +%Y%m%d_%H%M%S)_$sha.sql.gz"
+    backup_tmp="$backup_file.tmp"
+
+    if ! docker compose -f compose.prod.yml exec -T mysql sh -c 'mysqldump -u root -p"$MYSQL_ROOT_PASSWORD" --single-transaction --quick --routines --triggers --no-tablespaces "$MYSQL_DATABASE"' </dev/null | gzip > "$backup_tmp"; then
+        rm -f "$backup_tmp"
+        echo "Database backup failed. Aborting deploy." >&2
+        exit 1
+    fi
+    mv "$backup_tmp" "$backup_file"
+
+    # shellcheck disable=SC2012
+    (ls -1t "$backup_dir"/backup_*.sql.gz 2>/dev/null || true) | tail -n +11 | xargs -r -d '\n' rm -f
+
+    echo "==> Running migrations with funwork:$sha"
+    docker compose -f compose.prod.yml run --rm --no-deps -T app php artisan migrate --force </dev/null
+
+    echo "==> Starting production stack"
     docker compose -f compose.prod.yml up -d --remove-orphans
-    docker compose -f compose.prod.yml exec -T app php artisan migrate --force </dev/null
 
     # docs/ is excluded from the image (.dockerignore), so it is copied in from the checkout.
     # docker compose cp keeps the host uid, which appuser cannot delete in /tmp, so cleanup runs as root.

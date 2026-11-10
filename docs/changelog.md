@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-11-10
+
+- Deploy manual seguro en `scripts/deploy.sh` (backup previo a migración y migración previa a levantar la app): nuevo orden en el bloque remoto por SSH que aborta ante cualquier fallo antes de afectar los contenedores en ejecución (`set -euo pipefail`):
+  1. Construcción de `funwork:<sha>` y exportación de `APP_IMAGE="funwork:<sha>"`.
+  2. Preflight de base de datos: levanta MySQL (`up -d mysql`) y reintenta con `mysqladmin ping` hasta que esté listo.
+  3. Backup transaccional en `~/funwork/backups/backup_YYYYMMDD_HHMMSS_<sha>.sql.gz` vía `mysqldump` comprimido con gzip directo a archivo temporal `.tmp`, renombrando solo en éxito y conservando únicamente los 10 backups más recientes coincidentes con `backup_*.sql.gz`.
+  4. Migración en un contenedor one-off descartable (`run --rm --no-deps -T app php artisan migrate --force </dev/null`) con la nueva imagen.
+  5. Recreación del stack solo tras migrar (`up -d --remove-orphans`) y remoción de la migración post-up.
+  6. Sincronización de `docs/` y limpieza de imágenes Docker.
+  Documentación del nuevo flujo, comandos de restauración manual de base de datos y rollback de versión en `docs/01-architecture.md`.
+
 ## 2026-11-09
 
 - Tokens personales de API y servidor MCP (`POST /mcp/funwork`, `FunWorkServer`, `pages::settings.integrations`): tarjeta "API Tokens (MCP)" en Settings → Integrations para crear tokens con prefijo `fw_` (mostrados en texto plano una única vez y guardados como hash SHA-256 en `api_tokens`), listarlos con fecha de último uso y revocarlos; autenticación Bearer mediante `AuthenticateMcpWithApiToken` y exposición de 7 herramientas MCP (`list_projects`, `list_tasks`, `get_task`, `update_task_status`, `add_task`, `add_inbox_item`, `read_notebook`) autorizadas con las Policies vigentes. Ver [ADR-003](decisions/ADR-003-mcp-server-and-api-tokens.md).

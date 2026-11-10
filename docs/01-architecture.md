@@ -10,7 +10,25 @@
 - **Testing:** Pest v4 + pest-plugin-laravel. **Lint:** Laravel Pint.
 - **CI:** GitHub Actions (`lint.yml`, `tests.yml`).
 - **CD:** `deploy.yml` construye la imagen y despliega al VPS en cada push a `master`. `sync-docs.yml` espeja `docs/` en el notebook "Docs" del proyecto FunWork en cada push a `develop` o `master` que toca `docs/**`: copia `docs/` al contenedor `app` y corre `funwork:sync-docs`. Requiere los secrets `VPS_HOST`, `VPS_USERNAME`, `VPS_SSH_KEY` y `FUNWORK_DOCS_PROJECT_ID` (ID del proyecto FunWork en producción). Ambos workflows comparten el grupo de concurrencia `deploy-production`, así una sincronización nunca corre mientras se recrea el contenedor.
-- **Deploy manual (`scripts/deploy.sh`):** alternativa a Actions mientras la cuenta de GitHub está bloqueada por facturación (2026-11-05). Corre Pest y Pint en local y después, por SSH: actualiza un clon en `~/funwork/src`, construye la imagen `funwork:<sha>` en el VPS (sin GHCR), levanta el stack, migra y espeja `docs/` con `funwork:sync-docs`. Se configura con `FUNWORK_DEPLOY_HOST`, `FUNWORK_DOCS_PROJECT_ID` y `FUNWORK_DEPLOY_BRANCH` (por defecto `master`), en el entorno o en un `.deploy.env` que está en `.gitignore`. En el VPS necesita git, `~/funwork/.env` y `~/funwork/auth.json` (credenciales de Flux Pro). `compose.prod.yml` toma por defecto la imagen local `funwork:latest`.
+- **Deploy manual (`scripts/deploy.sh`):** alternativa a Actions mientras la cuenta de GitHub está bloqueada por facturación (2026-11-05). Corre Pest y Pint en local y después, por SSH en `~/funwork` (`set -euo pipefail`), ejecuta el siguiente orden para abortar ante cualquier fallo antes de afectar los contenedores en ejecución:
+  1. Actualiza el checkout `src/` (`git reset --hard origin/$BRANCH`), construye la imagen `funwork:<sha>` y exporta `APP_IMAGE="funwork:<sha>"`.
+  2. **Preflight de base de datos:** levanta el servicio MySQL (`docker compose -f compose.prod.yml up -d mysql`) y sondea con `mysqladmin ping` (~30 reintentos cada 2s); si no responde en 60s, aborta.
+  3. **Backup previo a migrar:** crea un dump comprimido en `~/funwork/backups/backup_YYYYMMDD_HHMMSS_<sha>.sql.gz` ejecutando `mysqldump` dentro del contenedor MySQL hacia un archivo temporal `.tmp`. Renombra a su nombre final solo en éxito (en fallo elimina el `.tmp` y aborta) y retiene únicamente los 10 archivos más recientes coincidentes con `backup_*.sql.gz`.
+  4. **Migración aislada:** ejecuta las migraciones en un contenedor descartable (`docker compose -f compose.prod.yml run --rm --no-deps -T app php artisan migrate --force </dev/null`) con la nueva imagen.
+  5. **Despliegue de la nueva versión:** recién tras migrar exitosamente, reinicia los servicios con `docker compose -f compose.prod.yml up -d --remove-orphans`.
+  6. **Sincronización y poda:** espeja `docs/` en el notebook "Docs" con `funwork:sync-docs` y poda imágenes viejas dejando solo la activa y `latest`.
+
+  Se configura con `FUNWORK_DEPLOY_HOST`, `FUNWORK_DOCS_PROJECT_ID` y `FUNWORK_DEPLOY_BRANCH` (por defecto `master`), en el entorno o en un `.deploy.env` (`.gitignore`). En el VPS necesita git, Docker, `~/funwork/.env`, `~/funwork/auth.json` (credenciales de Flux Pro) y el directorio `~/funwork/backups`. `compose.prod.yml` toma por defecto la imagen local `funwork:latest`.
+
+  Restauración manual de base de datos:
+  ```bash
+  gunzip < ~/funwork/backups/<file>.sql.gz | docker compose -f compose.prod.yml exec -T mysql sh -c 'mysql -u root -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE"'
+  ```
+
+  Rollback de código:
+  ```bash
+  APP_IMAGE=funwork:<previous-sha> docker compose -f compose.prod.yml up -d
+  ```
 
 ## Capas y responsabilidades
 
