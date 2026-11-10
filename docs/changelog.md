@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-09
+
+- Tokens personales de API y servidor MCP (`POST /mcp/funwork`, `FunWorkServer`, `pages::settings.integrations`): tarjeta "API Tokens (MCP)" en Settings → Integrations para crear tokens con prefijo `fw_` (mostrados en texto plano una única vez y guardados como hash SHA-256 en `api_tokens`), listarlos con fecha de último uso y revocarlos; autenticación Bearer mediante `AuthenticateMcpWithApiToken` y exposición de 7 herramientas MCP (`list_projects`, `list_tasks`, `get_task`, `update_task_status`, `add_task`, `add_inbox_item`, `read_notebook`) autorizadas con las Policies vigentes. Ver [ADR-003](decisions/ADR-003-mcp-server-and-api-tokens.md).
+
 ## 2026-11-08
 
 - Importador de tareas desde NotebookLM en el tablero de tareas (`projects.tasks.import-tasks`, `⚡task-board`): modal Flux accesible desde el botón "Import" en la barra de filtros del tablero para crear tareas en lote a partir del formato Markdown de NotebookLM (`- [ ] [AREA] Título — criterio — depende de: X`). Flujo en dos pasos con validación y vista previa en tabla (inspección de área, título, criterio, dependencia y advertencias de duplicados o áreas desconocidas), importación transaccional de líneas válidas con asignación automática al usuario actual y cálculo de posición por estado.

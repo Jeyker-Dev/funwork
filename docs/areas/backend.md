@@ -103,3 +103,20 @@ Laravel 13. Skills de referencia: `laravel-conventions` y `testing-strategy`.
 ### Cuenta
 - Registro público desactivado (Fortify) hasta que exista el multiusuario (Fase 5); los usuarios nuevos se crean a mano.
 - Avatares en S3 con URLs temporales firmadas (el bucket es privado y no se usan ACL públicas).
+
+### API tokens y servidor MCP (`laravel/mcp`, `FunWorkServer`)
+- **Emisión y almacenamiento (`CreateApiTokenAction`, `ApiToken`):**
+  - El usuario gestiona sus tokens en Settings → Integrations (`settings/integrations`).
+  - Cada token se genera con prefijo `fw_` + 40 caracteres aleatorios (`ApiToken::TOKEN_PREFIX . Str::random(40)`), se muestra en texto plano una única vez al crearlo y se persiste en `api_tokens.token` únicamente como hash SHA-256 (`ApiToken::hashToken()`).
+  - La revocación elimina el registro de `api_tokens` (filtrando por `user_id = auth()->id()`) e invalida el acceso de inmediato.
+- **Autenticación HTTP (`AuthenticateMcpWithApiToken`):**
+  - Protege `POST /mcp/funwork` (`routes/ai.php`). Extrae el header `Authorization: Bearer <token>`, calcula su hash SHA-256, verifica que el token exista y no esté vencido (`expires_at`), actualiza `last_used_at` e inyecta el usuario en `Auth::setUser($user)` y `$request->setUserResolver(...)` de forma segura para Laravel Octane (sin estado estático entre requests). Si falta o es inválido, responde `401 Unauthorized`.
+- **Herramientas expuestas en `FunWorkServer` (`app/Mcp/Tools/*`):**
+  - `list_projects`: lista los proyectos del usuario autenticado (`$user->projects()`, excluyendo archivados por defecto salvo `include_archived = true`) junto con sus áreas configuradas. Autoriza `ProjectPolicy::viewAny`.
+  - `list_tasks`: lista las tareas de un proyecto (`project_id`), con filtros opcionales por `status` (`TaskStatus`) y `area` (slug resuelto con `Project::areaByKey()` o `"none"` para tareas sin área). Autoriza `ProjectPolicy::view`.
+  - `get_task`: devuelve el detalle completo de una tarea (`task_id`). Autoriza `TaskPolicy::view`.
+  - `update_task_status`: actualiza únicamente el estado de una tarea (`task_id`, `status` validado con `Rule::enum(TaskStatus::class)`). Autoriza `TaskPolicy::update`.
+  - `add_task`: crea una tarea en un proyecto (`project_id`, `title`, `description`, `area` opcional resuelta por `areaByKey()`, `status`, `priority`, `due_date`), calcula `position = max(position) + 1` para ese estado y sincroniza al usuario autenticado en `task_user` dentro de `DB::transaction`. Autoriza `TaskPolicy::create`.
+  - `add_inbox_item`: captura un ítem en el inbox del proyecto (`project_id`, `content` máx 1000 caracteres). Autoriza `InboxItemPolicy::create`.
+  - `read_notebook`: exporta un notebook a Markdown reutilizando `BuildNotebookExportAction` (por `notebook_id`, o por `project_id` + `name`). Autoriza `NotebookPolicy::view`.
+

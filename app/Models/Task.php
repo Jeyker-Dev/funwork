@@ -47,4 +47,11 @@ class Task extends Model
     {
         return $this->belongsToMany(User::class);
     }
+
+    public function changeStatus(TaskStatus $status): void
+    {
+        $this->update([
+            'status' => $status,
+        ]);
+    }
 }

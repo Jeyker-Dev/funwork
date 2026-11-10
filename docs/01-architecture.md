@@ -2,7 +2,7 @@
 
 ## Stack
 
-- **Backend:** Laravel 13, PHP 8.4.1+, Fortify (auth y 2FA).
+- **Backend:** Laravel 13, PHP 8.4.1+, Fortify (auth y 2FA), `laravel/mcp` (servidor MCP).
 - **UI:** Livewire v4 (Single File Components nativos, sin Volt), Flux / Flux Pro, Alpine v3, TailwindCSS, Vite.
 - **Storage:** discos de Laravel; S3 para avatares y archivos de proyecto (URLs temporales firmadas para buckets privados).
 - **Colas:** jobs en base de datos (por ejemplo `CreateFolderZipJob`).
@@ -16,20 +16,21 @@
 
 | Capa | Ubicación | Responsabilidad |
 |---|---|---|
-| Rutas | `routes/web.php` | Rutas full-page con `Route::livewire`, bajo el middleware `auth`. |
+| Rutas | `routes/web.php`, `routes/settings.php`, `routes/ai.php` | Rutas full-page con `Route::livewire` bajo `auth` y endpoint MCP HTTP (`/mcp/funwork`) con `AuthenticateMcpWithApiToken`. |
+| MCP | `app/Mcp/Servers`, `app/Mcp/Tools` | Servidor MCP (`FunWorkServer`) y herramientas para agentes externos (Antigravity). |
 | Páginas | `resources/views/pages/**/⚡*.blade.php` | Componentes SFC que orquestan cada vista. |
 | Componentes | `resources/views/components/projects/**` | UI reutilizable por módulo. |
 | Form Objects | `app/Livewire/Forms` | Validación y persistencia de formularios. |
-| Actions | `app/Actions` (`Files`, `Fortify`) | Lógica de negocio reutilizable. |
+| Actions | `app/Actions` (`Auth`, `Files`, `Fortify`, `Notebooks`, `Projects`, `Tasks`) | Lógica de negocio reutilizable. |
 | Jobs / Notifications | `app/Jobs`, `app/Notifications` | Trabajo asíncrono y avisos al usuario. |
-| Modelos | `app/Models` | `Project`, `Task`, `InboxItem`, `Notebook`, `NotebookPage`, `Folder`, `ProjectFile`, `User`. |
+| Modelos | `app/Models` | `Project`, `Area`, `Task`, `InboxItem`, `Notebook`, `NotebookPage`, `Folder`, `ProjectFile`, `GoogleAccount`, `ApiToken`, `User`. |
 
 ## Convenciones críticas
 
 - Los componentes Livewire se crean **siempre** con `php artisan make:livewire`, nunca a mano.
 - No usar `Livewire\Volt\Volt`; en tests usar `Livewire::test()` / `Livewire::actingAs()`.
 - La lógica de negocio va en Actions o Form Objects, no en las vistas (skill `laravel-conventions`).
-- Autorización: todas las rutas `/projects/{project}/*`, componentes Livewire, Form Objects y Actions verifican propiedad mediante Policies en `app/Policies` (`ProjectPolicy`, `TaskPolicy`, `NotebookPolicy`, `NotebookPagePolicy`, `FolderPolicy`, `ProjectFilePolicy`, `InboxItemPolicy`).
+- Autorización: todas las rutas `/projects/{project}/*`, componentes Livewire, Form Objects, Actions y herramientas MCP verifican propiedad mediante Policies en `app/Policies` (`ProjectPolicy`, `TaskPolicy`, `NotebookPolicy`, `NotebookPagePolicy`, `FolderPolicy`, `ProjectFilePolicy`, `InboxItemPolicy`).
 
 ## Mapa de rutas
 
@@ -38,11 +39,12 @@
 | `/projects` | `pages::projects.index` |
 | `/projects/{project}` | `pages::projects.show` (dashboard) |
 | `/projects/{project}/inbox` | `pages::projects.inbox` |
-| `/projects/{project}/tasks[/{task}]` | tablero de tareas (ruta `get` clásica) |
+| `/projects/{project}/tasks[/{task}]` | tablero y detalle de tareas (`pages::projects.tasks.*`) |
 | `/projects/{project}/notebooks` | `pages::projects.notebooks.index` |
 | `/projects/{project}/notebooks/{notebook}/pages/{page}/edit` | editor de páginas |
 | `/projects/{project}/files` | `pages::projects.files.index` |
 | `/projects/{project}/files/{projectFile}/preview` | `ProjectFilePreviewController` |
+| `POST /mcp/funwork` | `FunWorkServer` (autenticado con `Bearer` token vía `AuthenticateMcpWithApiToken`) |
 
 ## Decisiones
 

@@ -2,7 +2,7 @@
 
 Tareas tomadas del backlog para ejecutar ahora. Las grandes abren un documento `odd/tasks/<feature>.md`.
 
-**Sprint:** Fase 2 adelantada — Flujo NotebookLM (aprobado el 2026-11-04). Se adelanta respecto de la Fase 1 para eliminar el reemplazo manual de fuentes en NotebookLM.
+**Sprint:** Fase 3 — MCP para Antigravity (iniciado el 2026-11-09).
 
 ## En curso
 
@@ -10,6 +10,7 @@ _Sin tareas en curso._
 
 ## Hechas en este sprint
 
+- [x] [BACKEND] API tokens + servidor MCP con `laravel/mcp` — Antigravity lista y actualiza tareas de FunWork — depende de: Fase 0, Áreas (`odd/tasks/mcp-server.md`)
 - [x] [BACKEND] Importador de tareas desde NotebookLM (formato fijo pegado en un textarea) — pegar N líneas crea N tareas con área y criterio — depende de: Áreas
 - [x] [DATABASE] Áreas por proyecto (frontend, backend, database, design; configurables) y etiqueta de área en tareas y notas — se puede filtrar el tablero por área — depende de: Fase 1 (commit `15b568a`)
 - [x] [FRONTEND] Badge "Cambios sin sincronizar" en tarjetas de notebook — etiqueta ámbar junto a la última sincronización cuando un notebook vinculado a Google Docs tiene modificaciones pendientes — depende de: Sincronización automática con debounce (commit `f603437`)

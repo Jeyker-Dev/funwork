@@ -45,7 +45,7 @@ Orden y motivos: ver [`../roadmap.md`](../roadmap.md).
 
 ## Fase 3 — MCP para Antigravity
 
-- [ ] [BACKEND] API tokens + servidor MCP con `laravel/mcp` — Antigravity lista y actualiza tareas de FunWork — depende de: Fase 0, Áreas
+- [x] [BACKEND] API tokens + servidor MCP con `laravel/mcp` — Antigravity lista y actualiza tareas de FunWork — depende de: Fase 0, Áreas
 - [ ] [DOCS] Retirar `docs/tasks/*.md` cuando el MCP esté en uso — el backlog vive solo en FunWork — depende de: MCP
 
 ## Fase 4 — Brain, notebooks y diseño

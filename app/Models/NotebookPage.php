@@ -3,11 +3,16 @@
 namespace App\Models;
 
 use App\Jobs\SyncNotebookToGoogleDocJob;
+use Database\Factories\NotebookPageFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class NotebookPage extends Model
 {
+    /** @use HasFactory<NotebookPageFactory> */
+    use HasFactory;
+
     protected $fillable = [
         'notebook_id',
         'source_path',

@@ -6,6 +6,7 @@
 |---|---|
 | `users` | Incluye columnas de 2FA, `username`, `profile_photo_path` y `timezone`. |
 | `projects` | Usa `archived_at` (no `archive_at`). |
+| `api_tokens` | Tokens personales de API para el servidor MCP (`user_id`, `name`, `token` único de 64 caracteres con hash SHA-256, `last_used_at`, `expires_at`). El token en texto plano (`fw_...`) nunca se persiste. |
 | `google_accounts` | Una cuenta de Google por usuario (`user_id` único). `access_token` y `refresh_token` se guardan con el cast `encrypted` (dependen de `APP_KEY`). |
 | `tasks` | `due_date` es una columna `date`. Clave foránea nullable `area_id` (`nullOnDelete`) para asociar un área del proyecto. |
 | `task_user` | Pivot para varios asignados por tarea. |
