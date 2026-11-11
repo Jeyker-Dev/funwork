@@ -114,7 +114,7 @@ new class extends Component {
                     </flux:heading>
 
                     @if(filled($task->description_excerpt))
-                        <flux:text class="text-gray-500 mt-2 line-clamp-2">
+                        <flux:text class="text-gray-500 mt-2 line-clamp-2 break-words">
                             {{ $task->description_excerpt }}
                         </flux:text>
                     @endif

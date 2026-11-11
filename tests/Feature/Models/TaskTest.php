@@ -161,6 +161,14 @@ test('description_excerpt returns empty string when description is null or blank
         ->and($emptyTask->description_excerpt)->toBe('');
 });
 
+test('description_excerpt truncates a 1000-character description to at most 203 characters', function () {
+    $longDescription = str_repeat('A very long task description sentence. ', 30);
+    $task = Task::factory()->create(['description' => $longDescription]);
+
+    expect(mb_strlen($task->description_excerpt))->toBeLessThanOrEqual(203)
+        ->and($task->description_excerpt)->toEndWith('...');
+});
+
 test('description_html strips raw script tags to prevent XSS', function () {
     $task = Task::factory()->create([
         'description' => "Malicious <script>alert('xss')</script> text",

@@ -51,6 +51,14 @@ class Task extends Model
         return $this->belongsToMany(User::class);
     }
 
+    private const array MARKDOWN_OPTIONS = [
+        'html_input' => 'strip',
+        'allow_unsafe_links' => false,
+        'max_nesting_level' => 10,
+    ];
+
+    private const int EXCERPT_LENGTH = 200;
+
     public function changeStatus(TaskStatus $status): void
     {
         $this->update([
@@ -66,15 +74,11 @@ class Task extends Model
                     return new HtmlString('');
                 }
 
-                $html = Str::markdown($this->description, [
-                    'html_input' => 'strip',
-                    'allow_unsafe_links' => false,
-                    'max_nesting_level' => 10,
-                ]);
+                $html = Str::markdown($this->description, self::MARKDOWN_OPTIONS);
 
                 return new HtmlString($html);
             }
-        );
+        )->shouldCache();
     }
 
     protected function descriptionExcerpt(): Attribute
@@ -85,16 +89,11 @@ class Task extends Model
                     return '';
                 }
 
-                $html = Str::markdown($this->description, [
-                    'html_input' => 'strip',
-                    'allow_unsafe_links' => false,
-                    'max_nesting_level' => 10,
-                ]);
-
+                $html = (string) $this->description_html;
                 $decoded = html_entity_decode(strip_tags($html), ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
-                return Str::squish($decoded);
+                return Str::limit(Str::squish($decoded), self::EXCERPT_LENGTH);
             }
-        );
+        )->shouldCache();
     }
 }
