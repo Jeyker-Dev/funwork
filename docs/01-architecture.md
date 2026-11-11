@@ -42,7 +42,7 @@
 | Capa | Ubicación | Responsabilidad |
 |---|---|---|
 | Rutas | `routes/web.php`, `routes/settings.php`, `routes/ai.php` | Rutas full-page con `Route::livewire` bajo `auth` y endpoint MCP HTTP (`/mcp/funwork`) con `AuthenticateMcpWithApiToken`. |
-| MCP | `app/Mcp/Servers`, `app/Mcp/Tools` | Servidor MCP (`FunWorkServer`) y herramientas para agentes externos (Antigravity). |
+| MCP | `app/Mcp/Servers`, `app/Mcp/Tools` | Servidor MCP (`FunWorkServer`) y herramientas para agentes externos (Antigravity): `list_projects`, `list_tasks`, `get_task`, `update_task_status`, `update_task_description`, `add_task`, `add_inbox_item`, `read_notebook`. |
 | Páginas | `resources/views/pages/**/⚡*.blade.php` | Componentes SFC que orquestan cada vista. |
 | Componentes | `resources/views/components/projects/**` | UI reutilizable por módulo. |
 | Form Objects | `app/Livewire/Forms` | Validación y persistencia de formularios. |

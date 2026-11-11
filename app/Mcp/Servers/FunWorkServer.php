@@ -8,6 +8,7 @@ use App\Mcp\Tools\GetTaskTool;
 use App\Mcp\Tools\ListProjectsTool;
 use App\Mcp\Tools\ListTasksTool;
 use App\Mcp\Tools\ReadNotebookTool;
+use App\Mcp\Tools\UpdateTaskDescriptionTool;
 use App\Mcp\Tools\UpdateTaskStatusTool;
 use Laravel\Mcp\Server;
 use Laravel\Mcp\Server\Attributes\Instructions;
@@ -28,6 +29,7 @@ class FunWorkServer extends Server
         ListTasksTool::class,
         GetTaskTool::class,
         UpdateTaskStatusTool::class,
+        UpdateTaskDescriptionTool::class,
         AddTaskTool::class,
         AddInboxItemTool::class,
         ReadNotebookTool::class,

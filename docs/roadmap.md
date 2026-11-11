@@ -45,10 +45,10 @@ Avance en curso: Áreas por proyecto implementadas (gestión CRUD con modal Flux
 
 ## Fase 3 — FunWork como servidor MCP para Antigravity
 
-Avance en curso: API tokens personales (SHA-256) en Settings → Integrations y servidor MCP (`FunWorkServer` con `laravel/mcp` en `/mcp/funwork`) implementados con las 7 herramientas de la v1 (`list_projects`, `list_tasks`, `get_task`, `update_task_status`, `add_task`, `add_inbox_item`, `read_notebook`).
+Avance en curso: API tokens personales (SHA-256) en Settings → Integrations y servidor MCP (`FunWorkServer` con `laravel/mcp` en `/mcp/funwork`) implementados con las herramientas de la v1 (`list_projects`, `list_tasks`, `get_task`, `update_task_status`, `update_task_description`, `add_task`, `add_inbox_item`, `read_notebook`).
 
 - API tokens + servidor MCP (`laravel/mcp`): completado.
-- Herramientas v1: `list_projects`, `list_tasks`, `get_task`, `update_task_status`, `add_task`, `add_inbox_item`, `read_notebook` (`log_decision` queda para la Fase 4 cuando exista el módulo Brain / Decisiones).
+- Herramientas v1: `list_projects`, `list_tasks`, `get_task`, `update_task_status`, `update_task_description`, `add_task`, `add_inbox_item`, `read_notebook` (`log_decision` queda para la Fase 4 cuando exista el módulo Brain / Decisiones).
 - Antigravity se configura en `~/.gemini/config/mcp_config.json`. Los agentes leen y crean tareas a través del servidor MCP de FunWork y actualizan su estado al terminarlas; `docs/tasks/*.md` ha sido retirado y el backlog/sprint vive en la aplicación.
 
 ## Fase 4 — Brain, notebooks y diseño

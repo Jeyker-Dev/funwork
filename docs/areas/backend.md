@@ -118,6 +118,7 @@ Laravel 13. Skills de referencia: `laravel-conventions` y `testing-strategy`.
   - `list_tasks`: lista las tareas de un proyecto (`project_id`), con filtros opcionales por `status` (`TaskStatus`) y `area` (slug resuelto con `Project::areaByKey()` o `"none"` para tareas sin área). Autoriza `ProjectPolicy::view`.
   - `get_task`: devuelve el detalle completo de una tarea (`task_id`). Autoriza `TaskPolicy::view`.
   - `update_task_status`: actualiza únicamente el estado de una tarea (`task_id`, `status` validado con `Rule::enum(TaskStatus::class)`). Autoriza `TaskPolicy::update`.
+  - `update_task_description`: reemplaza la descripción en Markdown (brief técnico) de una tarea existente (`task_id`, `description` validada hasta `Task::MAX_DESCRIPTION_LENGTH = 65535`). Autoriza `TaskPolicy::update`.
   - `add_task`: crea una tarea en un proyecto (`project_id`, `title`, `description`, `area` opcional resuelta por `areaByKey()`, `status`, `priority`, `due_date`), calcula `position = max(position) + 1` para ese estado y sincroniza al usuario autenticado en `task_user` dentro de `DB::transaction`. Autoriza `TaskPolicy::create`.
   - `add_inbox_item`: captura un ítem en el inbox del proyecto (`project_id`, `content` máx 1000 caracteres). Autoriza `InboxItemPolicy::create`.
   - `read_notebook`: exporta un notebook a Markdown reutilizando `BuildNotebookExportAction` (por `notebook_id`, o por `project_id` + `name`). Autoriza `NotebookPolicy::view`.

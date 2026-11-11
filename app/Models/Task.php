@@ -57,12 +57,21 @@ class Task extends Model
         'max_nesting_level' => 10,
     ];
 
+    public const int MAX_DESCRIPTION_LENGTH = 65535;
+
     private const int EXCERPT_LENGTH = 200;
 
     public function changeStatus(TaskStatus $status): void
     {
         $this->update([
             'status' => $status,
+        ]);
+    }
+
+    public function updateDescription(string $description): void
+    {
+        $this->update([
+            'description' => $description,
         ]);
     }
 
