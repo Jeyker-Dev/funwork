@@ -1,10 +1,10 @@
 # Roadmap
 
-> Origen: auditoría y análisis del 2026-10-31. Las tareas concretas viven en [`tasks/backlog.md`](tasks/backlog.md); este documento explica el porqué y el orden.
+> Origen: auditoría y análisis del 2026-10-31. El backlog y el sprint actual se gestionan en la aplicación FunWork (proyecto "FunWork"), donde los agentes leen y crean tareas a través del servidor MCP de FunWork; este documento explica el porqué y el orden.
 
 ## Principios
 
-- **Tareas en FunWork, conocimiento en el repo.** Backlog, sprint y estado de tareas se guardan en la base de datos de FunWork (cuando exista el importador o el MCP). Visión, arquitectura y ADRs quedan en `docs/`, versionados con el código. Ver [ADR-002](decisions/ADR-002-funwork-as-workflow-hub.md).
+- **Tareas en FunWork, conocimiento en el repo.** El backlog, el sprint actual y el estado de las tareas se gestionan en la base de datos de FunWork (proyecto "FunWork"), y los agentes leen y crean tareas a través del servidor MCP. Visión, arquitectura y ADRs quedan en `docs/`, versionados con el código. Ver [ADR-002](decisions/ADR-002-funwork-as-workflow-hub.md).
 - **Cada módulo produce datos estructurados y exportables a Markdown.** Ese export es el contexto para NotebookLM hoy y el dataset de los modelos por módulo en el futuro.
 - **Seguridad antes que features.** Las Policies son además la base del multiusuario futuro.
 
@@ -49,7 +49,7 @@ Avance en curso: API tokens personales (SHA-256) en Settings → Integrations y 
 
 - API tokens + servidor MCP (`laravel/mcp`): completado.
 - Herramientas v1: `list_projects`, `list_tasks`, `get_task`, `update_task_status`, `add_task`, `add_inbox_item`, `read_notebook` (`log_decision` queda para la Fase 4 cuando exista el módulo Brain / Decisiones).
-- Antigravity se configura en `~/.gemini/config/mcp_config.json`. Al terminar una tarea, la marca en FunWork y `docs/tasks/*.md` se retira.
+- Antigravity se configura en `~/.gemini/config/mcp_config.json`. Los agentes leen y crean tareas a través del servidor MCP de FunWork y actualizan su estado al terminarlas; `docs/tasks/*.md` ha sido retirado y el backlog/sprint vive en la aplicación.
 
 ## Fase 4 — Brain, notebooks y diseño
 

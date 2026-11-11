@@ -2,6 +2,7 @@
 
 ## 2026-11-11
 
+- Retiro de `docs/tasks/` y migración del backlog y sprint a FunWork (`docs/README.md`, `docs/roadmap.md`): eliminación de `docs/tasks/backlog.md` y `docs/tasks/sprint-actual.md`. El backlog y el sprint actual pasan a gestionarse directamente en la aplicación FunWork (proyecto "FunWork"), donde los agentes consultan, crean y actualizan tareas a través del servidor MCP (`FunWorkServer`). Actualización de la documentación del proyecto y roadmap para reflejar el nuevo ciclo de trabajo.
 - Renderizado de descripciones de tareas en Markdown y extractos acotados en tarjetas (`app/Models/Task.php`, `⚡show.blade.php`, `⚡show-tasks.blade.php`, `⚡task-board.blade.php`, `resources/css/app.css`): soporte de CommonMark seguro mediante los accessors `description_html` (con `html_input => 'strip'`, `allow_unsafe_links => false` y `max_nesting_level => 10`) y `description_excerpt` (texto plano squished de ~2 líneas con `line-clamp-2` en tarjetas de lista y tablero). La página de detalle formatea código monoespaciado y diagramas ASCII con scroll horizontal (`overflow-x-auto`), tablas, listas y títulos en modo claro/oscuro mediante `.markdown-content`, mientras que el textarea de edición preserva el Markdown crudo. Tests de Pest cubriendo renderizado, XSS (scripts, enlaces javascript y atributos) y componentes Livewire.
 
 ## 2026-11-10
