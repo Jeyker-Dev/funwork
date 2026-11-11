@@ -89,3 +89,112 @@ test('normalization migration converts lowercase status and priority values to e
         ->status->toBe('Todo')
         ->priority->toBe('Low');
 });
+
+test('description_html renders markdown headings, lists, tables, and fenced code blocks', function () {
+    $markdown = <<<'MD'
+    # Main Heading
+    Paragraph with **bold text** and `inline code`.
+    - Bullet one
+    - Bullet two
+
+    ```php
+    echo 'hello world';
+    ```
+
+    | Col A | Col B |
+    |---|---|
+    | Val 1 | Val 2 |
+    MD;
+
+    $task = Task::factory()->create(['description' => $markdown]);
+
+    $html = (string) $task->description_html;
+
+    expect($html)
+        ->toContain('<h1>Main Heading</h1>')
+        ->toContain('<strong>bold text</strong>')
+        ->toContain('<code>inline code</code>')
+        ->toContain('<li>Bullet one</li>')
+        ->toContain('language-php')
+        ->toContain("echo 'hello world';")
+        ->toContain('<table>')
+        ->toContain('<th>Col A</th>')
+        ->toContain('<td>Val 1</td>');
+});
+
+test('description_html returns empty html string when description is null or blank', function () {
+    $nullTask = Task::factory()->create(['description' => null]);
+    $emptyTask = Task::factory()->create(['description' => '   ']);
+
+    expect((string) $nullTask->description_html)->toBe('')
+        ->and((string) $emptyTask->description_html)->toBe('');
+});
+
+test('description_excerpt strips markdown syntax and tags into a squished plain text string', function () {
+    $markdown = <<<'MD'
+    # Heading
+    This has **bold text**, `code`, and a [link](https://example.com).
+    - First item
+    - Second item
+
+    ```
+    fenced block
+    ```
+    MD;
+
+    $task = Task::factory()->create(['description' => $markdown]);
+
+    expect($task->description_excerpt)
+        ->toBe('Heading This has bold text, code, and a link. First item Second item fenced block')
+        ->not->toContain('#')
+        ->not->toContain('**')
+        ->not->toContain('```')
+        ->not->toContain('<h1>')
+        ->not->toContain('<p>');
+});
+
+test('description_excerpt returns empty string when description is null or blank', function () {
+    $nullTask = Task::factory()->create(['description' => null]);
+    $emptyTask = Task::factory()->create(['description' => '   ']);
+
+    expect($nullTask->description_excerpt)->toBe('')
+        ->and($emptyTask->description_excerpt)->toBe('');
+});
+
+test('description_html strips raw script tags to prevent XSS', function () {
+    $task = Task::factory()->create([
+        'description' => "Malicious <script>alert('xss')</script> text",
+    ]);
+
+    expect((string) $task->description_html)
+        ->not->toContain('<script>')
+        ->not->toContain('</script>')
+        ->toContain('Malicious');
+});
+
+test('description_html neutralizes javascript and unsafe link schemes', function () {
+    $task = Task::factory()->create([
+        'description' => "[Click me](javascript:alert('xss')) and [Data](data:text/html;base64,PHNjcmlwdD4=) and [Safe](https://example.com)",
+    ]);
+
+    $html = (string) $task->description_html;
+
+    expect($html)
+        ->not->toContain('href="javascript:')
+        ->not->toContain('href="data:')
+        ->toContain('href="https://example.com"');
+});
+
+test('description_html strips inline event handlers and malicious HTML tags', function () {
+    $task = Task::factory()->create([
+        'description' => '<img src="x" onerror="alert(1)"> <div onmouseover="alert(2)">Hello</div>',
+    ]);
+
+    $html = (string) $task->description_html;
+
+    expect($html)
+        ->not->toContain('onerror')
+        ->not->toContain('onmouseover')
+        ->not->toContain('<img')
+        ->toContain('Hello');
+});

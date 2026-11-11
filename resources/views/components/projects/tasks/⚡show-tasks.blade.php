@@ -113,9 +113,11 @@ new class extends Component {
                         {{ $task->title }}
                     </flux:heading>
 
-                    <flux:text class="text-gray-500 mt-2">
-                        {{ $task->description }}
-                    </flux:text>
+                    @if(filled($task->description_excerpt))
+                        <flux:text class="text-gray-500 mt-2 line-clamp-2">
+                            {{ $task->description_excerpt }}
+                        </flux:text>
+                    @endif
                 </div>
 
                 <div class="flex items-center justify-between">

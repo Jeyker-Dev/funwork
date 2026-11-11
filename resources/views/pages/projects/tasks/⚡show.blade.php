@@ -95,10 +95,10 @@ class extends Component {
 
         <div>
             <flux:heading size="xl" level="1">{{ $task->title }}</flux:heading>
-            @if($task->description)
-                <flux:text class="mt-3 whitespace-pre-line text-zinc-600 dark:text-zinc-300">
-                    {{ $task->description }}
-                </flux:text>
+            @if(filled($task->description))
+                <div class="mt-4 markdown-content">
+                    {!! $task->description_html !!}
+                </div>
             @endif
         </div>
 

@@ -10,6 +10,7 @@ _Sin tareas en curso._
 
 ## Hechas en este sprint
 
+- [x] [FRONTEND] Render task descriptions as Markdown and clamp them in cards — Detail view renders safe Markdown with styled code/tables and cards show clamped 2-line plain text — depende de: -
 - [x] [BACKEND] API tokens + servidor MCP con `laravel/mcp` — Antigravity lista y actualiza tareas de FunWork — depende de: Fase 0, Áreas (`odd/tasks/mcp-server.md`)
 - [x] [BACKEND] Importador de tareas desde NotebookLM (formato fijo pegado en un textarea) — pegar N líneas crea N tareas con área y criterio — depende de: Áreas
 - [x] [DATABASE] Áreas por proyecto (frontend, backend, database, design; configurables) y etiqueta de área en tareas y notas — se puede filtrar el tablero por área — depende de: Fase 1 (commit `15b568a`)

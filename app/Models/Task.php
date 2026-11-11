@@ -4,10 +4,13 @@ namespace App\Models;
 
 use App\Enums\TaskPriority;
 use App\Enums\TaskStatus;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
 
 class Task extends Model
 {
@@ -53,5 +56,45 @@ class Task extends Model
         $this->update([
             'status' => $status,
         ]);
+    }
+
+    protected function descriptionHtml(): Attribute
+    {
+        return Attribute::make(
+            get: function (): HtmlString {
+                if (blank($this->description)) {
+                    return new HtmlString('');
+                }
+
+                $html = Str::markdown($this->description, [
+                    'html_input' => 'strip',
+                    'allow_unsafe_links' => false,
+                    'max_nesting_level' => 10,
+                ]);
+
+                return new HtmlString($html);
+            }
+        );
+    }
+
+    protected function descriptionExcerpt(): Attribute
+    {
+        return Attribute::make(
+            get: function (): string {
+                if (blank($this->description)) {
+                    return '';
+                }
+
+                $html = Str::markdown($this->description, [
+                    'html_input' => 'strip',
+                    'allow_unsafe_links' => false,
+                    'max_nesting_level' => 10,
+                ]);
+
+                $decoded = html_entity_decode(strip_tags($html), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+                return Str::squish($decoded);
+            }
+        );
     }
 }

@@ -29,6 +29,13 @@
   ```bash
   APP_IMAGE=funwork:<previous-sha> docker compose -f compose.prod.yml up -d
   ```
+- **Backups:** timer diario de systemd `funwork-backup.timer` (~03:05 hora del servidor) que ejecuta `/usr/local/bin/funwork-backup` para respaldar MySQL + `.env` en un bucket S3 dedicado mediante restic (cifrado; requiere la contraseña del repositorio). Retención: `restic forget --prune --keep-daily 7 --keep-weekly 4 --keep-monthly 6`. Complementa los dumps locales previos a cada migración en `~/funwork/backups` (los 10 más recientes).
+
+  Restauración desde restic:
+  ```bash
+  restic snapshots
+  restic restore <id> --target <dir>
+  ```
 
 ## Capas y responsabilidades
 

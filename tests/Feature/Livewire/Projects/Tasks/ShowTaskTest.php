@@ -204,3 +204,23 @@ test('unauthorized user receives 403 forbidden when mounting component and task 
         'title' => 'Intruder Cannot Touch',
     ]);
 });
+
+test('task detail page renders markdown html while form preserves raw markdown', function () {
+    $user = User::factory()->create();
+    $project = Project::factory()->create(['owner_id' => $user->id]);
+    $rawMarkdown = "# Implementation Plan\n\nThis is **crucial**.\n\n```bash\nphp artisan test\n```";
+
+    $task = Task::factory()->create([
+        'project_id' => $project->id,
+        'title' => 'Markdown Task',
+        'description' => $rawMarkdown,
+    ]);
+
+    Livewire::actingAs($user)
+        ->test('pages::projects.tasks.show', ['project' => $project, 'task' => $task])
+        ->assertOk()
+        ->assertSeeHtml('<h1>Implementation Plan</h1>')
+        ->assertSeeHtml('<strong>crucial</strong>')
+        ->assertSeeHtml('markdown-content')
+        ->assertSet('form.description', $rawMarkdown);
+});
