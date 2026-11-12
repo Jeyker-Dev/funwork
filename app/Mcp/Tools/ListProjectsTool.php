@@ -12,12 +12,13 @@ use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Attributes\Description;
 use Laravel\Mcp\Server\Attributes\Name;
-use Laravel\Mcp\Server\Tool;
 
 #[Name('list_projects')]
 #[Description('List the authenticated user\'s FunWork projects and their configured areas.')]
-class ListProjectsTool extends Tool
+class ListProjectsTool extends FunWorkTool
 {
+    protected string $authorizationMessage = 'You are not authorized to list projects.';
+
     public function schema(JsonSchema $schema): array
     {
         return [
@@ -27,14 +28,8 @@ class ListProjectsTool extends Tool
         ];
     }
 
-    public function handle(Request $request): Response
+    protected function execute(Request $request, User $user): Response
     {
-        $user = $request->user();
-
-        if (! $user instanceof User) {
-            return Response::error('Unauthenticated.');
-        }
-
         Gate::forUser($user)->authorize('viewAny', Project::class);
 
         $input = ListProjectsData::fromRequest($request);

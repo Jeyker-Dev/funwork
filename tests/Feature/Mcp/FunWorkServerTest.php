@@ -179,9 +179,16 @@ test('get_task rejects viewing a task owned by another user', function () {
 test('update_task_status transitions the task status for the project owner', function () {
     $user = User::factory()->create();
     $project = Project::factory()->create(['owner_id' => $user->id]);
+    app(CreateDefaultAreasAction::class)->execute($project);
+    $backendArea = $project->areaByKey('backend');
+
     $task = Task::factory()->create([
         'project_id' => $project->id,
+        'title' => 'Status Task',
+        'description' => 'Detailed brief for status update',
         'status' => TaskStatus::Todo,
+        'priority' => TaskPriority::High,
+        'area_id' => $backendArea->id,
     ]);
 
     FunWorkServer::actingAs($user)
@@ -190,7 +197,11 @@ test('update_task_status transitions the task status for the project owner', fun
             'status' => 'Doing',
         ])
         ->assertOk()
-        ->assertSee('Doing');
+        ->assertSee('Doing')
+        ->assertSee('Status Task')
+        ->assertSee('Detailed brief for status update')
+        ->assertSee('High')
+        ->assertSee('backend');
 
     expect($task->fresh()->status)->toBe(TaskStatus::Doing);
 });

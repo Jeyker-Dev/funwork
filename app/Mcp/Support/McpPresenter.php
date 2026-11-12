@@ -3,6 +3,7 @@
 namespace App\Mcp\Support;
 
 use App\Models\Area;
+use App\Models\InboxItem;
 use App\Models\Project;
 use App\Models\Task;
 
@@ -41,6 +42,19 @@ class McpPresenter
                 'slug' => $area->slug,
                 'color' => $area->color,
             ])->values()->all(),
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function inboxItem(InboxItem $item): array
+    {
+        return [
+            'id' => $item->id,
+            'project_id' => $item->project_id,
+            'content' => $item->content,
+            'created_at' => $item->created_at?->toISOString(),
         ];
     }
 

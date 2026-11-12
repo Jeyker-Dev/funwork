@@ -1,5 +1,7 @@
 <?php
 
+use App\Enums\TaskPriority;
+use App\Enums\TaskStatus;
 use App\Mcp\Servers\FunWorkServer;
 use App\Mcp\Tools\UpdateTaskDescriptionTool;
 use App\Models\Project;
@@ -12,6 +14,8 @@ test('update_task_description updates the description for the project owner', fu
     $task = Task::factory()->create([
         'project_id' => $project->id,
         'description' => 'Original description',
+        'status' => TaskStatus::Doing,
+        'priority' => TaskPriority::High,
     ]);
 
     $newDescription = "# Technical Brief\n\n- Criterion 1\n- Criterion 2";
@@ -22,7 +26,10 @@ test('update_task_description updates the description for the project owner', fu
             'description' => $newDescription,
         ])
         ->assertOk()
-        ->assertSee($task->title);
+        ->assertSee($task->title)
+        ->assertSee('Technical Brief')
+        ->assertSee('Doing')
+        ->assertSee('High');
 
     expect($task->fresh()->description)->toBe($newDescription);
 });

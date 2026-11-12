@@ -9,18 +9,18 @@ use App\Enums\TaskStatus;
 use App\Mcp\Support\McpPresenter;
 use App\Models\Project;
 use App\Models\User;
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\JsonSchema\JsonSchema;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Attributes\Description;
 use Laravel\Mcp\Server\Attributes\Name;
-use Laravel\Mcp\Server\Tool;
 
 #[Name('add_task')]
 #[Description('Create a new task in a FunWork project, assigning it to the authenticated user.')]
-class AddTaskTool extends Tool
+class AddTaskTool extends FunWorkTool
 {
+    protected string $authorizationMessage = 'You are not authorized to create tasks in this project.';
+
     public function __construct(
         private CreateTaskAction $createTask,
     ) {}
@@ -52,21 +52,11 @@ class AddTaskTool extends Tool
         ];
     }
 
-    public function handle(Request $request): Response
+    protected function execute(Request $request, User $user): Response
     {
-        $user = $request->user();
-
-        if (! $user instanceof User) {
-            return Response::error('Unauthenticated.');
-        }
-
         $input = AddTaskData::fromRequest($request);
 
-        $project = Project::find($input->projectId);
-
-        if (! $project instanceof Project) {
-            return Response::error('Project not found.');
-        }
+        $project = Project::findOrFail($input->projectId);
 
         $area = null;
 
@@ -78,11 +68,7 @@ class AddTaskTool extends Tool
             }
         }
 
-        try {
-            $task = ($this->createTask)($project, $user, $input, $area);
-        } catch (AuthorizationException) {
-            return Response::error('You are not authorized to create tasks in this project.');
-        }
+        $task = ($this->createTask)($project, $user, $input, $area);
 
         return Response::json(McpPresenter::taskDetail($task));
     }

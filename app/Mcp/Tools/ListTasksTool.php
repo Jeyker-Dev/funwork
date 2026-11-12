@@ -8,20 +8,20 @@ use App\Mcp\Support\McpPresenter;
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\JsonSchema\JsonSchema;
 use Illuminate\Support\Facades\Gate;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Attributes\Description;
 use Laravel\Mcp\Server\Attributes\Name;
-use Laravel\Mcp\Server\Tool;
 
 #[Name('list_tasks')]
 #[Description('List tasks in a FunWork project, optionally filtered by status (Todo, Doing, Done) and area slug.')]
-class ListTasksTool extends Tool
+class ListTasksTool extends FunWorkTool
 {
     public const NO_AREA_FILTER = 'none';
+
+    protected string $authorizationMessage = 'You are not authorized to access this project.';
 
     public function schema(JsonSchema $schema): array
     {
@@ -37,27 +37,13 @@ class ListTasksTool extends Tool
         ];
     }
 
-    public function handle(Request $request): Response
+    protected function execute(Request $request, User $user): Response
     {
-        $user = $request->user();
-
-        if (! $user instanceof User) {
-            return Response::error('Unauthenticated.');
-        }
-
         $input = ListTasksData::fromRequest($request);
 
-        $project = Project::find($input->projectId);
+        $project = Project::findOrFail($input->projectId);
 
-        if (! $project instanceof Project) {
-            return Response::error('Project not found.');
-        }
-
-        try {
-            Gate::forUser($user)->authorize('view', $project);
-        } catch (AuthorizationException) {
-            return Response::error('You are not authorized to access this project.');
-        }
+        Gate::forUser($user)->authorize('view', $project);
 
         $query = $project->tasks()->with('area')->orderBy('position')->orderBy('id');
 
