@@ -17,6 +17,7 @@ Laravel 13. Skills de referencia: `laravel-conventions` y `testing-strategy`.
 - `ownerId` debe coincidir con `auth()->id()` (de lo contrario aborta con 403); el selector de dueño solo ofrece al usuario autenticado.
 - `dueDate` y `archiveDate` se validan como fecha; `archiveDate` se guarda en `archived_at`.
 - Creación de áreas por defecto: `ProjectForm::store()` invoca `App\Actions\Projects\CreateDefaultAreasAction::execute($project)` al crear el proyecto, generando 4 áreas base: Frontend (`blue`, pos 1), Backend (`green`, pos 2), Database (`amber`, pos 3) y Design (`purple`, pos 4). Una migración de datos garantiza estas áreas en proyectos preexistentes.
+- Estadísticas de panel: `Project::dashboardStats(?User $user = null): array` calcula en el modelo `tasks_count` (excluyendo tareas con estado `Done`), `today_tasks_count` (tareas abiertas con `due_date` coincidente con `DateHelper::userToday($user)`) e `inbox_count` a través de la relación `hasMany` `inboxItems`, reemplazando consultas directas desacopladas en la vista.
 
 ### Áreas de proyecto (`Area`, `manage-areas`)
 - Relación: `Project::areas()` (`hasMany`, ordenado por `position`).
@@ -28,6 +29,10 @@ Laravel 13. Skills de referencia: `laravel-conventions` y `testing-strategy`.
 
 ### Notebooks (`NotebookForm`)
 - Requeridos: `project_id`, `created_by`. Al crear: toast, cierre del modal, reset del formulario y evento `notebook-created`.
+- **Páginas de notebook (`⚡editor`, `App\Actions\Notebooks\*`):**
+  - Creación correlativa: `App\Actions\Notebooks\CreateNotebookPageAction::execute(Notebook $notebook, User $user, array $content = ...): NotebookPage` calcula `order = max(order) + 1` (iniciando en 1 si no hay páginas) y asigna `created_by`.
+  - Guardado y regla de página vacía: `App\Actions\Notebooks\SaveNotebookPageAction::execute(NotebookPage $page, string $title, string $body): NotebookPage` persiste el contenido. Si título y cuerpo están vacíos y el notebook tiene más de una página, lanza `App\Exceptions\Notebooks\NotebookPageCannotBeEmptyException` (heredera de `BusinessRuleException`) para que la vista informe al usuario (`"Page cannot be empty. Delete explicitly if needed."`) sin silenciarla ni mutar UI directamente en la acción. Cuando es la única página del notebook, el vaciado sí está permitido.
+  - Borrado y página de fallback: `App\Actions\Notebooks\DeleteNotebookPageAction::execute(NotebookPage $page): ?NotebookPage` elimina la página dentro de una transacción `DB::transaction` y retorna la página de reemplazo (`NotebookPage::fallbackPageAfterDelete()`, priorizando la página anterior sobre la siguiente). La vista `⚡editor` autoriza la acción, delega a las acciones y registra excepciones inesperadas con contexto sin silenciarlas.
 
 ### Exportación de notebook (`project.notebooks.export`)
 - `GET /projects/{project}/notebooks/{notebook}/export` (`NotebookExportController`, `scopeBindings()`, middleware `can:view,project` y `can:view,notebook`) descarga `{notebook-slug}.md`.

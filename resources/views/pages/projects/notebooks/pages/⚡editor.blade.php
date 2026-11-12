@@ -1,13 +1,17 @@
 <?php
 
-use Livewire\Component;
-use Livewire\Attributes\Layout;
-use Livewire\Attributes\Computed;
-use App\Models\Project;
+use App\Actions\Notebooks\CreateNotebookPageAction;
+use App\Actions\Notebooks\DeleteNotebookPageAction;
+use App\Actions\Notebooks\SaveNotebookPageAction;
+use App\Exceptions\Notebooks\NotebookPageCannotBeEmptyException;
 use App\Models\Notebook;
 use App\Models\NotebookPage;
-use Illuminate\Support\Facades\Log;
+use App\Models\Project;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Livewire\Attributes\Computed;
+use Livewire\Attributes\Layout;
+use Livewire\Component;
 
 new #[Layout('layouts.focus')]
 class extends Component {
@@ -38,13 +42,13 @@ class extends Component {
     #[Computed]
     public function previousPage(): ?NotebookPage
     {
-        return $this->notebook->pages()->where('order', '<', $this->page->order)->orderBy('order', 'desc')->first();
+        return $this->page->previousPage();
     }
 
     #[Computed]
     public function nextPage(): ?NotebookPage
     {
-        return $this->notebook->pages()->where('order', '>', $this->page->order)->orderBy('order', 'asc')->first();
+        return $this->page->nextPage();
     }
 
     #[Computed]
@@ -69,32 +73,27 @@ class extends Component {
         $this->save();
     }
 
-    public function save(): void
+    public function save(?SaveNotebookPageAction $saveAction = null): void
     {
         $this->authorize('update', $this->page);
 
         $this->resetErrorBag();
         $this->hasError = false;
 
-        if (trim($this->content) === '' && trim($this->title) === '') {
-            if ($this->totalPages > 1) {
-                $this->hasError = true;
-                $this->errorMessage = 'Page cannot be empty. Delete explicitly if needed.';
-                return;
-            }
-        }
+        $saveAction ??= app(SaveNotebookPageAction::class);
 
         try {
-            $this->page->update([
-                'content' => [
-                    'title' => $this->title,
-                    'body' => $this->content,
-                ],
-            ]);
-        } catch (\Exception $e) {
+            $saveAction->execute($this->page, $this->title, $this->content);
+        } catch (NotebookPageCannotBeEmptyException $e) {
+            $this->hasError = true;
+            $this->errorMessage = $e->getMessage();
+        } catch (\Throwable $e) {
             $this->hasError = true;
             $this->errorMessage = 'Failed to save.';
-            Log::error('Autosave failed: ' . $e->getMessage());
+            Log::error('Autosave failed: '.$e->getMessage(), [
+                'page_id' => $this->page->id,
+                'exception' => $e,
+            ]);
         }
     }
 
@@ -103,7 +102,7 @@ class extends Component {
         $this->save();
     }
 
-    public function deletePage(): ?\Illuminate\Http\RedirectResponse
+    public function deletePage(?DeleteNotebookPageAction $deleteAction = null): void
     {
         $this->authorize('delete', $this->page);
 
@@ -111,34 +110,32 @@ class extends Component {
             $this->title = '';
             $this->content = '';
             $this->save();
-            return null;
+
+            return;
         }
 
-        $fallbackPage = $this->previousPage ?? $this->nextPage;
-
-        $this->page->delete();
+        $deleteAction ??= app(DeleteNotebookPageAction::class);
+        $fallbackPage = $deleteAction->execute($this->page);
 
         if ($fallbackPage) {
-            return redirect()->route('project.notebooks.pages.edit', [
+            $this->redirectRoute('project.notebooks.pages.edit', [
                 'project' => $this->project,
                 'notebook' => $this->notebook,
                 'page' => $fallbackPage,
             ]);
+
+            return;
         }
 
-        return redirect()->route('project.notebooks', ['project' => $this->project]);
+        $this->redirectRoute('project.notebooks', ['project' => $this->project]);
     }
 
-    public function createNextPage()
+    public function createNextPage(?CreateNotebookPageAction $createAction = null): void
     {
         $this->authorize('create', [NotebookPage::class, $this->notebook]);
 
-        $nextOrder = $this->notebook->pages()->max('order') + 1;
-        $newPage = $this->notebook->pages()->create([
-            'content' => ['title' => '', 'body' => ''],
-            'order' => $nextOrder,
-            'created_by' => Auth::id(),
-        ]);
+        $createAction ??= app(CreateNotebookPageAction::class);
+        $newPage = $createAction->execute($this->notebook, Auth::user());
 
         $this->redirectRoute('project.notebooks.pages.edit', [
             'project' => $this->project,

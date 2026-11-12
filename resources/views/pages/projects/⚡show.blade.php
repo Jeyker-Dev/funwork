@@ -42,11 +42,7 @@ class extends Component {
                 ->orderBy('due_date', 'asc')
                 ->take(5)
                 ->get(),
-            'stats' => [
-                'tasks_count' => $this->project->tasks()->where('status', '!=', TaskStatus::Done->value)->count(),
-                'today_tasks_count' => $this->project->tasks()->where('status', '!=', TaskStatus::Done->value)->whereDate('due_date', $localToday)->count(),
-                'inbox_count' => \App\Models\InboxItem::where('project_id', $this->project->id)->count(),
-            ],
+            'stats' => $this->project->dashboardStats(),
         ];
     }
 };

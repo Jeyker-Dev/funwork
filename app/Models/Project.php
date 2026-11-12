@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\TaskStatus;
+use App\Support\DateHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -59,6 +61,30 @@ class Project extends Model
     public function files(): HasMany
     {
         return $this->hasMany(ProjectFile::class, 'project_id');
+    }
+
+    public function inboxItems(): HasMany
+    {
+        return $this->hasMany(InboxItem::class, 'project_id');
+    }
+
+    /**
+     * @return array{tasks_count: int, today_tasks_count: int, inbox_count: int}
+     */
+    public function dashboardStats(?User $user = null): array
+    {
+        $localToday = DateHelper::userToday($user);
+
+        return [
+            'tasks_count' => $this->tasks()
+                ->where('status', '!=', TaskStatus::Done->value)
+                ->count(),
+            'today_tasks_count' => $this->tasks()
+                ->where('status', '!=', TaskStatus::Done->value)
+                ->whereDate('due_date', $localToday)
+                ->count(),
+            'inbox_count' => $this->inboxItems()->count(),
+        ];
     }
 
     public function getRecentActivities()

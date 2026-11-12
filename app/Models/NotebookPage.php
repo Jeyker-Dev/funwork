@@ -57,4 +57,25 @@ class NotebookPage extends Model
     {
         return $this->belongsTo(Notebook::class);
     }
+
+    public function previousPage(): ?self
+    {
+        return $this->notebook->pages()
+            ->where('order', '<', $this->order)
+            ->orderBy('order', 'desc')
+            ->first();
+    }
+
+    public function nextPage(): ?self
+    {
+        return $this->notebook->pages()
+            ->where('order', '>', $this->order)
+            ->orderBy('order', 'asc')
+            ->first();
+    }
+
+    public function fallbackPageAfterDelete(): ?self
+    {
+        return $this->previousPage() ?? $this->nextPage();
+    }
 }
