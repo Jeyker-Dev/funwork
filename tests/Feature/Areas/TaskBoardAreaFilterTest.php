@@ -26,7 +26,7 @@ test('the board filter by an area shows only its tasks, no area shows tasks with
     $feTask2 = Task::factory()->create([
         'project_id' => $project->id,
         'title' => 'Frontend Task 2',
-        'status' => TaskStatus::Todo->value,
+        'status' => TaskStatus::Doing->value,
         'area_id' => $frontend->id,
         'position' => 2,
     ]);

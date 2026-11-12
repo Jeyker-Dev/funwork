@@ -2,6 +2,7 @@
 
 ## 2026-11-12
 
+- Carga diferida (lazy-mount) del slider de tareas ocultas (`<x-projects.tasks.slider>`): los componentes Livewire internos (`⚡slider-filters`, `⚡slider-tasks`, `⚡slider-pagination`) se configuran con el atributo `lazy` para evitar su montaje y consultas a la base de datos durante la carga inicial del tablero (`⚡task-board`) y del indicador (`⚡task-more-indicator`), cargándose únicamente cuando el modal flyout es abierto por el usuario. Se mantiene la reactividad completa de filtros y paginación una vez abierto, con pruebas en Pest que verifican la ausencia de consultas y marcado en la carga inicial y el renderizado directo.
 - Escape de comodines LIKE en la búsqueda de proyectos (⚡project-finder, ⚡show-projects): los caracteres especiales (`%` y `_`) ingresados por el usuario se tratan como texto literal en lugar de comodines de coincidencia total, evitando que la búsqueda devuelva todos los proyectos al ingresar `%` o coincidencias espurias con `_`.
 
 ## 2026-11-11

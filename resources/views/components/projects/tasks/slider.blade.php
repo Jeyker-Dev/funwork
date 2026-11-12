@@ -6,9 +6,9 @@
         <flux:text class="mt-2">Make changes to your personal details.</flux:text>
     </div>
 
-    <livewire:projects.tasks.slider-filters :project="$project" :initialFilter="$status" :area="$area" />
+    <livewire:projects.tasks.slider-filters :project="$project" :initialFilter="$status" :area="$area" lazy />
 
-    <livewire:projects.tasks.slider-tasks :project="$project" :initialFilter="$status" :area="$area" />
+    <livewire:projects.tasks.slider-tasks :project="$project" :initialFilter="$status" :area="$area" lazy />
 
-    <livewire:projects.tasks.slider-pagination :project="$project" :initialFilter="$status" :area="$area" />
+    <livewire:projects.tasks.slider-pagination :project="$project" :initialFilter="$status" :area="$area" lazy />
 </div>
