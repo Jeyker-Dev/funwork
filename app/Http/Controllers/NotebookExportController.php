@@ -12,7 +12,7 @@ class NotebookExportController extends Controller
 {
     public function __invoke(Project $project, Notebook $notebook, BuildNotebookExportAction $action): StreamedResponse
     {
-        $markdown = $action->execute($notebook);
+        $markdown = $action($notebook);
 
         $filename = (Str::slug($notebook->name) ?: 'notebook').'.md';
 

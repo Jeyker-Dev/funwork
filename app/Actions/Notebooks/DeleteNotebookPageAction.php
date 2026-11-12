@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
  */
 class DeleteNotebookPageAction
 {
-    public function execute(NotebookPage $page): ?NotebookPage
+    public function __invoke(NotebookPage $page): ?NotebookPage
     {
         return DB::transaction(function () use ($page): ?NotebookPage {
             $fallbackPage = $page->fallbackPageAfterDelete();
@@ -21,10 +21,5 @@ class DeleteNotebookPageAction
 
             return $fallbackPage;
         });
-    }
-
-    public function __invoke(NotebookPage $page): ?NotebookPage
-    {
-        return $this->execute($page);
     }
 }

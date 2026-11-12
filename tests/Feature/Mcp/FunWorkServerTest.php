@@ -27,7 +27,7 @@ test('list_projects returns only the authenticated user non-archived projects wi
         'name' => 'FunWork Active',
         'archived_at' => null,
     ]);
-    app(CreateDefaultAreasAction::class)->execute($activeProject);
+    app(CreateDefaultAreasAction::class)($activeProject);
 
     Project::factory()->create([
         'owner_id' => $userA->id,
@@ -81,7 +81,7 @@ test('list_projects includes archived projects of the authenticated user when re
 test('list_tasks filters tasks by status and area slug', function () {
     $user = User::factory()->create();
     $project = Project::factory()->create(['owner_id' => $user->id]);
-    app(CreateDefaultAreasAction::class)->execute($project);
+    app(CreateDefaultAreasAction::class)($project);
 
     $backendArea = $project->areaByKey('backend');
     $frontendArea = $project->areaByKey('frontend');
@@ -144,7 +144,7 @@ test('list_tasks rejects access to a project owned by another user', function ()
 test('get_task returns the full task details for the project owner', function () {
     $user = User::factory()->create();
     $project = Project::factory()->create(['owner_id' => $user->id]);
-    app(CreateDefaultAreasAction::class)->execute($project);
+    app(CreateDefaultAreasAction::class)($project);
     $backendArea = $project->areaByKey('backend');
 
     $task = Task::factory()->create([
@@ -179,7 +179,7 @@ test('get_task rejects viewing a task owned by another user', function () {
 test('update_task_status transitions the task status for the project owner', function () {
     $user = User::factory()->create();
     $project = Project::factory()->create(['owner_id' => $user->id]);
-    app(CreateDefaultAreasAction::class)->execute($project);
+    app(CreateDefaultAreasAction::class)($project);
     $backendArea = $project->areaByKey('backend');
 
     $task = Task::factory()->create([
@@ -247,7 +247,7 @@ test('update_task_status rejects updating a task owned by another user', functio
 test('add_task creates a task with area resolution, position calculation, and user assignment', function () {
     $user = User::factory()->create();
     $project = Project::factory()->create(['owner_id' => $user->id]);
-    app(CreateDefaultAreasAction::class)->execute($project);
+    app(CreateDefaultAreasAction::class)($project);
 
     Task::factory()->create([
         'project_id' => $project->id,

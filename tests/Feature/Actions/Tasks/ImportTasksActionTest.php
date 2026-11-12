@@ -29,8 +29,8 @@ test('it creates valid tasks and skips invalid lines', function () {
     - [ ] Invalid task without criterion
     TEXT;
 
-    $parsedLines = $this->parser->execute($this->project, $text);
-    $this->action->execute($this->project, $parsedLines, $this->user);
+    $parsedLines = ($this->parser)($this->project, $text);
+    ($this->action)($this->project, $parsedLines, $this->user);
 
     expect(Task::where('title', 'Valid task')->exists())->toBeTrue()
         ->and(Task::where('title', 'Invalid task without criterion')->exists())->toBeFalse();
@@ -49,8 +49,8 @@ test('it appends position after max position per status', function () {
     - [ ] [BACKEND] Second Todo — Criterion 3
     TEXT;
 
-    $parsedLines = $this->parser->execute($this->project, $text);
-    $this->action->execute($this->project, $parsedLines, $this->user);
+    $parsedLines = ($this->parser)($this->project, $text);
+    ($this->action)($this->project, $parsedLines, $this->user);
 
     $todo1 = Task::where('title', 'First Todo')->first();
     $todo2 = Task::where('title', 'Second Todo')->first();
@@ -64,8 +64,8 @@ test('it appends position after max position per status', function () {
 test('it assigns importing user to tasks', function () {
     $text = '- [ ] [BACKEND] Task — Criterion';
 
-    $parsedLines = $this->parser->execute($this->project, $text);
-    $this->action->execute($this->project, $parsedLines, $this->user);
+    $parsedLines = ($this->parser)($this->project, $text);
+    ($this->action)($this->project, $parsedLines, $this->user);
 
     $task = Task::where('title', 'Task')->first();
     expect($task->users)->toHaveCount(1)
@@ -75,8 +75,8 @@ test('it assigns importing user to tasks', function () {
 test('it stores dependency in description when present', function () {
     $text = '- [ ] [BACKEND] Task — Criterion — depende de: Auth';
 
-    $parsedLines = $this->parser->execute($this->project, $text);
-    $this->action->execute($this->project, $parsedLines, $this->user);
+    $parsedLines = ($this->parser)($this->project, $text);
+    ($this->action)($this->project, $parsedLines, $this->user);
 
     $task = Task::where('title', 'Task')->first();
     expect($task->description)->toBe("Criterion\n\nDepende de: Auth");
@@ -85,8 +85,8 @@ test('it stores dependency in description when present', function () {
 test('it associates resolved area with task', function () {
     $text = '- [ ] [BACKEND] Task with area — Criterion';
 
-    $parsedLines = $this->parser->execute($this->project, $text);
-    $this->action->execute($this->project, $parsedLines, $this->user);
+    $parsedLines = ($this->parser)($this->project, $text);
+    ($this->action)($this->project, $parsedLines, $this->user);
 
     $task = Task::where('title', 'Task with area')->first();
     expect($task->area_id)->toBe($this->backendArea->id);
@@ -96,9 +96,9 @@ test('it throws authorization exception and does not create tasks when user is u
     $otherUser = User::factory()->create();
 
     $text = '- [ ] Task 1 — Criterion 1';
-    $parsedLines = $this->parser->execute($this->project, $text);
+    $parsedLines = ($this->parser)($this->project, $text);
 
-    expect(fn () => $this->action->execute($this->project, $parsedLines, $otherUser))
+    expect(fn () => ($this->action)($this->project, $parsedLines, $otherUser))
         ->toThrow(AuthorizationException::class);
 
     expect(Task::count())->toBe(0);

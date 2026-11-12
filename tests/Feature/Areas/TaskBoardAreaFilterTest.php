@@ -10,7 +10,7 @@ use Livewire\Livewire;
 test('the board filter by an area shows only its tasks, no area shows tasks without area, and counters match', function () {
     $user = User::factory()->create();
     $project = Project::factory()->create(['owner_id' => $user->id]);
-    app(CreateDefaultAreasAction::class)->execute($project);
+    app(CreateDefaultAreasAction::class)($project);
 
     $frontend = $project->areas()->where('slug', 'frontend')->first();
     $backend = $project->areas()->where('slug', 'backend')->first();
@@ -84,7 +84,7 @@ test('the board filter by an area shows only its tasks, no area shows tasks with
 test('slider filters and tasks respect the area filter', function () {
     $user = User::factory()->create();
     $project = Project::factory()->create(['owner_id' => $user->id]);
-    app(CreateDefaultAreasAction::class)->execute($project);
+    app(CreateDefaultAreasAction::class)($project);
 
     $frontend = $project->areas()->where('slug', 'frontend')->first();
     $backend = $project->areas()->where('slug', 'backend')->first();
@@ -133,7 +133,7 @@ test('slider filters and tasks respect the area filter', function () {
 test('task-count and task-more-indicator respect the area filter', function () {
     $user = User::factory()->create();
     $project = Project::factory()->create(['owner_id' => $user->id]);
-    app(CreateDefaultAreasAction::class)->execute($project);
+    app(CreateDefaultAreasAction::class)($project);
 
     $frontend = $project->areas()->where('slug', 'frontend')->first();
     $backend = $project->areas()->where('slug', 'backend')->first();

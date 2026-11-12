@@ -52,7 +52,7 @@ test('creating a project through the create-project component creates 4 default 
 test('areaByKey matches slug case-insensitively and returns null for unknown key', function () {
     $user = User::factory()->create();
     $project = Project::factory()->create(['owner_id' => $user->id]);
-    app(CreateDefaultAreasAction::class)->execute($project);
+    app(CreateDefaultAreasAction::class)($project);
 
     expect($project->areaByKey('BACKEND'))->not->toBeNull()
         ->and($project->areaByKey('BACKEND')->slug)->toBe('backend')
@@ -65,7 +65,7 @@ test('areaByKey matches slug case-insensitively and returns null for unknown key
 test('the owner can create, rename, recolor, reorder and delete areas', function () {
     $user = User::factory()->create();
     $project = Project::factory()->create(['owner_id' => $user->id]);
-    app(CreateDefaultAreasAction::class)->execute($project);
+    app(CreateDefaultAreasAction::class)($project);
 
     $component = Livewire::actingAs($user)
         ->test('projects.⚡manage-areas', ['project' => $project]);
@@ -124,8 +124,8 @@ test('duplicate slug in another project is allowed', function () {
     $projectA = Project::factory()->create(['owner_id' => $userA->id]);
     $projectB = Project::factory()->create(['owner_id' => $userB->id]);
 
-    app(CreateDefaultAreasAction::class)->execute($projectA);
-    app(CreateDefaultAreasAction::class)->execute($projectB);
+    app(CreateDefaultAreasAction::class)($projectA);
+    app(CreateDefaultAreasAction::class)($projectB);
 
     Livewire::actingAs($userA)
         ->test('projects.⚡manage-areas', ['project' => $projectA])
@@ -158,7 +158,7 @@ test('another user is denied from managing areas', function () {
 test('deleting an area sets area_id to null on its tasks and notebooks without deleting them', function () {
     $user = User::factory()->create();
     $project = Project::factory()->create(['owner_id' => $user->id]);
-    app(CreateDefaultAreasAction::class)->execute($project);
+    app(CreateDefaultAreasAction::class)($project);
 
     $area = $project->areas()->where('slug', 'backend')->first();
 

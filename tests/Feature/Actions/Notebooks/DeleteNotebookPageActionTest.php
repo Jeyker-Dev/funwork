@@ -19,7 +19,7 @@ test('it falls back to previous page when deleting a middle page', function () {
     $page3 = NotebookPage::factory()->create(['notebook_id' => $notebook->id, 'order' => 3, 'created_by' => $user->id]);
 
     $action = new DeleteNotebookPageAction;
-    $fallback = $action->execute($page2);
+    $fallback = $action($page2);
 
     expect($fallback?->id)->toBe($page1->id)
         ->and(NotebookPage::find($page2->id))->toBeNull()
@@ -35,7 +35,7 @@ test('it falls back to next page when deleting the first page', function () {
     $page2 = NotebookPage::factory()->create(['notebook_id' => $notebook->id, 'order' => 2, 'created_by' => $user->id]);
 
     $action = new DeleteNotebookPageAction;
-    $fallback = $action->execute($page1);
+    $fallback = $action($page1);
 
     expect($fallback?->id)->toBe($page2->id)
         ->and(NotebookPage::find($page1->id))->toBeNull()
@@ -50,7 +50,7 @@ test('it returns null fallback when deleting the only page', function () {
     $page = NotebookPage::factory()->create(['notebook_id' => $notebook->id, 'order' => 1, 'created_by' => $user->id]);
 
     $action = new DeleteNotebookPageAction;
-    $fallback = $action->execute($page);
+    $fallback = $action($page);
 
     expect($fallback)->toBeNull()
         ->and(NotebookPage::find($page->id))->toBeNull()

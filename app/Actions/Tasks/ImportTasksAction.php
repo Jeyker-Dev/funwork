@@ -14,7 +14,7 @@ class ImportTasksAction
     /**
      * @param  array<ParsedTaskLineData>  $lines
      */
-    public function execute(Project $project, array $lines, User $user): void
+    public function __invoke(Project $project, array $lines, User $user): void
     {
         Gate::forUser($user)->authorize('create', [Task::class, $project]);
 
@@ -51,13 +51,5 @@ class ImportTasksAction
                 $task->users()->sync([$user->id]);
             }
         });
-    }
-
-    /**
-     * @param  array<ParsedTaskLineData>  $lines
-     */
-    public function __invoke(Project $project, array $lines, User $user): void
-    {
-        $this->execute($project, $lines, $user);
     }
 }

@@ -118,7 +118,7 @@ class extends Component {
             return null;
         }
 
-        $response = $action->execute($this->project, $this->selectedIds);
+        $response = $action($this->project, $this->selectedIds);
 
         $this->clearSelection();
         $this->dispatch('download-completed');
@@ -136,7 +136,7 @@ class extends Component {
         }
 
         try {
-            $action->execute($this->project, $this->selectedIds);
+            $action($this->project, $this->selectedIds);
 
             $this->clearSelection();
 

@@ -23,7 +23,7 @@ test('it saves page title and body', function () {
     ]);
 
     $action = new SaveNotebookPageAction;
-    $updated = $action->execute($page, 'New Title', 'New Body');
+    $updated = $action($page, 'New Title', 'New Body');
 
     expect($updated->content)->toBe(['title' => 'New Title', 'body' => 'New Body'])
         ->and($page->fresh()->content)->toBe(['title' => 'New Title', 'body' => 'New Body']);
@@ -50,7 +50,7 @@ test('it enforces empty page rule by throwing domain exception when multiple pag
 
     $action = new SaveNotebookPageAction;
 
-    expect(fn () => $action->execute($page1, '   ', '  '))
+    expect(fn () => $action($page1, '   ', '  '))
         ->toThrow(NotebookPageCannotBeEmptyException::class, 'Page cannot be empty. Delete explicitly if needed.');
 
     // Page content remains untouched
@@ -70,7 +70,7 @@ test('it allows empty title and body when page is the only page in notebook', fu
     ]);
 
     $action = new SaveNotebookPageAction;
-    $updated = $action->execute($page, '', '');
+    $updated = $action($page, '', '');
 
     expect($updated->content)->toBe(['title' => '', 'body' => ''])
         ->and($page->fresh()->content)->toBe(['title' => '', 'body' => '']);

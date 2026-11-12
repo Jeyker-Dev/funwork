@@ -12,7 +12,7 @@ use App\Models\Notebook;
  */
 class BuildNotebookExportAction
 {
-    public function execute(Notebook $notebook): string
+    public function __invoke(Notebook $notebook): string
     {
         $sections = [
             "# {$notebook->name}",

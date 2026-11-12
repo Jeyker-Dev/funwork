@@ -97,7 +97,7 @@ new class extends Component {
         $this->authorize('view', $this->project);
 
         try {
-            $action->execute($this->project, $this->selectedIds, $this->targetFolderId);
+            $action($this->project, $this->selectedIds, $this->targetFolderId);
             Flux::modal('move-items-modal')->close();
             $this->dispatch('items-moved');
             Flux::toast('Items moved successfully.');

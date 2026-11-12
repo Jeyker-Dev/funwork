@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Gate;
 
 class DeleteSelectionAction
 {
-    public function execute(Project $project, array $selectedIds): void
+    public function __invoke(Project $project, array $selectedIds): void
     {
         Gate::authorize('view', $project);
 

@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 
 class CreateApiTokenAction
 {
-    public function execute(User $user, string $name): CreatedApiTokenData
+    public function __invoke(User $user, string $name): CreatedApiTokenData
     {
         $plainTextToken = ApiToken::TOKEN_PREFIX.Str::random(40);
 
@@ -22,10 +22,5 @@ class CreateApiTokenAction
             apiToken: $apiToken,
             plainTextToken: $plainTextToken,
         );
-    }
-
-    public function __invoke(User $user, string $name): CreatedApiTokenData
-    {
-        return $this->execute($user, $name);
     }
 }

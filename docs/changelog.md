@@ -2,6 +2,12 @@
 
 ## 2026-11-12
 
+- Alineación de Actions con la convención invocable (`app/Actions/*`, `laravel-conventions`):
+  - Todas las clases en `app/Actions` (salvo `app/Actions/Fortify`, que responde a contratos del paquete) exponen únicamente `__invoke()`, eliminando `execute()` y la duplicidad de APIs. Se actualizaron todos los puntos de llamada (vistas Livewire SFC, controladores, Jobs, herramientas MCP, otras Actions y tests) para invocar la acción directamente (`($this->action)(...)` o `app(Action::class)(...)`).
+  - Reubicación de `ReorderTasks` a `App\Actions\Tasks\ReorderTasksAction` (`app/Actions/Tasks/ReorderTasksAction.php`), actualizando sus componentes Livewire consumidores (`⚡show-tasks`, `⚡task-board`) y sus tests asociados.
+  - Eliminación de la clase base abstracta prematura `BusinessRuleException`; `NotebookPageCannotBeEmptyException` pasa a extender `DomainException` directamente manteniendo su mensaje de dominio.
+  - Remoción de la verificación innecesaria de `$notebook &&` en `SaveNotebookPageAction`, asumiendo el contrato de integridad donde una página siempre pertenece a un notebook.
+
 - Extracción de lógica de negocio de vistas SFC Livewire a Actions y métodos de modelo (`CreateNotebookPageAction`, `SaveNotebookPageAction`, `DeleteNotebookPageAction`, `Project::dashboardStats()`):
   - En el editor de páginas de notebooks (`⚡editor.blade.php`), la creación de la siguiente página incrementando correlativamente el orden delega a `CreateNotebookPageAction`; la regla que prohíbe páginas vacías salvo que sea la única del cuaderno se extrae a `SaveNotebookPageAction` lanzando la excepción de dominio `NotebookPageCannotBeEmptyException` (heredando de `BusinessRuleException`), la cual es atrapada por el componente para notificar al usuario sin alterar el estado en la acción; la resolución de la página de reemplazo tras borrar se traslada a `DeleteNotebookPageAction` y `NotebookPage::fallbackPageAfterDelete()`; y las excepciones inesperadas durante el guardado se registran en logs con contexto (`page_id`, excepción) sin silenciarse.
   - En el panel del proyecto (`⚡show.blade.php`), el cálculo de métricas de tareas e inbox delega a `$project->dashboardStats()`, utilizando la relación `inboxItems` en lugar de invocar `InboxItem::where` desacoplado del modelo y respetando la zona horaria del usuario para tareas vencidas o del día.

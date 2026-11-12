@@ -27,7 +27,7 @@ class ParseTaskImportAction
     /**
      * @return array<ParsedTaskLineData>
      */
-    public function execute(Project $project, string $text): array
+    public function __invoke(Project $project, string $text): array
     {
         $rawLines = preg_split('/\r\n|\r|\n/', $text) ?: [];
         $existingTitles = Task::where('project_id', $project->id)
@@ -41,11 +41,6 @@ class ParseTaskImportAction
             ->map(fn (string $trimmedLine): ParsedTaskLineData => $this->parseLine($project, $trimmedLine, $existingTitles))
             ->values()
             ->all();
-    }
-
-    public function __invoke(Project $project, string $text): array
-    {
-        return $this->execute($project, $text);
     }
 
     /**

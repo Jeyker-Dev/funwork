@@ -1,7 +1,7 @@
 <?php
 
+use App\Actions\Tasks\ReorderTasksAction;
 use App\Enums\TaskStatus;
-use App\Livewire\Actions\ReorderTasks;
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;
@@ -18,7 +18,7 @@ test('it reorders tasks and updates status', function () {
 
     $this->actingAs($user);
 
-    $action = new ReorderTasks;
+    $action = new ReorderTasksAction;
     $payload = [
         'Todo' => [$task2->id],
         'Doing' => [$task1->id, $task3->id],
@@ -45,7 +45,7 @@ test('it rejects invalid status keys before modifying any tasks', function () {
 
     $this->actingAs($user);
 
-    $action = new ReorderTasks;
+    $action = new ReorderTasksAction;
     $payload = [
         'Doing' => [$task1->id],
         'InvalidStatus' => [$task2->id],
@@ -69,7 +69,7 @@ test('it prevents unauthorized users from reordering tasks', function () {
 
     $this->actingAs($unauthorizedUser);
 
-    $action = new ReorderTasks;
+    $action = new ReorderTasksAction;
     $payload = [
         'Doing' => [$task->id],
     ];

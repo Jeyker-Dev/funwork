@@ -16,7 +16,7 @@ class CreateNotebookPageAction
     /**
      * @param  array{title?: string, body?: string}  $content
      */
-    public function execute(Notebook $notebook, User $user, array $content = ['title' => '', 'body' => '']): NotebookPage
+    public function __invoke(Notebook $notebook, User $user, array $content = ['title' => '', 'body' => '']): NotebookPage
     {
         $maxOrder = $notebook->pages()->max('order');
         $nextOrder = ($maxOrder !== null ? (int) $maxOrder : 0) + 1;
@@ -26,13 +26,5 @@ class CreateNotebookPageAction
             'order' => $nextOrder,
             'created_by' => $user->id,
         ]);
-    }
-
-    /**
-     * @param  array{title?: string, body?: string}  $content
-     */
-    public function __invoke(Notebook $notebook, User $user, array $content = ['title' => '', 'body' => '']): NotebookPage
-    {
-        return $this->execute($notebook, $user, $content);
     }
 }

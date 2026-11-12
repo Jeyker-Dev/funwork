@@ -13,12 +13,12 @@ use App\Models\NotebookPage;
  */
 class SaveNotebookPageAction
 {
-    public function execute(NotebookPage $page, string $title, string $body): NotebookPage
+    public function __invoke(NotebookPage $page, string $title, string $body): NotebookPage
     {
         if (trim($title) === '' && trim($body) === '') {
             $notebook = $page->notebook;
 
-            if ($notebook && $notebook->pages()->count() > 1) {
+            if ($notebook->pages()->count() > 1) {
                 throw new NotebookPageCannotBeEmptyException;
             }
         }
@@ -31,10 +31,5 @@ class SaveNotebookPageAction
         ]);
 
         return $page;
-    }
-
-    public function __invoke(NotebookPage $page, string $title, string $body): NotebookPage
-    {
-        return $this->execute($page, $title, $body);
     }
 }

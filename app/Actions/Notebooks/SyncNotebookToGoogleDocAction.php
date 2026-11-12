@@ -27,7 +27,7 @@ class SyncNotebookToGoogleDocAction
      *
      * @throws GoogleAuthorizationException when the user has to connect Google again
      */
-    public function execute(Notebook $notebook, User $user): string
+    public function __invoke(Notebook $notebook, User $user): string
     {
         Gate::forUser($user)->authorize('update', $notebook);
 
@@ -37,7 +37,7 @@ class SyncNotebookToGoogleDocAction
             throw new GoogleAuthorizationException('The user has not connected a Google account.');
         }
 
-        $markdown = $this->buildExport->execute($notebook);
+        $markdown = ($this->buildExport)($notebook);
 
         try {
             $docId = $notebook->google_doc_id;

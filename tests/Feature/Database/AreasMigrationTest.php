@@ -26,7 +26,7 @@ test('data migration populates default areas for existing projects that have non
         {
             $action = app(CreateDefaultAreasAction::class);
             foreach (Project::doesntHave('areas')->cursor() as $project) {
-                $action->execute($project);
+                $action($project);
             }
         }
     };
@@ -55,7 +55,7 @@ test('data migration does not duplicate areas for projects that already have are
         {
             $action = app(CreateDefaultAreasAction::class);
             foreach (Project::doesntHave('areas')->cursor() as $project) {
-                $action->execute($project);
+                $action($project);
             }
         }
     };

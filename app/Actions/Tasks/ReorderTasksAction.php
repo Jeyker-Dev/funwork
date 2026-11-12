@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Actions;
+namespace App\Actions\Tasks;
 
 use App\Enums\TaskStatus;
 use App\Models\Project;
@@ -15,7 +15,7 @@ use Illuminate\Validation\ValidationException;
  * Receives the full payload: { "Todo": [3, 1, 2], "Doing": [5, 4], "Done": [6] }
  * Updates each task's status and position atomically.
  */
-class ReorderTasks
+class ReorderTasksAction
 {
     public function __invoke(array $payload, int $projectId): void
     {

@@ -14,7 +14,7 @@ return new class extends Migration
         $action = app(CreateDefaultAreasAction::class);
 
         foreach (Project::doesntHave('areas')->cursor() as $project) {
-            $action->execute($project);
+            $action($project);
         }
     }
 

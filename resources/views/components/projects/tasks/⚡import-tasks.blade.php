@@ -50,7 +50,7 @@ new class extends Component
         }
 
         $this->resetErrorBag();
-        $this->parsedLines = $parser->execute($this->project, $this->text);
+        $this->parsedLines = $parser($this->project, $this->text);
         $this->step = 2;
     }
 
@@ -77,10 +77,10 @@ new class extends Component
             return;
         }
 
-        $parsedLines = $parser->execute($this->project, $this->text);
+        $parsedLines = $parser($this->project, $this->text);
         $validCount = count(array_filter($parsedLines, fn (ParsedTaskLineData $line): bool => $line->isValid()));
 
-        $importer->execute($this->project, $parsedLines, auth()->user());
+        $importer($this->project, $parsedLines, auth()->user());
 
         Flux::toast("{$validCount} tasks imported", variant: 'success');
         Flux::modal('import-tasks-modal-'.$this->project->id)->close();

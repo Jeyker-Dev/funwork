@@ -18,7 +18,7 @@ class MoveSelectionAction
      *
      * @throws ValidationException
      */
-    public function execute(Project $project, array $selectedIds, ?int $targetFolderId): void
+    public function __invoke(Project $project, array $selectedIds, ?int $targetFolderId): void
     {
         Gate::authorize('view', $project);
 

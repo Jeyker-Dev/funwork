@@ -4,7 +4,7 @@ Laravel 13. Skills de referencia: `laravel-conventions` y `testing-strategy`.
 
 ## Convenciones
 
-- La lógica de negocio va en `app/Actions/*` y en Form Objects (`app/Livewire/Forms`).
+- La lógica de negocio va en `app/Actions/*` y en Form Objects (`app/Livewire/Forms`). Todas las Actions son invocables (`__invoke`), sin estado, y se ejecutan llamando a la instancia directamente (`($this->action)(...)` o `app(Action::class)(...)`).
 - Autorización: ninguna acción sin Policy (`app/Policies/*Policy.php`). Las rutas `/projects/{project}/*` usan middleware `can`, los componentes Livewire usan `$this->authorize()`, y los Form Objects/Actions usan `Gate::authorize()`. Las rutas anidadas usan `scopeBindings()` para que el hijo pertenezca al padre de la URL (404 si no).
 - Storage siempre a través de los discos de Laravel, nunca con rutas absolutas.
 - Tareas pesadas en Jobs encolados; el resultado se avisa con `DatabaseNotification`.
@@ -16,7 +16,7 @@ Laravel 13. Skills de referencia: `laravel-conventions` y `testing-strategy`.
 - Requeridos: `name`, `description`, `icon`, `type`, `status`, `ownerId`.
 - `ownerId` debe coincidir con `auth()->id()` (de lo contrario aborta con 403); el selector de dueño solo ofrece al usuario autenticado.
 - `dueDate` y `archiveDate` se validan como fecha; `archiveDate` se guarda en `archived_at`.
-- Creación de áreas por defecto: `ProjectForm::store()` invoca `App\Actions\Projects\CreateDefaultAreasAction::execute($project)` al crear el proyecto, generando 4 áreas base: Frontend (`blue`, pos 1), Backend (`green`, pos 2), Database (`amber`, pos 3) y Design (`purple`, pos 4). Una migración de datos garantiza estas áreas en proyectos preexistentes.
+- Creación de áreas por defecto: `ProjectForm::store()` invoca `App\Actions\Projects\CreateDefaultAreasAction` al crear el proyecto, generando 4 áreas base: Frontend (`blue`, pos 1), Backend (`green`, pos 2), Database (`amber`, pos 3) y Design (`purple`, pos 4). Una migración de datos garantiza estas áreas en proyectos preexistentes.
 - Estadísticas de panel: `Project::dashboardStats(?User $user = null): array` calcula en el modelo `tasks_count` (excluyendo tareas con estado `Done`), `today_tasks_count` (tareas abiertas con `due_date` coincidente con `DateHelper::userToday($user)`) e `inbox_count` a través de la relación `hasMany` `inboxItems`, reemplazando consultas directas desacopladas en la vista.
 
 ### Áreas de proyecto (`Area`, `manage-areas`)
@@ -30,13 +30,13 @@ Laravel 13. Skills de referencia: `laravel-conventions` y `testing-strategy`.
 ### Notebooks (`NotebookForm`)
 - Requeridos: `project_id`, `created_by`. Al crear: toast, cierre del modal, reset del formulario y evento `notebook-created`.
 - **Páginas de notebook (`⚡editor`, `App\Actions\Notebooks\*`):**
-  - Creación correlativa: `App\Actions\Notebooks\CreateNotebookPageAction::execute(Notebook $notebook, User $user, array $content = ...): NotebookPage` calcula `order = max(order) + 1` (iniciando en 1 si no hay páginas) y asigna `created_by`.
-  - Guardado y regla de página vacía: `App\Actions\Notebooks\SaveNotebookPageAction::execute(NotebookPage $page, string $title, string $body): NotebookPage` persiste el contenido. Si título y cuerpo están vacíos y el notebook tiene más de una página, lanza `App\Exceptions\Notebooks\NotebookPageCannotBeEmptyException` (heredera de `BusinessRuleException`) para que la vista informe al usuario (`"Page cannot be empty. Delete explicitly if needed."`) sin silenciarla ni mutar UI directamente en la acción. Cuando es la única página del notebook, el vaciado sí está permitido.
-  - Borrado y página de fallback: `App\Actions\Notebooks\DeleteNotebookPageAction::execute(NotebookPage $page): ?NotebookPage` elimina la página dentro de una transacción `DB::transaction` y retorna la página de reemplazo (`NotebookPage::fallbackPageAfterDelete()`, priorizando la página anterior sobre la siguiente). La vista `⚡editor` autoriza la acción, delega a las acciones y registra excepciones inesperadas con contexto sin silenciarlas.
+  - Creación correlativa: `App\Actions\Notebooks\CreateNotebookPageAction` calcula `order = max(order) + 1` (iniciando en 1 si no hay páginas) y asigna `created_by`.
+  - Guardado y regla de página vacía: `App\Actions\Notebooks\SaveNotebookPageAction` persiste el contenido. Si título y cuerpo están vacíos y el notebook tiene más de una página, lanza `App\Exceptions\Notebooks\NotebookPageCannotBeEmptyException` (heredera directa de `DomainException`) para que la vista informe al usuario (`"Page cannot be empty. Delete explicitly if needed."`) sin silenciarla ni mutar UI directamente en la acción. Cuando es la única página del notebook, el vaciado sí está permitido.
+  - Borrado y página de fallback: `App\Actions\Notebooks\DeleteNotebookPageAction` elimina la página dentro de una transacción `DB::transaction` y retorna la página de reemplazo (`NotebookPage::fallbackPageAfterDelete()`, priorizando la página anterior sobre la siguiente). La vista `⚡editor` autoriza la acción, delega a las acciones invocándolas directamente y registra excepciones inesperadas con contexto sin silenciarlas.
 
 ### Exportación de notebook (`project.notebooks.export`)
 - `GET /projects/{project}/notebooks/{notebook}/export` (`NotebookExportController`, `scopeBindings()`, middleware `can:view,project` y `can:view,notebook`) descarga `{notebook-slug}.md`.
-- El Markdown lo arma `App\Actions\Notebooks\BuildNotebookExportAction::execute(Notebook)`. No autoriza: quien la llama verifica el acceso. Lo reutiliza la sincronización con Google Docs, para que el Doc y el `.md` tengan el mismo contenido.
+- El Markdown lo arma `App\Actions\Notebooks\BuildNotebookExportAction`. No autoriza: quien la llama verifica el acceso. Lo reutiliza la sincronización con Google Docs, para que el Doc y el `.md` tengan el mismo contenido.
 - Contenido: título `# {notebook name}`, generado por FunWork el Y-m-d H:i UTC, descripción si existe, y cada página en orden (`order` luego `id`) como `## {title}` más su cuerpo. Una página sin título sale como "Página N". Si no tiene páginas, emite `_Sin páginas._`.
 
 ### Sincronización de notebook con Google Docs
@@ -48,7 +48,7 @@ Laravel 13. Skills de referencia: `laravel-conventions` y `testing-strategy`.
   - **Disparadores:** eventos `saved` y `deleted` de `NotebookPage` (al crear, editar o borrar páginas) y `SyncDocsCommand` al detectar cambios (`created + updated + deleted > 0`). Registran `notebooks.content_changed_at = now()`.
   - **Regla:** solo aplica a notebooks con Google Doc existente (`google_doc_id` no nulo). Los notebooks que el usuario nunca sincronizó manualmente no se envían a Google.
   - **Debounce de 2 minutos:** el job es `ShouldQueue` y `ShouldBeUnique` (`uniqueId()` = notebook ID), despachado con `->delay(now()->addMinutes(2))`. Las ráfagas de edición quedan consolidadas en un único job.
-  - **Ejecución y reintentos:** al correr recarga el notebook y omite la sync si fue eliminado, si `google_doc_id` es nulo, o si `google_doc_synced_at >= content_changed_at` (ya sincronizado). En caso contrario invoca `SyncNotebookToGoogleDocAction::execute($notebook, $owner)`. Ante `GoogleAuthorizationException` no reintenta; ante fallos de conexión o HTTP reintenta hasta 3 veces con backoff (`[10, 30, 60]`). No bloquea la cola.
+  - **Ejecución y reintentos:** al correr recarga el notebook y omite la sync si fue eliminado, si `google_doc_id` es nulo, o si `google_doc_synced_at >= content_changed_at` (ya sincronizado). En caso contrario invoca `SyncNotebookToGoogleDocAction($notebook, $owner)`. Ante `GoogleAuthorizationException` no reintenta; ante fallos de conexión o HTTP reintenta hasta 3 veces con backoff (`[10, 30, 60]`). No bloquea la cola.
   - **Badge de cambios pendientes:** en la tarjeta del notebook (`⚡show-notebooks`), si existe `google_doc_id` y `content_changed_at > google_doc_synced_at` (o `google_doc_synced_at` es null), se visualiza `<flux:badge color="amber" size="sm">` con "Cambios sin sincronizar" junto a la última sincronización, desapareciendo al sincronizar.
 - Configuración: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` y `GOOGLE_REDIRECT_URI` (por defecto `/auth/google/callback`, relativo a `APP_URL`).
 - Puesta en marcha en Google Cloud:
@@ -78,7 +78,7 @@ Laravel 13. Skills de referencia: `laravel-conventions` y `testing-strategy`.
 
 ### Tareas
 - Varios asignados por tarea (pivot `task_user`); el selector solo ofrece al usuario autenticado y `TaskForm` valida `assignedUserIds.*` contra `auth()->id()`.
-- Estados y prioridades usan obligatoriamente los Backed Enums `App\Enums\TaskStatus` (`Todo`, `Doing`, `Done`) y `App\Enums\TaskPriority` (`Low`, `Medium`, `High`), casteados en `Task`, validados con `Rule::enum` en `TaskForm` y `ConvertInboxToTaskForm`, y verificados con `TaskStatus::tryFrom` antes de la transacción en `ReorderTasks`. El dashboard aún filtra por `'completed'` (pendiente de unificar con `TaskStatus::Done`).
+- Estados y prioridades usan obligatoriamente los Backed Enums `App\Enums\TaskStatus` (`Todo`, `Doing`, `Done`) y `App\Enums\TaskPriority` (`Low`, `Medium`, `High`), casteados en `Task`, validados con `Rule::enum` en `TaskForm` y `ConvertInboxToTaskForm`, y verificados con `TaskStatus::tryFrom` antes de la transacción en `ReorderTasksAction` (`App\Actions\Tasks\ReorderTasksAction`). El dashboard aún filtra por `'completed'` (pendiente de unificar con `TaskStatus::Done`).
 - Vencimientos y fecha local: `tasks.due_date` es `dateTime` (almacenado como `'Y-m-d 00:00:00'`) y se compara siempre por fecha (`whereDate`), nunca contra `now()`. La fecha local del usuario se calcula como `now(auth()->user()->timezone ?? config('app.timezone'))->toDateString()` centralizada en `App\Support\DateHelper::userToday()` y en `$user->localDate()`. Regla de vencimiento: una tarea se considera vencida ("Overdue") si su fecha es anterior al día local del usuario (`due_date < localToday`), y "de hoy" ("Due today") si coincide con el día local del usuario (`due_date == localToday`) (commit `ba699d3`).
 
 ### Importador de tareas desde NotebookLM (`ParseTaskImportAction`, `ImportTasksAction`, `projects.tasks.import-tasks`)

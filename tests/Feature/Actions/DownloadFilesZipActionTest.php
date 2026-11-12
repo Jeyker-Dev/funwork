@@ -36,7 +36,7 @@ test('generates zip with selected files and folders', function () {
 
     $action = new DownloadFilesZipAction;
 
-    $response = $action->execute($project, ['file_'.$file1->id, 'folder_'.$folder->id]);
+    $response = $action($project, ['file_'.$file1->id, 'folder_'.$folder->id]);
 
     expect($response)->toBeInstanceOf(BinaryFileResponse::class);
 
@@ -66,5 +66,5 @@ test('throws exception if a requested file is missing', function () {
     ]);
 
     $action = new DownloadFilesZipAction;
-    $action->execute($project, ['file_'.$file1->id]);
+    $action($project, ['file_'.$file1->id]);
 })->throws(ValidationException::class, 'The requested file is unavailable.');

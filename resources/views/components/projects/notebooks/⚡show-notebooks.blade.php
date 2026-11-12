@@ -102,7 +102,7 @@ new class extends Component
         $notebook = $this->project->notebooks()->findOrFail($notebookId);
 
         try {
-            $syncNotebook->execute($notebook, auth()->user());
+            $syncNotebook($notebook, auth()->user());
         } catch (GoogleAuthorizationException) {
             session()->put('google_return_to', route('project.notebooks', $this->project, absolute: false));
 

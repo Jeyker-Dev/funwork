@@ -180,7 +180,7 @@ test('another user cannot sync the notebook', function () {
 
     Livewire::test('projects.notebooks.⚡show-notebooks', ['project' => $project])->assertForbidden();
 
-    expect(fn () => app(SyncNotebookToGoogleDocAction::class)->execute($notebook, $otherUser))
+    expect(fn () => app(SyncNotebookToGoogleDocAction::class)($notebook, $otherUser))
         ->toThrow(AuthorizationException::class);
 
     Http::assertNothingSent();

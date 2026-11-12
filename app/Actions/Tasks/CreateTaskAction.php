@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Gate;
 
 class CreateTaskAction
 {
-    public function execute(Project $project, User $user, AddTaskData $taskInput, ?Area $area = null): Task
+    public function __invoke(Project $project, User $user, AddTaskData $taskInput, ?Area $area = null): Task
     {
         Gate::forUser($user)->authorize('create', [Task::class, $project]);
 
@@ -42,10 +42,5 @@ class CreateTaskAction
 
             return $task;
         });
-    }
-
-    public function __invoke(Project $project, User $user, AddTaskData $taskInput, ?Area $area = null): Task
-    {
-        return $this->execute($project, $user, $taskInput, $area);
     }
 }

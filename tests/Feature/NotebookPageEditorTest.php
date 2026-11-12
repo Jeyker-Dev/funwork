@@ -199,7 +199,7 @@ test('it handles unexpected error during save by setting error message and loggi
     $this->actingAs($user);
 
     $mockAction = Mockery::mock(SaveNotebookPageAction::class);
-    $mockAction->shouldReceive('execute')
+    $mockAction->shouldReceive('__invoke')
         ->andThrow(new RuntimeException('Unexpected DB glitch'));
     app()->instance(SaveNotebookPageAction::class, $mockAction);
 

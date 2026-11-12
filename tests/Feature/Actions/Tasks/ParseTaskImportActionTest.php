@@ -24,7 +24,7 @@ beforeEach(function () {
 test('it parses valid line with prefix, area, criterion and dependency', function () {
     $text = '- [ ] [BACKEND] Setup database schema — migration runs without errors — depende de: Docker';
 
-    $results = $this->action->execute($this->project, $text);
+    $results = ($this->action)($this->project, $text);
 
     expect($results)->toHaveCount(1);
     $item = $results[0];
@@ -46,7 +46,7 @@ test('it parses valid line with prefix, area, criterion and dependency', functio
 test('it parses valid line without prefix', function () {
     $text = '[BACKEND] Build API endpoint — returns 200 with valid JSON';
 
-    $results = $this->action->execute($this->project, $text);
+    $results = ($this->action)($this->project, $text);
 
     expect($results)->toHaveCount(1);
     $item = $results[0];
@@ -62,7 +62,7 @@ test('it parses valid line without prefix', function () {
 test('it parses line with - [x] prefix as Done status', function () {
     $text = '- [x] [BACKEND] Completed task — all tests green';
 
-    $results = $this->action->execute($this->project, $text);
+    $results = ($this->action)($this->project, $text);
 
     expect($results)->toHaveCount(1);
     $item = $results[0];
@@ -75,7 +75,7 @@ test('it parses line with - [x] prefix as Done status', function () {
 test('it supports em dash, en dash and double dash separators', function (string $separator) {
     $text = "- [ ] [BACKEND] Task title {$separator} Acceptance criterion {$separator} depende de: Core";
 
-    $results = $this->action->execute($this->project, $text);
+    $results = ($this->action)($this->project, $text);
 
     expect($results)->toHaveCount(1);
     $item = $results[0];
@@ -93,7 +93,7 @@ test('it supports em dash, en dash and double dash separators', function (string
 test('it handles missing area without errors or warnings', function () {
     $text = '- [ ] Task without area — Acceptance criterion';
 
-    $results = $this->action->execute($this->project, $text);
+    $results = ($this->action)($this->project, $text);
 
     expect($results)->toHaveCount(1);
     $item = $results[0];
@@ -109,7 +109,7 @@ test('it handles missing area without errors or warnings', function () {
 test('it produces a warning when area is not found but still imports without area', function () {
     $text = '- [ ] [QA] Write E2E tests — Cypress suite passes';
 
-    $results = $this->action->execute($this->project, $text);
+    $results = ($this->action)($this->project, $text);
 
     expect($results)->toHaveCount(1);
     $item = $results[0];
@@ -123,7 +123,7 @@ test('it produces a warning when area is not found but still imports without are
 test('it produces an error when acceptance criterion is missing', function () {
     $text = '- [ ] [BACKEND] Task without criterion';
 
-    $results = $this->action->execute($this->project, $text);
+    $results = ($this->action)($this->project, $text);
 
     expect($results)->toHaveCount(1);
     $item = $results[0];
@@ -136,7 +136,7 @@ test('it produces an error when title is longer than 255 characters', function (
     $longTitle = str_repeat('a', 256);
     $text = "- [ ] [BACKEND] {$longTitle} — Acceptance criterion";
 
-    $results = $this->action->execute($this->project, $text);
+    $results = ($this->action)($this->project, $text);
 
     expect($results)->toHaveCount(1);
     $item = $results[0];
@@ -155,7 +155,7 @@ test('it silently skips blank lines', function () {
 
     ';
 
-    $results = $this->action->execute($this->project, $text);
+    $results = ($this->action)($this->project, $text);
 
     expect($results)->toHaveCount(2)
         ->and($results[0]->title)->toBe('Task 1')
@@ -165,7 +165,7 @@ test('it silently skips blank lines', function () {
 test('it treats depende de: - as no dependency', function () {
     $text = '- [ ] [BACKEND] Independent task — Acceptance criterion — depende de: -';
 
-    $results = $this->action->execute($this->project, $text);
+    $results = ($this->action)($this->project, $text);
 
     expect($results)->toHaveCount(1);
     $item = $results[0];
@@ -183,7 +183,7 @@ test('it warns when title already exists in project case-insensitively', functio
 
     $text = '- [ ] [BACKEND] existing feature task — New criterion';
 
-    $results = $this->action->execute($this->project, $text);
+    $results = ($this->action)($this->project, $text);
 
     expect($results)->toHaveCount(1);
     $item = $results[0];

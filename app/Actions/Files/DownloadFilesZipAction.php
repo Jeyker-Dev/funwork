@@ -10,7 +10,7 @@ use ZipArchive;
 
 class DownloadFilesZipAction
 {
-    public function execute(Project $project, array $selectedIds)
+    public function __invoke(Project $project, array $selectedIds)
     {
         Gate::authorize('view', $project);
 

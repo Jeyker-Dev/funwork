@@ -53,7 +53,7 @@ class ProjectForm extends Form
             'owner_id' => $this->ownerId,
         ]);
 
-        app(CreateDefaultAreasAction::class)->execute($project);
+        app(CreateDefaultAreasAction::class)($project);
 
         $this->reset();
 

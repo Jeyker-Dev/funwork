@@ -33,7 +33,7 @@ it('moves files and folders to a target folder', function () {
     ]);
 
     $action = new MoveSelectionAction;
-    $action->execute($project, ['file_'.$file->id, 'folder_'.$folder->id], $targetFolder->id);
+    $action($project, ['file_'.$file->id, 'folder_'.$folder->id], $targetFolder->id);
 
     expect($file->fresh()->folder_id)->toBe($targetFolder->id);
     expect($folder->fresh()->parent_id)->toBe($targetFolder->id);
@@ -53,7 +53,7 @@ it('prevents moving to the same directory', function () {
 
     $action = new MoveSelectionAction;
 
-    expect(fn () => $action->execute($project, ['file_'.$file->id], $folder->id))
+    expect(fn () => $action($project, ['file_'.$file->id], $folder->id))
         ->toThrow(ValidationException::class);
 });
 
@@ -69,15 +69,15 @@ it('prevents inception paradox (moving folder into itself or descendant)', funct
     $action = new MoveSelectionAction;
 
     // Move into itself
-    expect(fn () => $action->execute($project, ['folder_'.$parent->id], $parent->id))
+    expect(fn () => $action($project, ['folder_'.$parent->id], $parent->id))
         ->toThrow(ValidationException::class);
 
     // Move into child
-    expect(fn () => $action->execute($project, ['folder_'.$parent->id], $child->id))
+    expect(fn () => $action($project, ['folder_'.$parent->id], $child->id))
         ->toThrow(ValidationException::class);
 
     // Move into grandchild
-    expect(fn () => $action->execute($project, ['folder_'.$parent->id], $grandchild->id))
+    expect(fn () => $action($project, ['folder_'.$parent->id], $grandchild->id))
         ->toThrow(ValidationException::class);
 });
 
@@ -118,7 +118,7 @@ it('auto-renames items on collision', function () {
     ]);
 
     $action = new MoveSelectionAction;
-    $action->execute($project, ['file_'.$movingFile->id, 'folder_'.$movingFolder->id], $targetFolder->id);
+    $action($project, ['file_'.$movingFile->id, 'folder_'.$movingFolder->id], $targetFolder->id);
 
     expect($movingFile->fresh()->name)->toBe('document (1).txt');
     expect($movingFolder->fresh()->name)->toBe('Subfolder (1)');

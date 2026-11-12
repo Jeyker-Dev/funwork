@@ -1,7 +1,7 @@
 <?php
 
 use App\Enums\TaskStatus;
-use App\Livewire\Actions\ReorderTasks;
+use App\Actions\Tasks\ReorderTasksAction;
 use App\Models\Project;
 use App\Models\Task;
 use App\Support\QueryHelper;
@@ -86,7 +86,7 @@ new class extends Component {
 
     public function reorderTasks(array $payload): void
     {
-        app(ReorderTasks::class)($payload, $this->projectId);
+        app(ReorderTasksAction::class)($payload, $this->projectId);
     }
 }; ?>
 

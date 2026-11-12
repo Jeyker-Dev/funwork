@@ -54,7 +54,7 @@ class ReadNotebookTool extends FunWorkTool
             'name' => $notebook->name,
             'description' => $notebook->description,
             'area' => McpPresenter::area($notebook->area),
-            'markdown' => $this->buildExport->execute($notebook),
+            'markdown' => ($this->buildExport)($notebook),
         ]);
     }
 }

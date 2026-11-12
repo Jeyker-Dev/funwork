@@ -19,7 +19,7 @@ class CreateDefaultAreasAction
     /**
      * Create the default areas for the given project.
      */
-    public function execute(Project $project): void
+    public function __invoke(Project $project): void
     {
         foreach (self::DEFAULTS as $default) {
             $project->areas()->create($default);

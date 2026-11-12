@@ -44,7 +44,7 @@ new #[Title('Integrations settings')] class extends Component
     {
         $this->validateOnly('tokenName');
 
-        $created = $createApiToken->execute(auth()->user(), trim($this->tokenName));
+        $created = $createApiToken(auth()->user(), trim($this->tokenName));
 
         $this->plainTextToken = $created->plainTextToken;
         $this->reset('tokenName');

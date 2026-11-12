@@ -15,8 +15,8 @@ test('task creation accepts area of same project, accepts null, and rejects area
     $user = User::factory()->create();
     $projectA = Project::factory()->create(['owner_id' => $user->id]);
     $projectB = Project::factory()->create(['owner_id' => $user->id]);
-    app(CreateDefaultAreasAction::class)->execute($projectA);
-    app(CreateDefaultAreasAction::class)->execute($projectB);
+    app(CreateDefaultAreasAction::class)($projectA);
+    app(CreateDefaultAreasAction::class)($projectB);
 
     $areaA = $projectA->areas()->where('slug', 'backend')->first();
     $areaB = $projectB->areas()->where('slug', 'backend')->first();
@@ -67,8 +67,8 @@ test('task edit accepts area of same project, accepts null, and rejects area of 
     $user = User::factory()->create();
     $projectA = Project::factory()->create(['owner_id' => $user->id]);
     $projectB = Project::factory()->create(['owner_id' => $user->id]);
-    app(CreateDefaultAreasAction::class)->execute($projectA);
-    app(CreateDefaultAreasAction::class)->execute($projectB);
+    app(CreateDefaultAreasAction::class)($projectA);
+    app(CreateDefaultAreasAction::class)($projectB);
 
     $areaA = $projectA->areas()->where('slug', 'frontend')->first();
     $areaB = $projectB->areas()->where('slug', 'frontend')->first();
@@ -113,8 +113,8 @@ test('notebook creation accepts area of same project, accepts null, and rejects 
     $user = User::factory()->create();
     $projectA = Project::factory()->create(['owner_id' => $user->id]);
     $projectB = Project::factory()->create(['owner_id' => $user->id]);
-    app(CreateDefaultAreasAction::class)->execute($projectA);
-    app(CreateDefaultAreasAction::class)->execute($projectB);
+    app(CreateDefaultAreasAction::class)($projectA);
+    app(CreateDefaultAreasAction::class)($projectB);
 
     $areaA = $projectA->areas()->where('slug', 'database')->first();
     $areaB = $projectB->areas()->where('slug', 'database')->first();
@@ -159,8 +159,8 @@ test('notebook change area in show-notebooks accepts area of same project, accep
     $user = User::factory()->create();
     $projectA = Project::factory()->create(['owner_id' => $user->id]);
     $projectB = Project::factory()->create(['owner_id' => $user->id]);
-    app(CreateDefaultAreasAction::class)->execute($projectA);
-    app(CreateDefaultAreasAction::class)->execute($projectB);
+    app(CreateDefaultAreasAction::class)($projectA);
+    app(CreateDefaultAreasAction::class)($projectB);
 
     $areaA = $projectA->areas()->where('slug', 'design')->first();
     $areaB = $projectB->areas()->where('slug', 'design')->first();
@@ -204,8 +204,8 @@ test('convert inbox to task accepts area of same project, accepts null, and reje
     $user = User::factory()->create();
     $projectA = Project::factory()->create(['owner_id' => $user->id]);
     $projectB = Project::factory()->create(['owner_id' => $user->id]);
-    app(CreateDefaultAreasAction::class)->execute($projectA);
-    app(CreateDefaultAreasAction::class)->execute($projectB);
+    app(CreateDefaultAreasAction::class)($projectA);
+    app(CreateDefaultAreasAction::class)($projectB);
 
     $areaA = $projectA->areas()->where('slug', 'backend')->first();
     $areaB = $projectB->areas()->where('slug', 'backend')->first();
@@ -253,8 +253,8 @@ test('convert inbox to notebook accepts area of same project, accepts null, and 
     $user = User::factory()->create();
     $projectA = Project::factory()->create(['owner_id' => $user->id]);
     $projectB = Project::factory()->create(['owner_id' => $user->id]);
-    app(CreateDefaultAreasAction::class)->execute($projectA);
-    app(CreateDefaultAreasAction::class)->execute($projectB);
+    app(CreateDefaultAreasAction::class)($projectA);
+    app(CreateDefaultAreasAction::class)($projectB);
 
     $areaA = $projectA->areas()->where('slug', 'frontend')->first();
     $areaB = $projectB->areas()->where('slug', 'frontend')->first();

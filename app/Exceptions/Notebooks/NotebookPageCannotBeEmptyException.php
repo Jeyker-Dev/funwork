@@ -2,9 +2,9 @@
 
 namespace App\Exceptions\Notebooks;
 
-use App\Exceptions\BusinessRuleException;
+use DomainException;
 
-final class NotebookPageCannotBeEmptyException extends BusinessRuleException
+final class NotebookPageCannotBeEmptyException extends DomainException
 {
     public function __construct(string $message = 'Page cannot be empty. Delete explicitly if needed.')
     {

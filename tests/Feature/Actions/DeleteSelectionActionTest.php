@@ -32,7 +32,7 @@ test('deletes selected files and folders cascadingly', function () {
     ]);
 
     $action = new DeleteSelectionAction;
-    $action->execute($project, ['folder_'.$folder1->id, 'file_'.$file2->id]);
+    $action($project, ['folder_'.$folder1->id, 'file_'.$file2->id]);
 
     expect($folder1->fresh()->trashed())->toBeTrue()
         ->and($childFolder->fresh()->trashed())->toBeTrue()

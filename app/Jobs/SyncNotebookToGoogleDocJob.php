@@ -74,7 +74,7 @@ class SyncNotebookToGoogleDocJob implements ShouldBeUnique, ShouldQueue
         }
 
         try {
-            $action->execute($notebook, $owner);
+            $action($notebook, $owner);
         } catch (GoogleAuthorizationException) {
             // Do not retry: the action already deletes the Google account.
             $this->fail();

@@ -83,7 +83,7 @@ class extends Component {
         $saveAction ??= app(SaveNotebookPageAction::class);
 
         try {
-            $saveAction->execute($this->page, $this->title, $this->content);
+            $saveAction($this->page, $this->title, $this->content);
         } catch (NotebookPageCannotBeEmptyException $e) {
             $this->hasError = true;
             $this->errorMessage = $e->getMessage();
@@ -115,7 +115,7 @@ class extends Component {
         }
 
         $deleteAction ??= app(DeleteNotebookPageAction::class);
-        $fallbackPage = $deleteAction->execute($this->page);
+        $fallbackPage = $deleteAction($this->page);
 
         if ($fallbackPage) {
             $this->redirectRoute('project.notebooks.pages.edit', [
@@ -135,7 +135,7 @@ class extends Component {
         $this->authorize('create', [NotebookPage::class, $this->notebook]);
 
         $createAction ??= app(CreateNotebookPageAction::class);
-        $newPage = $createAction->execute($this->notebook, Auth::user());
+        $newPage = $createAction($this->notebook, Auth::user());
 
         $this->redirectRoute('project.notebooks.pages.edit', [
             'project' => $this->project,

@@ -98,7 +98,7 @@ test('the MCP HTTP endpoint rejects requests with an invalid Bearer token', func
 
 test('the MCP HTTP endpoint authenticates a valid Bearer token and records last used timestamp', function () {
     $user = User::factory()->create();
-    $created = app(CreateApiTokenAction::class)->execute($user, 'Antigravity CLI');
+    $created = app(CreateApiTokenAction::class)($user, 'Antigravity CLI');
 
     $this->withHeader('Authorization', 'Bearer '.$created->plainTextToken)
         ->postJson(route('mcp.funwork'), [
@@ -120,7 +120,7 @@ test('the MCP HTTP endpoint authenticates a valid Bearer token and records last 
 
 test('the MCP HTTP endpoint rejects an expired Bearer token', function () {
     $user = User::factory()->create();
-    $created = app(CreateApiTokenAction::class)->execute($user, 'Antigravity CLI');
+    $created = app(CreateApiTokenAction::class)($user, 'Antigravity CLI');
 
     $created->apiToken->update(['expires_at' => now()->subMinute()]);
 
@@ -135,7 +135,7 @@ test('the MCP HTTP endpoint rejects an expired Bearer token', function () {
 
 test('the MCP HTTP endpoint rejects a revoked Bearer token', function () {
     $user = User::factory()->create();
-    $created = app(CreateApiTokenAction::class)->execute($user, 'Antigravity CLI');
+    $created = app(CreateApiTokenAction::class)($user, 'Antigravity CLI');
 
     $created->apiToken->delete();
 
@@ -150,7 +150,7 @@ test('the MCP HTTP endpoint rejects a revoked Bearer token', function () {
 
 test('the MCP HTTP endpoint throttles requests to 60 per minute and returns 429 on the 61st request', function () {
     $user = User::factory()->create();
-    $created = app(CreateApiTokenAction::class)->execute($user, 'Rate Limited Client');
+    $created = app(CreateApiTokenAction::class)($user, 'Rate Limited Client');
 
     $maxAllowedRequests = 60;
 
@@ -179,7 +179,7 @@ test('the MCP HTTP endpoint throttles requests to 60 per minute and returns 429 
 
 test('the MCP HTTP endpoint does not rewrite token last_used_at within the same minute', function () {
     $user = User::factory()->create();
-    $created = app(CreateApiTokenAction::class)->execute($user, 'Antigravity CLI');
+    $created = app(CreateApiTokenAction::class)($user, 'Antigravity CLI');
 
     $this->freezeTime();
 
@@ -210,7 +210,7 @@ test('the MCP HTTP endpoint does not rewrite token last_used_at within the same 
 
 test('the MCP HTTP endpoint updates token last_used_at after a minute has passed', function () {
     $user = User::factory()->create();
-    $created = app(CreateApiTokenAction::class)->execute($user, 'Antigravity CLI');
+    $created = app(CreateApiTokenAction::class)($user, 'Antigravity CLI');
 
     $this->freezeTime();
 

@@ -1,6 +1,6 @@
 <?php
 
-use App\Livewire\Actions\ReorderTasks;
+use App\Actions\Tasks\ReorderTasksAction;
 use App\Models\Folder;
 use App\Models\InboxItem;
 use App\Models\Notebook;
@@ -117,7 +117,7 @@ test('user B cannot mount or mutate user A project dashboard or tasks', function
     Livewire::test('projects.tasks.create-task', ['project' => $this->projectA, 'status' => 'Todo'])
         ->assertForbidden();
 
-    expect(fn () => app(ReorderTasks::class)(['Doing' => [$taskA->id]], $this->projectA->id))
+    expect(fn () => app(ReorderTasksAction::class)(['Doing' => [$taskA->id]], $this->projectA->id))
         ->toThrow(AuthorizationException::class);
 });
 

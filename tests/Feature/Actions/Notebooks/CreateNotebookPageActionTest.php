@@ -15,7 +15,7 @@ test('it creates the first page with order 1 when notebook is empty', function (
     $notebook = Notebook::factory()->create(['project_id' => $project->id, 'created_by' => $user->id]);
 
     $action = new CreateNotebookPageAction;
-    $page = $action->execute($notebook, $user);
+    $page = $action($notebook, $user);
 
     expect($page->order)->toBe(1)
         ->and($page->created_by)->toBe($user->id)
