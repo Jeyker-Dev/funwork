@@ -15,7 +15,7 @@
         <flux:dropdown position="bottom" align="end">
             <flux:button variant="ghost" size="sm" icon="ellipsis-vertical" class="text-gray-400 hover:text-gray-900 hover:bg-white/50 transition-colors" />
             <flux:menu>
-                <flux:menu.item wire:click="downloadFolderAsync({{ $folder->id }})" icon="arrow-down-tray">Download</flux:menu.item>
+                <flux:menu.item wire:click="downloadFolder({{ $folder->id }})" icon="arrow-down-tray">Download</flux:menu.item>
                 <flux:menu.item 
                     x-data="{
                         copy() {

@@ -28,7 +28,7 @@ Avance: **Sprint 1 de Fase 1 cerrado** — enums de tareas validados, filtro del
 - Enums `TaskStatus` (Todo/Doing/Done) y `TaskPriority`, validados en `TaskForm` y `ReorderTasks`. Corregir el filtro `'completed'` del dashboard (`pages/projects/⚡show.blade.php:33,38-39`).
 - Usar `users.timezone` en vencimientos y en "hoy".
 - Página de detalle de tarea (hoy la vista está vacía) y rutas de tareas con `Route::livewire`.
-- Arreglar el ZIP de carpetas: despachar `CreateFolderZipJob`, leer del disco real (S3) y mostrar las notificaciones en la UI.
+- Descarga de carpetas en ZIP: completado manteniendo la descarga síncrona mediante `DownloadFilesZipAction` (recursiva, contemplando el disco de cada archivo y compatible con S3), removiendo el job asíncrono no despachado y sus notificaciones como código muerto.
 - Mover las consultas y reglas de las vistas SFC a Actions o Forms. Unificar el mapa de colores de estado (hoy está repetido en 5 componentes).
 - ~~Tablero: eager loading de asignados, menos queries por columna.~~ Descartada: sin N+1 real; se reemplaza por un test que fija la cantidad de queries.
 - Deploy: correr `migrate --force` antes de servir la nueva versión y hacer backup de la base de datos antes de migrar.

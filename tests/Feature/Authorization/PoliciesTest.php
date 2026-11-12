@@ -356,7 +356,7 @@ test('user B cannot move their own file into user A folder via move-items-modal'
         ->and($fileB->fresh()->project_id)->toBe($projectB->id);
 });
 
-test('user B cannot download user A folder as ZIP via downloadFolderAsync', function () {
+test('user B cannot download user A folder as ZIP via downloadFolder', function () {
     Storage::fake(config('filesystems.default'));
     Notification::fake();
 
@@ -370,7 +370,7 @@ test('user B cannot download user A folder as ZIP via downloadFolderAsync', func
     $this->actingAs($this->userB);
 
     Livewire::test('pages::projects.files.index', ['project' => $projectB])
-        ->call('downloadFolderAsync', $folderA->id)
+        ->call('downloadFolder', $folderA->id)
         ->assertNotFound()
         ->assertNoFileDownloaded();
 
@@ -398,7 +398,7 @@ test('user A can download their own folder and files as ZIP on local disk', func
     $this->actingAs($this->userA);
 
     Livewire::test('pages::projects.files.index', ['project' => $this->projectA])
-        ->call('downloadFolderAsync', $folderA->id)
+        ->call('downloadFolder', $folderA->id)
         ->assertHasNoErrors()
         ->assertFileDownloaded();
 });

@@ -66,8 +66,7 @@ Laravel 13. Skills de referencia: `laravel-conventions` y `testing-strategy`.
 ### Archivos y carpetas
 - Crear carpeta: el nombre es obligatorio y se valida.
 - Borrado: prohibido si el archivo está en uso o en un proceso activo; en ese caso se devuelve un error explicativo.
-- ZIP de selección: si falta algún archivo, se aborta de forma segura y se devuelve un error.
-- ZIP de carpeta: asíncrono con `CreateFolderZipJob` → toast "Preparing download..." → notificación con el link (o con el fallo). **Estado actual: roto.** El job nunca se despacha, solo lee del disco `local` y las notificaciones no se muestran en la UI.
+- ZIP de carpetas y selección: se descarga de forma síncrona mediante `DownloadFilesZipAction`, empaquetando recursivamente las carpetas y leyendo cada archivo desde su propio disco (S3 o local). Si falta algún archivo solicitado, se aborta de forma segura y se devuelve un error de validación.
 - Mover: no se permite mover al mismo directorio ni dentro de sí mismo o de una subcarpeta (la "paradoja Inception"). Si el nombre ya existe en el destino, se renombra solo: `name (1)`, `name (2)`…
 - Renombrar: el nombre debe ser único entre archivos y carpetas del mismo directorio; la extensión se preserva; requiere permiso `update`.
 - Búsqueda global: `LIKE` sobre `name` escapando comodines con `App\Support\QueryHelper::escapeLike` (`ESCAPE '!'`) e ignora `currentFolderId` mientras haya una búsqueda activa (commit `0cd9d7e`).

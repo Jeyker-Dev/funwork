@@ -4,9 +4,8 @@
 
 - **Backend:** Laravel 13, PHP 8.4.1+, Fortify (auth y 2FA), `laravel/mcp` (servidor MCP).
 - **UI:** Livewire v4 (Single File Components nativos, sin Volt), Flux / Flux Pro, Alpine v3, TailwindCSS, Vite.
-- **Storage:** discos de Laravel; S3 para avatares y archivos de proyecto (URLs temporales firmadas para buckets privados).
-- **Colas:** jobs en base de datos (por ejemplo `CreateFolderZipJob`).
-- **Notificaciones:** `DatabaseNotification` (por ejemplo, el link de descarga del ZIP).
+- **Storage:** discos de Laravel; S3 para avatares y archivos de proyecto (URLs temporales firmadas para buckets privados). La descarga de carpetas y archivos en ZIP es síncrona mediante `DownloadFilesZipAction` (recursiva, contemplando el disco de cada archivo y compatible con S3).
+- **Colas:** jobs en base de datos (por ejemplo `SyncNotebookToGoogleDocJob`).
 - **Testing:** Pest v4 + pest-plugin-laravel. **Lint:** Laravel Pint.
 - **CI:** GitHub Actions (`lint.yml`, `tests.yml`).
 - **CD:** `deploy.yml` construye la imagen y despliega al VPS en cada push a `master`. `sync-docs.yml` espeja `docs/` en el notebook "Docs" del proyecto FunWork en cada push a `develop` o `master` que toca `docs/**`: copia `docs/` al contenedor `app` y corre `funwork:sync-docs`. Requiere los secrets `VPS_HOST`, `VPS_USERNAME`, `VPS_SSH_KEY` y `FUNWORK_DOCS_PROJECT_ID` (ID del proyecto FunWork en producción). Ambos workflows comparten el grupo de concurrencia `deploy-production`, así una sincronización nunca corre mientras se recrea el contenedor.

@@ -97,7 +97,7 @@ class extends Component {
         Flux::modal('delete-confirmation')->show();
     }
 
-    public function downloadFolderAsync(int $folderId, DownloadFilesZipAction $action)
+    public function downloadFolder(int $folderId, DownloadFilesZipAction $action)
     {
         $this->selectedIds = ['folder_' . $folderId];
         return $this->downloadSelected($action);
