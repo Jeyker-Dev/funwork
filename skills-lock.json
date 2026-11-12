@@ -1,35 +1,35 @@
 {
-  "version": 1,
+  "version": 2,
   "skills": {
     "clean-code": {
       "source": "Jeyker-Dev/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/practices/clean-code/SKILL.md",
-      "computedHash": "2555b48007162516e67b339e583a485c210c7a92db8b79eea14180a56151d88f"
+      "computedHash": "6eff0520466bd361834a393a8eeb4e1fbe3dba3fa354666766b5689014a267ab"
     },
     "error-handling": {
       "source": "Jeyker-Dev/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/practices/error-handling/SKILL.md",
-      "computedHash": "8df34f3a30e323d522196a1af4a19eb6f1fd93461a56555ee9f7f6a198d1c212"
+      "computedHash": "c7b812e9336f048985fff9390af358ee4f3be129b8030db7716eb1e855302f63"
     },
     "laravel-conventions": {
       "source": "Jeyker-Dev/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/stacks/laravel-conventions/SKILL.md",
-      "computedHash": "618d98ae0e5d0c395f5ecc6c854efb406ffa99f50f7bdb5221836544b8ae51e2"
+      "computedHash": "53fcafe1356de3db4f4afa0c3a5b278327abbced7e3215391af16c0b03f4fcd5"
     },
     "project-docs": {
       "source": "Jeyker-Dev/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/practices/project-docs/SKILL.md",
-      "computedHash": "31edd05a31825cc86e5b34c4844c2ee41c64602d7364078591bd67693bea8a08"
+      "computedHash": "4ec1e343cfc75ba3848be0a282e2dbd1230a14044d4cf8f542cfd702e88a7fb1"
     },
     "testing-strategy": {
       "source": "Jeyker-Dev/agent-skills",
       "sourceType": "github",
       "skillPath": "skills/practices/testing-strategy/SKILL.md",
-      "computedHash": "a2e1b14535e049fc8c5a8ff7f0199a6f8f0cff363082c2f7ec2167bfb0402654"
+      "computedHash": "e2661d34c8dfa09df099e4437d9bff81005d6ce0bbc024a51d34e6475d50c603"
     }
   }
 }

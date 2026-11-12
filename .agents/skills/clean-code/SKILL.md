@@ -3,12 +3,14 @@ name: clean-code
 description: >
   Applies Jeyker's opinionated clean-code rules: no magic values, no flag
   parameters, guard clauses, trust in type contracts (YAGNI), Tell-Don't-Ask,
-  command-query separation, and when to extract a private method versus a new
-  class. Use when writing, refactoring, or reviewing code in any language, or
-  when deciding whether a class or method is too large.
+  command-query separation, when to extract a private method versus a new
+  class, and when to extract shared steps instead of copying a sibling class.
+  Use when writing, refactoring, or reviewing code in any language, when
+  creating a class modeled on an existing one, or when deciding whether a
+  class or method is too large.
 metadata:
   author: Jeyker-Dev
-  version: "1.0"
+  version: "1.1"
 ---
 
 # Clean Code
@@ -92,6 +94,14 @@ registerVipUser($input);
 
 Do not abstract until the third repetition; duplication is cheaper than the
 wrong abstraction [rule of three].
+
+- When you create a class by mirroring a sibling, count the siblings that
+  share the same steps first. If yours makes three or more, extract the shared
+  steps (base class with a template method, trait, or helper) before adding
+  it; do not copy them again [DRY]. Extract only when the copies change for
+  the same reason; code that merely looks alike stays duplicated.
+- Serialize each resource through one presenter or resource class. Never build
+  its array by hand in a second place [single source of truth].
 
 ## Size is a signal, not a limit
 
