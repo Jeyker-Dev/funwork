@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-12
+
+- Escape de comodines LIKE en la búsqueda de proyectos (⚡project-finder, ⚡show-projects): los caracteres especiales (`%` y `_`) ingresados por el usuario se tratan como texto literal en lugar de comodines de coincidencia total, evitando que la búsqueda devuelva todos los proyectos al ingresar `%` o coincidencias espurias con `_`.
+
 ## 2026-11-11
 
 - Descarga síncrona de carpetas en ZIP y eliminación de código asíncrono muerto (`pages::projects.files.index`, `folder-card`, `DownloadFilesZipAction`): consolidación de la descarga de carpetas como operación síncrona mediante `DownloadFilesZipAction` (recursiva, contemplando el disco de cada archivo y compatible con S3). Se renombra `downloadFolderAsync` a `downloadFolder` en el componente y tarjeta de carpetas, se remueven mensajes que sugerían procesamiento en segundo plano y se eliminan el job muerto `CreateFolderZipJob`, sus notificaciones y tests.

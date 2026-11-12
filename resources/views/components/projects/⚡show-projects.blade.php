@@ -1,8 +1,9 @@
 <?php
 
-use Livewire\Component;
 use App\Models\Project;
+use App\Support\QueryHelper;
 use Livewire\Attributes\On;
+use Livewire\Component;
 
 new class extends Component {
     public string $search = '';
@@ -11,7 +12,7 @@ new class extends Component {
     {
         return [
             'projects' => Project::where('owner_id', auth()->id())
-                ->where('name', 'like', '%' . $this->search . '%')
+                ->whereRaw("name LIKE ? ESCAPE '!'", ['%' . QueryHelper::escapeLike($this->search) . '%'])
                 ->get(),
         ];
     }

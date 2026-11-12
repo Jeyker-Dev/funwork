@@ -73,3 +73,45 @@ test('reacts to project-created event by refreshing data', function () {
     $component->dispatch('project-created')
         ->assertSee('New Dynamic Project');
 });
+
+test('searching for percent wildcard returns only project with literal percent and not every project', function () {
+    $user = User::factory()->create();
+
+    Project::factory()->create(['name' => 'Project 100%', 'owner_id' => $user->id]);
+    Project::factory()->create(['name' => 'Other Project', 'owner_id' => $user->id]);
+
+    $this->actingAs($user);
+
+    Livewire::test('projects.show-projects')
+        ->set('search', '%')
+        ->assertSee('Project 100%')
+        ->assertDontSee('Other Project');
+});
+
+test('searching for underscore wildcard matches only a project whose name literally contains underscore', function () {
+    $user = User::factory()->create();
+
+    Project::factory()->create(['name' => 'project_alpha', 'owner_id' => $user->id]);
+    Project::factory()->create(['name' => 'projectalpha', 'owner_id' => $user->id]);
+
+    $this->actingAs($user);
+
+    Livewire::test('projects.show-projects')
+        ->set('search', '_')
+        ->assertSee('project_alpha')
+        ->assertDontSee('projectalpha');
+});
+
+test('regression: searching for normal text continues to return matching projects', function () {
+    $user = User::factory()->create();
+
+    Project::factory()->create(['name' => 'Alpha Project', 'owner_id' => $user->id]);
+    Project::factory()->create(['name' => 'Beta Project', 'owner_id' => $user->id]);
+
+    $this->actingAs($user);
+
+    Livewire::test('projects.show-projects')
+        ->set('search', 'Alpha')
+        ->assertSee('Alpha Project')
+        ->assertDontSee('Beta Project');
+});
