@@ -9,6 +9,7 @@ Laravel 13. Skills de referencia: `laravel-conventions` y `testing-strategy`.
 - Storage siempre a través de los discos de Laravel, nunca con rutas absolutas.
 - Tareas pesadas en Jobs encolados; el resultado se avisa con `DatabaseNotification`.
 - Búsquedas `LIKE`: escapar comodines (`!`, `%`, `_`) mediante `App\Support\QueryHelper::escapeLike()` con `whereRaw("col LIKE ? ESCAPE '!'", ['%'.$escaped.'%'])` compatible con SQLite y MySQL (commit `0cd9d7e`).
+- Renderizado Markdown seguro: `App\Support\Markdown::toHtml(?string): HtmlString` centraliza `Str::markdown` con `html_input => 'strip'`, `allow_unsafe_links => false` y `max_nesting_level => 10` (usado por `Task` y `Decision`).
 
 ## Reglas de negocio vigentes
 
@@ -103,6 +104,12 @@ Laravel 13. Skills de referencia: `laravel-conventions` y `testing-strategy`.
 
 ### Inbox
 - Los ítems se convierten a otros elementos mediante modales.
+
+### Decisiones (ADRs, `Decision`, `App\Actions\Decisions\*`)
+- Modelo `Decision` con estado respaldado en el enum `App\Enums\DecisionStatus` (`Proposed`, `Accepted`, `Rejected`, `Superseded`), fecha opcional `decided_at`, secciones Markdown (`context`, `decision`, `consequences`) renderizadas con `App\Support\Markdown::toHtml()`, y referencia opcional `superseded_by_id` (con `nullOnDelete`).
+- Numeración correlativa por proyecto (`UNIQUE(project_id, number)`): `CreateDecisionAction` asigna `number = max(number) + 1` dentro de `DB::transaction` con `lockForUpdate()`.
+- Regla de reemplazo (`Superseded`): cuando `status` es `Superseded`, `superseded_by_id` es obligatorio, debe pertenecer al mismo proyecto y no puede apuntar a la misma decisión (`InvalidSupersedingDecisionException`). Al cambiar a otro estado, `superseded_by_id` se limpia a `null`.
+- Autorización (`DecisionPolicy`): solo el dueño del proyecto puede listar (`viewAny`), crear (`create`), ver (`view`) y editar (`update`) decisiones. No existe borrado de decisiones (una decisión se reemplaza, nunca se elimina).
 
 ### Cuenta
 - Registro público desactivado (Fortify) hasta que exista el multiusuario (Fase 5); los usuarios nuevos se crean a mano.

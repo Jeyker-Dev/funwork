@@ -43,6 +43,15 @@
             </flux:sidebar.item>
 
             <flux:sidebar.item
+                icon="scale"
+                :href="route('project.decisions', ['project' => $project])"
+                :current="request()->routeIs('project.decisions*')"
+                wire:navigate
+            >
+                {{ __('Decisions') }}
+            </flux:sidebar.item>
+
+            <flux:sidebar.item
                 icon="folder"
                 :href="route('project.files', ['project' => $project])"
                 :current="request()->routeIs('project.files' , ['project' => $project])"

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\TaskPriority;
 use App\Enums\TaskStatus;
+use App\Support\Markdown;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -51,12 +52,6 @@ class Task extends Model
         return $this->belongsToMany(User::class);
     }
 
-    private const array MARKDOWN_OPTIONS = [
-        'html_input' => 'strip',
-        'allow_unsafe_links' => false,
-        'max_nesting_level' => 10,
-    ];
-
     public const int MAX_DESCRIPTION_LENGTH = 65535;
 
     private const int EXCERPT_LENGTH = 200;
@@ -78,15 +73,7 @@ class Task extends Model
     protected function descriptionHtml(): Attribute
     {
         return Attribute::make(
-            get: function (): HtmlString {
-                if (blank($this->description)) {
-                    return new HtmlString('');
-                }
-
-                $html = Str::markdown($this->description, self::MARKDOWN_OPTIONS);
-
-                return new HtmlString($html);
-            }
+            get: fn (): HtmlString => Markdown::toHtml($this->description)
         )->shouldCache();
     }
 

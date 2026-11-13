@@ -53,7 +53,7 @@ Avance en curso: API tokens personales (SHA-256) en Settings → Integrations y 
 
 ## Fase 4 — Brain, notebooks y diseño
 
-- Módulo **Brain / Decisiones**: ADRs y notas de análisis por proyecto (el futuro "NotebookLM interno").
+- Módulo **Brain / Decisiones**: completado — ADRs por proyecto con numeración correlativa (`ADR-001`), estados (`Proposed`, `Accepted`, `Rejected`, `Superseded`), renderizado seguro de Markdown y aislamiento por propietario (el futuro "NotebookLM interno" y `log_decision` MCP quedan como siguientes pasos).
 - Editor Markdown para las páginas de los notebooks.
 - Módulo **Diseño**: links de Stitch y `DESIGN.md` por pantalla.
 - Captura rápida global (atajo de teclado → inbox de cualquier proyecto).
