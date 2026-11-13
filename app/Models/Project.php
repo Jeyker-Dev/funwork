@@ -68,6 +68,11 @@ class Project extends Model
         return $this->hasMany(InboxItem::class, 'project_id');
     }
 
+    public function decisions(): HasMany
+    {
+        return $this->hasMany(Decision::class, 'project_id');
+    }
+
     /**
      * @return array{tasks_count: int, today_tasks_count: int, inbox_count: int}
      */

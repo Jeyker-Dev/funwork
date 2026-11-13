@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-11-13
+
+- Módulo Brain / Decisiones — dominio y helper compartido de Markdown (`App\Support\Markdown`, `Decision`, `DecisionStatus`, `DecisionPolicy`, `CreateDecisionAction`, `UpdateDecisionAction`):
+  - Extracción del renderizado seguro de Markdown desde `Task` hacia `App\Support\Markdown::toHtml()` (`html_input => 'strip'`, `allow_unsafe_links => false`, `max_nesting_level => 10`), manteniendo intacto el comportamiento de `Task::description_html`.
+  - Creación de la tabla `decisions` con clave única `(project_id, number)`, modelo `Decision`, enum `DecisionStatus`, factory con estados, `DecisionPolicy` (solo dueño, sin borrado) y acciones invocables para crear decisiones con numeración secuencial por proyecto bajo `lockForUpdate()` y actualizarlas validando la regla `Superseded`.
+
 ## 2026-11-12
 
 - Cobertura de pruebas de comportamiento para búsqueda global y panel de proyecto (`ProjectFinderTest`, `ShowProjectsTest`, `ShowDashboardTest`):
