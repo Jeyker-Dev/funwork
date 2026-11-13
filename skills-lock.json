@@ -1,6 +1,12 @@
 {
   "version": 2,
   "skills": {
+    "break-ui": {
+      "source": "emilkowalski/skills",
+      "sourceType": "github",
+      "skillPath": "skills/break-ui/SKILL.md",
+      "computedHash": "accfc40025b4cc57475bebdcef52153a1598beec2794d6f11dec5cbbd79481c9"
+    },
     "clean-code": {
       "source": "Jeyker-Dev/agent-skills",
       "sourceType": "github",
@@ -12,6 +18,24 @@
       "sourceType": "github",
       "skillPath": "skills/practices/error-handling/SKILL.md",
       "computedHash": "c7b812e9336f048985fff9390af358ee4f3be129b8030db7716eb1e855302f63"
+    },
+    "fixing-accessibility": {
+      "source": "ibelick/ui-skills",
+      "sourceType": "github",
+      "skillPath": "skills/fixing-accessibility/SKILL.md",
+      "computedHash": "50fe52aae0661c5aef2d1ed868bbfcda877ce96a6ec16ffa1c8a77dc83ea9695"
+    },
+    "frontend-design": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/frontend-design/SKILL.md",
+      "computedHash": "83485963700bcf11d5bf78118facb301676b69d918fee2e45a95e7f1a2840f6c"
+    },
+    "impeccable": {
+      "source": "pbakaus/impeccable",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/impeccable/SKILL.md",
+      "computedHash": "ba6f33350863bd8138de222e55a7bf0f409ed329770a92e3db7535cbd2d0fb80"
     },
     "laravel-conventions": {
       "source": "Jeyker-Dev/agent-skills",
@@ -30,6 +54,18 @@
       "sourceType": "github",
       "skillPath": "skills/practices/testing-strategy/SKILL.md",
       "computedHash": "e2661d34c8dfa09df099e4437d9bff81005d6ce0bbc024a51d34e6475d50c603"
+    },
+    "ui-design": {
+      "source": "Jeyker-Dev/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/practices/ui-design/SKILL.md",
+      "computedHash": "42a002099254bc95ae4ad45db963d251ba0d344cda31ec948c775fc119137cc5"
+    },
+    "web-design-guidelines": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-design-guidelines/SKILL.md",
+      "computedHash": "4f68ae07187fb0d1fb78c88b503d089da4cf5a9d9625d1f2e425b1590bf96d92"
     }
   }
 }
