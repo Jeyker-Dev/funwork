@@ -38,13 +38,13 @@ Relationships:
 ## Tasks (Slices)
 - [x] **Slice 1 — Shared Markdown helper + domain**: `App\Support\Markdown` helper + `Task` refactor, `decisions` migration, `Decision` model, `DecisionStatus` enum, `DecisionFactory`, `DecisionPolicy`, `CreateDecisionAction`, `UpdateDecisionAction`, policy + action + Task Markdown regression tests, docs.
 - [x] **Slice 2 — List and show pages**: `pages::projects.decisions.index`, `pages::projects.decisions.show`, routes in `routes/web.php`, sidebar link in `sidebar.blade.php`, list filter + Markdown/XSS + policy isolation tests, docs.
-- [ ] **Slice 3 — Create/edit with DecisionForm**: `DecisionForm`, create/edit UI, status transitions including `Superseded` (same-project constraint), validation + CRUD + Superseded + policy isolation tests, docs.
+- [x] **Slice 3 — Create/edit with DecisionForm**: `DecisionForm`, create/edit UI, status transitions including `Superseded` (same-project constraint), validation + CRUD + Superseded + policy isolation tests, docs.
 
 ## Acceptance Criteria
-- [ ] Migration creates `decisions` with the FKs and the unique `(project_id, number)` index.
-- [ ] Owner sees their project's decisions listed with ADR number, title, status badge and date; status filter works.
-- [ ] Show page renders context/decision/consequences as Markdown; `<script>`, `javascript:` links and HTML attributes are stripped.
-- [ ] Owner can create a decision; numbers increment per project starting at 1, independently per project.
-- [ ] Owner can edit content and status; `Superseded` requires a superseding decision from the same project.
-- [ ] Another user gets 403/404 on list, show, create and edit of someone else's project decisions.
-- [ ] Task description rendering is unchanged after extracting the Markdown helper.
+- [x] Migration creates `decisions` with the FKs and the unique `(project_id, number)` index.
+- [x] Owner sees their project's decisions listed with ADR number, title, status badge and date; status filter works.
+- [x] Show page renders context/decision/consequences as Markdown; `<script>`, `javascript:` links and HTML attributes are stripped.
+- [x] Owner can create a decision; numbers increment per project starting at 1, independently per project.
+- [x] Owner can edit content and status; `Superseded` requires a superseding decision from the same project.
+- [x] Another user gets 403/404 on list, show, create and edit of someone else's project decisions.
+- [x] Task description rendering is unchanged after extracting the Markdown helper.

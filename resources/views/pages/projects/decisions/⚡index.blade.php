@@ -1,6 +1,9 @@
 <?php
 
+use App\Actions\Decisions\CreateDecisionAction;
 use App\Enums\DecisionStatus;
+use App\Exceptions\BusinessRuleException;
+use App\Livewire\Forms\DecisionForm;
 use App\Models\Decision;
 use App\Models\Project;
 use Livewire\Attributes\Layout;
@@ -14,6 +17,8 @@ class extends Component
 {
     public Project $project;
 
+    public DecisionForm $form;
+
     #[Url(as: 'status', except: '')]
     public string $statusFilter = '';
 
@@ -22,19 +27,35 @@ class extends Component
         $this->authorize('viewAny', [Decision::class, $project]);
 
         $this->project = $project;
+        $this->form->setProject($project);
+    }
+
+    public function createDecision(CreateDecisionAction $createDecision): void
+    {
+        $this->authorize('create', [Decision::class, $this->project]);
+
+        try {
+            $this->form->store($this->project, auth()->user(), $createDecision);
+        } catch (BusinessRuleException $exception) {
+            $this->addError('form.supersededById', $exception->getMessage());
+        }
     }
 
     public function with(): array
     {
         $status = DecisionStatus::tryFrom($this->statusFilter);
 
-        $decisions = $this->project->decisions()
-            ->when($status !== null, fn ($query) => $query->where('status', $status->value))
+        $allDecisions = $this->project->decisions()
             ->orderByDesc('number')
             ->get();
 
+        $decisions = $status !== null
+            ? $allDecisions->where('status', $status)->values()
+            : $allDecisions;
+
         return [
             'decisions' => $decisions,
+            'supersedingOptions' => $allDecisions,
             'statuses' => DecisionStatus::cases(),
         ];
     }
@@ -50,13 +71,21 @@ class extends Component
             </flux:text>
         </div>
 
-        <div class="w-48">
-            <flux:select wire:model.live="statusFilter" aria-label="Filter by status">
-                <flux:select.option value="">{{ __('All statuses') }}</flux:select.option>
-                @foreach ($statuses as $status)
-                    <flux:select.option :value="$status->value">{{ $status->label() }}</flux:select.option>
-                @endforeach
-            </flux:select>
+        <div class="flex items-center gap-3">
+            <div class="w-48">
+                <flux:select wire:model.live="statusFilter" aria-label="Filter by status">
+                    <flux:select.option value="">{{ __('All statuses') }}</flux:select.option>
+                    @foreach ($statuses as $status)
+                        <flux:select.option :value="$status->value">{{ $status->label() }}</flux:select.option>
+                    @endforeach
+                </flux:select>
+            </div>
+
+            <flux:modal.trigger name="create-decision">
+                <flux:button variant="primary" icon="plus">
+                    {{ __('New Decision') }}
+                </flux:button>
+            </flux:modal.trigger>
         </div>
     </div>
 
@@ -101,4 +130,26 @@ class extends Component
             </div>
         </flux:card>
     @endif
+
+    <flux:modal name="create-decision" class="md:w-2xl">
+        <form wire:submit="createDecision" class="space-y-6">
+            <div>
+                <flux:heading size="lg">{{ __('New Decision') }}</flux:heading>
+                <flux:text class="mt-1">{{ __('Record an architecture decision for this project.') }}</flux:text>
+            </div>
+
+            <x-projects.decisions.form-fields
+                :statuses="$statuses"
+                :superseding-options="$supersedingOptions"
+                :current-status="$form->status"
+            />
+
+            <div class="flex justify-end gap-3">
+                <flux:modal.close>
+                    <flux:button variant="ghost">{{ __('Cancel') }}</flux:button>
+                </flux:modal.close>
+                <flux:button type="submit" variant="primary">{{ __('Create Decision') }}</flux:button>
+            </div>
+        </form>
+    </flux:modal>
 </div>

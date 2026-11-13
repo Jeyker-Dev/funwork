@@ -1,5 +1,9 @@
 <?php
 
+use App\Actions\Decisions\UpdateDecisionAction;
+use App\Enums\DecisionStatus;
+use App\Exceptions\BusinessRuleException;
+use App\Livewire\Forms\DecisionForm;
 use App\Models\Decision;
 use App\Models\Project;
 use Livewire\Attributes\Layout;
@@ -14,6 +18,8 @@ class extends Component
 
     public Decision $decision;
 
+    public DecisionForm $form;
+
     public function mount(Project $project, Decision $decision): void
     {
         $this->authorize('view', $project);
@@ -21,12 +27,36 @@ class extends Component
 
         $this->project = $project;
         $this->decision = $decision->load(['supersededBy', 'creator']);
+        $this->form->setDecision($this->decision);
+    }
+
+    public function save(UpdateDecisionAction $updateDecision): void
+    {
+        $this->authorize('update', $this->decision);
+
+        try {
+            $this->form->update($this->decision, auth()->user(), $updateDecision);
+            $this->decision->refresh()->load(['supersededBy', 'creator']);
+        } catch (BusinessRuleException $exception) {
+            $this->addError('form.supersededById', $exception->getMessage());
+        }
+    }
+
+    public function with(): array
+    {
+        return [
+            'statuses' => DecisionStatus::cases(),
+            'supersedingOptions' => $this->project->decisions()
+                ->where('id', '!=', $this->decision->id)
+                ->orderByDesc('number')
+                ->get(),
+        ];
     }
 };
 ?>
 
 <div class="max-w-4xl mx-auto w-full py-6 space-y-6">
-    <div>
+    <div class="flex items-center justify-between gap-4">
         <a
             href="{{ route('project.decisions', ['project' => $project]) }}"
             class="inline-flex items-center gap-2 text-sm font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition"
@@ -35,6 +65,12 @@ class extends Component
             <flux:icon.arrow-left class="size-4" stroke-width="2.5" />
             {{ __('Back to Decisions') }}
         </a>
+
+        <flux:modal.trigger name="edit-decision">
+            <flux:button variant="filled" icon="pencil-square">
+                {{ __('Edit') }}
+            </flux:button>
+        </flux:modal.trigger>
     </div>
 
     <flux:card class="space-y-6">
@@ -98,4 +134,26 @@ class extends Component
             </section>
         </div>
     </flux:card>
+
+    <flux:modal name="edit-decision" class="md:w-2xl">
+        <form wire:submit="save" class="space-y-6">
+            <div>
+                <flux:heading size="lg">{{ __('Edit') }} {{ $decision->code }}</flux:heading>
+                <flux:text class="mt-1">{{ __('Update decision details and status.') }}</flux:text>
+            </div>
+
+            <x-projects.decisions.form-fields
+                :statuses="$statuses"
+                :superseding-options="$supersedingOptions"
+                :current-status="$form->status"
+            />
+
+            <div class="flex justify-end gap-3">
+                <flux:modal.close>
+                    <flux:button variant="ghost">{{ __('Cancel') }}</flux:button>
+                </flux:modal.close>
+                <flux:button type="submit" variant="primary">{{ __('Save Changes') }}</flux:button>
+            </div>
+        </form>
+    </flux:modal>
 </div>

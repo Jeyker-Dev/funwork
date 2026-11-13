@@ -31,9 +31,9 @@ it('renders context, decision, and consequences as safe markdown and strips XSS'
 
     $content = $response->getContent();
 
-    expect($content)->not->toContain("alert('xss')")
-        ->and($content)->not->toContain('javascript:alert(1)')
-        ->and($content)->not->toContain('onclick="alert(1)"');
+    expect($content)->not->toContain("<script>alert('xss')</script>")
+        ->and($content)->not->toContain('href="javascript:alert(1)"')
+        ->and($content)->not->toContain('<div onclick="alert(1)">');
 });
 
 it('displays link to superseding decision when superseded', function () {

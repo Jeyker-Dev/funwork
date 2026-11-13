@@ -2,6 +2,9 @@
 
 ## 2026-11-13
 
+- Módulo Brain / Decisiones — creación, edición y transiciones de estado (`DecisionForm`, `pages::projects.decisions.index`, `pages::projects.decisions.show`):
+  - Nuevo Form Object compartido `App\Livewire\Forms\DecisionForm` y parcial reutilizable `<x-projects.decisions.form-fields>` para crear decisiones desde modal en el listado y editarlas desde modal en la vista de detalle.
+  - Validación de campos requeridos, selección condicional de decisión reemplazante cuando el estado es `Superseded` (mismo proyecto, sin auto-reemplazo), manejo de `BusinessRuleException` en los componentes y pruebas en Pest.
 - Módulo Brain / Decisiones — listado, vista de detalle y navegación (`pages::projects.decisions.index`, `pages::projects.decisions.show`, `routes/web.php`, `sidebar.blade.php`):
   - Nueva página de listado `/projects/{project}/decisions` (`project.decisions`) con código correlativo (`ADR-001`), título, badge de estado, fecha `decided_at` y filtro reactivo por estado (`DecisionStatus`).
   - Nueva página de detalle `/projects/{project}/decisions/{decision}` (`project.decisions.show`) con `scopeBindings()`, renderizado seguro de Markdown (`.markdown-content`) para Context, Decision y Consequences, y enlace a la decisión reemplazante cuando está `Superseded`.
