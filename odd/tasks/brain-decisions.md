@@ -37,7 +37,7 @@ Relationships:
 
 ## Tasks (Slices)
 - [x] **Slice 1 — Shared Markdown helper + domain**: `App\Support\Markdown` helper + `Task` refactor, `decisions` migration, `Decision` model, `DecisionStatus` enum, `DecisionFactory`, `DecisionPolicy`, `CreateDecisionAction`, `UpdateDecisionAction`, policy + action + Task Markdown regression tests, docs.
-- [ ] **Slice 2 — List and show pages**: `pages::projects.decisions.index`, `pages::projects.decisions.show`, routes in `routes/web.php`, sidebar link in `sidebar.blade.php`, list filter + Markdown/XSS + policy isolation tests, docs.
+- [x] **Slice 2 — List and show pages**: `pages::projects.decisions.index`, `pages::projects.decisions.show`, routes in `routes/web.php`, sidebar link in `sidebar.blade.php`, list filter + Markdown/XSS + policy isolation tests, docs.
 - [ ] **Slice 3 — Create/edit with DecisionForm**: `DecisionForm`, create/edit UI, status transitions including `Superseded` (same-project constraint), validation + CRUD + Superseded + policy isolation tests, docs.
 
 ## Acceptance Criteria

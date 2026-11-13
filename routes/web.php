@@ -49,6 +49,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::livewire('/projects/{project}/notebooks', 'pages::projects.notebooks.index')
         ->can('view', 'project')
         ->name('project.notebooks');
+    Route::livewire('/projects/{project}/decisions', 'pages::projects.decisions.index')
+        ->can('view', 'project')
+        ->name('project.decisions');
+    Route::livewire('/projects/{project}/decisions/{decision}', 'pages::projects.decisions.show')
+        ->scopeBindings()
+        ->can('view', 'project')
+        ->can('view', 'decision')
+        ->name('project.decisions.show');
     Route::livewire('/projects/{project}/files', 'pages::projects.files.index')
         ->can('view', 'project')
         ->name('project.files');

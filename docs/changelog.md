@@ -2,6 +2,10 @@
 
 ## 2026-11-13
 
+- Módulo Brain / Decisiones — listado, vista de detalle y navegación (`pages::projects.decisions.index`, `pages::projects.decisions.show`, `routes/web.php`, `sidebar.blade.php`):
+  - Nueva página de listado `/projects/{project}/decisions` (`project.decisions`) con código correlativo (`ADR-001`), título, badge de estado, fecha `decided_at` y filtro reactivo por estado (`DecisionStatus`).
+  - Nueva página de detalle `/projects/{project}/decisions/{decision}` (`project.decisions.show`) con `scopeBindings()`, renderizado seguro de Markdown (`.markdown-content`) para Context, Decision y Consequences, y enlace a la decisión reemplazante cuando está `Superseded`.
+  - Enlace "Decisions" agregado al sidebar de proyecto junto a Notebooks.
 - Módulo Brain / Decisiones — dominio y helper compartido de Markdown (`App\Support\Markdown`, `Decision`, `DecisionStatus`, `DecisionPolicy`, `CreateDecisionAction`, `UpdateDecisionAction`):
   - Extracción del renderizado seguro de Markdown desde `Task` hacia `App\Support\Markdown::toHtml()` (`html_input => 'strip'`, `allow_unsafe_links => false`, `max_nesting_level => 10`), manteniendo intacto el comportamiento de `Task::description_html`.
   - Creación de la tabla `decisions` con clave única `(project_id, number)`, modelo `Decision`, enum `DecisionStatus`, factory con estados, `DecisionPolicy` (solo dueño, sin borrado) y acciones invocables para crear decisiones con numeración secuencial por proyecto bajo `lockForUpdate()` y actualizarlas validando la regla `Superseded`.
