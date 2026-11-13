@@ -14,17 +14,32 @@ x-app: &app
             condition: service_healthy
 
 services:
-    app:
-        <<: *app
+    # Single public entry point. Terminates TLS and routes each domain to its app,
+    # so other stacks on this VPS (e.g. the mobile apps API) can share ports 80/443.
+    caddy:
+        image: 'caddy:2.10'
+        restart: unless-stopped
         ports:
             - '80:80'
             - '443:443'
             - '443:443/udp'
+        configs:
+            - source: caddyfile
+              target: /etc/caddy/Caddyfile
         volumes:
-            - 'storage:/app/storage/app'
             # Let's Encrypt certificates; losing them would hit rate limits on redeploy.
             - 'caddy_data:/data'
             - 'caddy_config:/config'
+        networks:
+            - edge
+        depends_on:
+            - app
+
+    app:
+        <<: *app
+        networks:
+            - funwork
+            - edge
 
     queue:
         <<: *app
@@ -59,6 +74,19 @@ services:
 networks:
     funwork:
         driver: bridge
+    # Fixed name so other compose projects can join it as an external network
+    # and be reached by Caddy.
+    edge:
+        name: edge
+        driver: bridge
+
+configs:
+    caddyfile:
+        content: |
+            ${APP_DOMAIN} {
+                encode zstd gzip
+                reverse_proxy app:8000
+            }
 
 volumes:
     storage:
