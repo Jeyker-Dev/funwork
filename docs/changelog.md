@@ -2,6 +2,11 @@
 
 ## 2026-11-12
 
+- Cobertura de pruebas de comportamiento para búsqueda global y panel de proyecto (`ProjectFinderTest`, `ShowProjectsTest`, `ShowDashboardTest`):
+  - En `⚡project-finder` y `⚡show-projects`, se agregaron pruebas de aislamiento por propietario (los proyectos de otros usuarios nunca aparecen en el listado ni al buscar), exclusión efectiva del proyecto actual cuando su nombre coincide con la búsqueda, límite de 3 resultados en el selector del header, enlaces a `projects.show` y omisión de fecha de vencimiento cuando `due_at` es nulo.
+  - En el panel de proyecto (`⚡show.blade.php`), se agregaron pruebas de saludo con el nombre visible del usuario, renderizado de métricas con respaldo al total de tareas abiertas cuando no hay tareas para hoy, exclusión de tareas futuras o sin fecha en "Urgent Tasks" (orden ascendente por vencimiento y límite de 5), estados vacíos de tareas urgentes y actividad reciente, enlace "View All" hacia tareas y límite de 5 elementos en actividad reciente.
+  - Se verificó que `resources/views/dashboard.blade.php` (placeholder del starter kit) no tiene ruta registrada en `routes/web.php`, aunque `route('dashboard')` sigue referenciada en `resources/views/welcome.blade.php` y `resources/views/pages/settings/⚡profile.blade.php`.
+
 - Alineación de Actions con la convención invocable (`app/Actions/*`, `laravel-conventions`):
   - Todas las clases en `app/Actions` (salvo `app/Actions/Fortify`, que responde a contratos del paquete) exponen únicamente `__invoke()`, eliminando `execute()` y la duplicidad de APIs. Se actualizaron todos los puntos de llamada (vistas Livewire SFC, controladores, Jobs, herramientas MCP, otras Actions y tests) para invocar la acción directamente (`($this->action)(...)` o `app(Action::class)(...)`).
   - Reubicación de `ReorderTasks` a `App\Actions\Tasks\ReorderTasksAction` (`app/Actions/Tasks/ReorderTasksAction.php`), actualizando sus componentes Livewire consumidores (`⚡show-tasks`, `⚡task-board`) y sus tests asociados.

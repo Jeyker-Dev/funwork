@@ -115,3 +115,35 @@ test('regression: searching for normal text continues to return matching project
         ->assertSee('Alpha Project')
         ->assertDontSee('Beta Project');
 });
+
+test('never shows other users projects in the list or search results', function () {
+    $user = User::factory()->create();
+    $otherUser = User::factory()->create();
+
+    Project::factory()->create(['name' => 'My Project', 'owner_id' => $user->id]);
+    Project::factory()->create(['name' => 'Foreign Project', 'owner_id' => $otherUser->id]);
+
+    $this->actingAs($user);
+
+    Livewire::test('projects.show-projects')
+        ->assertSee('My Project')
+        ->assertDontSee('Foreign Project')
+        ->set('search', 'Foreign')
+        ->assertDontSee('Foreign Project');
+});
+
+test('links each project card to its dashboard and omits due date when unset', function () {
+    $user = User::factory()->create();
+    $project = Project::factory()->create([
+        'name' => 'Undated Project',
+        'due_at' => null,
+        'owner_id' => $user->id,
+    ]);
+
+    $this->actingAs($user);
+
+    Livewire::test('projects.show-projects')
+        ->assertSee('Undated Project')
+        ->assertSeeHtml(route('projects.show', ['project' => $project]))
+        ->assertDontSee('Due:');
+});

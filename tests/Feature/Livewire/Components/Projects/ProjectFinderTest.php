@@ -69,3 +69,51 @@ test('regression: searching for normal text continues to return matching project
         ->assertSee('Alpha Project')
         ->assertDontSee('Beta Project');
 });
+
+test('excludes current project from search results even when its name matches', function () {
+    $user = User::factory()->create();
+    $currentProject = Project::factory()->create(['name' => 'Current Alpha', 'owner_id' => $user->id]);
+    $otherProject = Project::factory()->create(['name' => 'Current Beta', 'owner_id' => $user->id]);
+
+    Livewire::actingAs($user)
+        ->test('projects.project-finder', ['project' => $currentProject])
+        ->set('search', 'Current')
+        ->assertSee('Current Beta')
+        ->assertSeeHtml(route('projects.show', ['project' => $otherProject]))
+        ->assertDontSeeHtml(route('projects.show', ['project' => $currentProject]));
+});
+
+test('never shows other users projects in search results', function () {
+    $user = User::factory()->create();
+    $otherUser = User::factory()->create();
+    $currentProject = Project::factory()->create(['name' => 'Current Project', 'owner_id' => $user->id]);
+    Project::factory()->create(['name' => 'Secret Project', 'owner_id' => $otherUser->id]);
+
+    Livewire::actingAs($user)
+        ->test('projects.project-finder', ['project' => $currentProject])
+        ->assertDontSee('Secret Project')
+        ->set('search', 'Secret')
+        ->assertDontSee('Secret Project');
+});
+
+test('limits search results to at most three projects and links each to its dashboard', function () {
+    $user = User::factory()->create();
+    $currentProject = Project::factory()->create(['name' => 'Current Project', 'owner_id' => $user->id]);
+    $otherProjects = Project::factory()->count(4)->sequence(
+        ['name' => 'Match One'],
+        ['name' => 'Match Two'],
+        ['name' => 'Match Three'],
+        ['name' => 'Match Four'],
+    )->create(['owner_id' => $user->id]);
+
+    $html = Livewire::actingAs($user)
+        ->test('projects.project-finder', ['project' => $currentProject])
+        ->set('search', 'Match')
+        ->html();
+
+    $matchedLinks = $otherProjects->filter(
+        fn (Project $project): bool => str_contains($html, route('projects.show', ['project' => $project]))
+    );
+
+    expect($matchedLinks)->toHaveCount(3);
+});
