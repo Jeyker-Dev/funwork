@@ -1,6 +1,7 @@
 # syntax=docker/dockerfile:1
 
-# Production image: Laravel Octane on FrankenPHP (Caddy with automatic HTTPS).
+# Production image: Laravel Octane on FrankenPHP, serving plain HTTP on port 8000.
+# TLS is terminated by the standalone Caddy service in compose.prod.yml.
 # Local development uses Laravel Sail (compose.yaml), not this file.
 
 # --- Stage 1: PHP dependencies -------------------------------------------------
@@ -55,9 +56,8 @@ COPY docker/entrypoint.sh /usr/local/bin/entrypoint
 
 ARG USER=appuser
 
-# Run as a non-root user that can still bind ports 80/443.
+# Run as a non-root user; port 8000 needs no extra capabilities.
 RUN useradd --create-home --shell /bin/sh ${USER} \
-    && setcap CAP_NET_BIND_SERVICE=+eip /usr/local/bin/frankenphp \
     && mkdir -p storage/app/public storage/framework/cache/data storage/framework/sessions \
         storage/framework/views storage/logs bootstrap/cache \
     && php artisan package:discover --ansi \
@@ -68,4 +68,4 @@ USER ${USER}
 
 ENTRYPOINT ["entrypoint"]
 
-CMD ["sh", "-c", "php artisan octane:frankenphp --host=${APP_DOMAIN} --port=443 --https --http-redirect --admin-host=127.0.0.1"]
+CMD ["php", "artisan", "octane:frankenphp", "--host=0.0.0.0", "--port=8000", "--admin-host=127.0.0.1"]

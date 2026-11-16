@@ -15,6 +15,8 @@
 
 ## 2026-11-12
 
+- Proxy de entrada independiente en producción: Caddy deja de vivir dentro del contenedor de FunWork y pasa a ser el servicio `caddy` de `compose.prod.yml`, dueño de los puertos 80/443 y de los certificados (se reutiliza el volumen `caddy_data`). `app` sirve HTTP en el puerto 8000 dentro de las redes `funwork` y `edge`, y Laravel confía en los encabezados del proxy. Así otros servicios del VPS, como la API de las apps móviles, pueden compartir los puertos 80/443.
+
 - Cobertura de pruebas de comportamiento para búsqueda global y panel de proyecto (`ProjectFinderTest`, `ShowProjectsTest`, `ShowDashboardTest`):
   - En `⚡project-finder` y `⚡show-projects`, se agregaron pruebas de aislamiento por propietario (los proyectos de otros usuarios nunca aparecen en el listado ni al buscar), exclusión efectiva del proyecto actual cuando su nombre coincide con la búsqueda, límite de 3 resultados en el selector del header, enlaces a `projects.show` y omisión de fecha de vencimiento cuando `due_at` es nulo.
   - En el panel de proyecto (`⚡show.blade.php`), se agregaron pruebas de saludo con el nombre visible del usuario, renderizado de métricas con respaldo al total de tareas abiertas cuando no hay tareas para hoy, exclusión de tareas futuras o sin fecha en "Urgent Tasks" (orden ascendente por vencimiento y límite de 5), estados vacíos de tareas urgentes y actividad reciente, enlace "View All" hacia tareas y límite de 5 elementos en actividad reciente.
