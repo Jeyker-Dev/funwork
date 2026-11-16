@@ -7,8 +7,10 @@ use App\Exceptions\Notebooks\NotebookPageCannotBeEmptyException;
 use App\Models\Notebook;
 use App\Models\NotebookPage;
 use App\Models\Project;
+use App\Support\Markdown;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\HtmlString;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -61,6 +63,12 @@ class extends Component {
     public function currentPageIndex(): int
     {
         return $this->notebook->pages()->where('order', '<=', $this->page->order)->count();
+    }
+
+    #[Computed]
+    public function previewHtml(): HtmlString
+    {
+        return Markdown::toHtml($this->content);
     }
 
     public function updatedTitle(): void
@@ -146,10 +154,45 @@ class extends Component {
 };
 ?>
 
-<div class="flex flex-col h-screen w-full max-w-5xl mx-auto px-6 pt-8 pb-4" x-data="{
+<div class="flex flex-col min-h-screen w-full max-w-5xl mx-auto px-6 pt-8 pb-4" x-data="{
+    mode: 'write',
+    hasPendingSync: false,
+    isMac: /Mac|iPhone|iPad|iPod/i.test(navigator.platform || ''),
+    init() {
+        this.$wire.$hook('commit', ({ succeed }) => {
+            succeed(() => {
+                this.hasPendingSync = false;
+            });
+        });
+
+        this.$watch('mode', async (value) => {
+            if (value === 'preview' && this.hasPendingSync) {
+                this.hasPendingSync = false;
+                await this.$wire.$commit();
+            }
+        });
+    },
+    toggleMode(focusEditor = false) {
+        this.mode = this.mode === 'write' ? 'preview' : 'write';
+
+        if (this.mode === 'write' && focusEditor) {
+            this.$nextTick(() => this.$refs.bodyInput?.focus());
+        }
+    },
     handleKeydown(e) {
+        if (! this.$el.isConnected) {
+            return;
+        }
+
         if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-            @this.createNextPage();
+            this.$wire.createNextPage();
+
+            return;
+        }
+
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && ! e.altKey && e.key.toLowerCase() === 'p' && ! e.repeat) {
+            e.preventDefault();
+            this.toggleMode(true);
         }
     }
 }" @keydown.window="handleKeydown">
@@ -212,21 +255,48 @@ class extends Component {
     @endif
 
     <!-- Canvas (Editor) -->
-    <div class="flex-grow flex flex-col w-full max-w-3xl mx-auto">
+    <div class="flex-grow flex flex-col w-full max-w-3xl mx-auto min-w-0">
         <input type="text"
                wire:model.live.debounce.1000ms="title"
                placeholder="Optional title..."
+               aria-label="Page title"
                x-data="{ focused: false }"
                @focus="focused = true"
                @blur="focused = false"
-               :class="($wire.title || focused) ? 'text-4xl md:text-5xl mb-8 opacity-100' : 'text-xl mb-4 opacity-40 hover:opacity-100'"
+               :class="($wire.title || focused) ? 'text-4xl md:text-5xl mb-6 opacity-100' : 'text-xl mb-4 opacity-40 hover:opacity-100'"
                class="w-full bg-transparent border-0 ring-0 focus:ring-0 outline-none font-bold text-zinc-900 dark:text-zinc-100 placeholder-zinc-300 dark:placeholder-zinc-700 px-0 transition-all duration-300"/>
 
+        <div class="flex items-center justify-between gap-3 mb-6 pb-3 border-b border-zinc-200/80 dark:border-zinc-800/80" wire:ignore>
+            <flux:radio.group variant="segmented" size="sm" x-model="mode" aria-label="Editor mode">
+                <flux:radio value="write" icon="pencil-square" checked>Write</flux:radio>
+                <flux:radio value="preview" icon="eye">Preview</flux:radio>
+            </flux:radio.group>
+
+            <span class="hidden sm:inline text-xs text-zinc-500 dark:text-zinc-400" x-text="isMac ? '⌘⇧P to toggle' : 'Ctrl+Shift+P to toggle'"></span>
+        </div>
+
         <textarea
+            x-ref="bodyInput"
+            x-show="mode === 'write'"
             wire:model.live.debounce.1000ms="content"
+            @input="hasPendingSync = true"
+            aria-label="Page content"
             class="w-full flex-grow bg-transparent border-0 ring-0 focus:ring-0 resize-none outline-none text-lg leading-relaxed text-zinc-800 dark:text-zinc-200 placeholder-zinc-300 dark:placeholder-zinc-700 px-0"
             placeholder="Start writing..."
         ></textarea>
+
+        <div
+            x-show="mode === 'preview'"
+            x-cloak
+            style="display: none;"
+            class="flex-grow min-w-0 w-full"
+        >
+            @if (blank($this->previewHtml->toHtml()))
+                <p class="text-lg leading-relaxed text-zinc-500 dark:text-zinc-400 italic">Nothing to preview</p>
+            @else
+                <div class="markdown-content min-w-0">{!! $this->previewHtml !!}</div>
+            @endif
+        </div>
     </div>
 
     <!-- Footer Navigation -->
