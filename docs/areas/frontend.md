@@ -32,6 +32,7 @@ Livewire v4 SFC + Flux / Flux Pro + Alpine v3 + Tailwind. Skill de referencia: `
 
 ### Notebooks
 - Estado vacío: "No Notebooks, Yet.". Lista con filtros. Editor de páginas.
+- **Vista previa Markdown en el editor (`pages::projects.notebooks.pages.editor`):** selector segmentado `Write` / `Preview` (estado de sesión en Alpine con `Write` por defecto y atajo `Ctrl/Cmd+Shift+P`). El modo `Write` conserva intacto el `<textarea>` con autoguardado de Markdown crudo en `content['body']`; el modo `Preview` renderiza en servidor mediante `previewHtml` (`App\Support\Markdown::toHtml()`) dentro de `.markdown-content` con scroll horizontal en bloques de código/tablas, o muestra `"Nothing to preview"` si el cuerpo está vacío.
 - **Insignia y cambio de área:** badge `<flux:badge size="sm" :color="$notebook->area->color">` en la tarjeta de notebook (`⚡show-notebooks`), selector de área en creación (`⚡create-notebook`), y modal para "Change area" desde el menú contextual de cada notebook.
 
 ### Archivos

@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-11-16
+
+- Vista previa Markdown en el editor de páginas de notebooks (`pages::projects.notebooks.pages.editor`, `tests/Feature/NotebookPageEditorTest.php`):
+  - Selector segmentado `Write` / `Preview` junto al título de la página (por defecto `Write`, recordado en la sesión con Alpine) y atajo de teclado `Ctrl/Cmd+Shift+P` activo solo mientras la página del editor está abierta.
+  - Renderizado en servidor mediante la propiedad computada `previewHtml` usando `App\Support\Markdown::toHtml()` dentro de `.markdown-content` (con scroll horizontal para bloques de código y tablas, y mensaje atenuado `"Nothing to preview"` cuando el cuerpo está vacío), sincronizando cambios pendientes al pasar a `Preview` y preservando intacto el autoguardado en Markdown crudo dentro de `content['body']`.
+
 ## 2026-11-13
 
 - Módulo Brain / Decisiones — creación, edición y transiciones de estado (`DecisionForm`, `pages::projects.decisions.index`, `pages::projects.decisions.show`):
