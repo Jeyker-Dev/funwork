@@ -3,6 +3,7 @@
 namespace App\Mcp\Support;
 
 use App\Models\Area;
+use App\Models\Decision;
 use App\Models\InboxItem;
 use App\Models\Project;
 use App\Models\Task;
@@ -85,6 +86,36 @@ class McpPresenter
             'description' => $task->description,
             'created_at' => $task->created_at?->toISOString(),
             'updated_at' => $task->updated_at?->toISOString(),
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function decisionSummary(Decision $decision): array
+    {
+        return [
+            'id' => $decision->id,
+            'project_id' => $decision->project_id,
+            'code' => $decision->code,
+            'title' => $decision->title,
+            'status' => $decision->status->value,
+            'decided_at' => $decision->decided_at?->format('Y-m-d'),
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function decisionDetail(Decision $decision): array
+    {
+        return [
+            ...self::decisionSummary($decision),
+            'context' => $decision->context,
+            'decision' => $decision->decision,
+            'consequences' => $decision->consequences,
+            'created_at' => $decision->created_at?->toISOString(),
+            'updated_at' => $decision->updated_at?->toISOString(),
         ];
     }
 }

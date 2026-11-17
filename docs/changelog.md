@@ -2,6 +2,10 @@
 
 ## 2026-11-16
 
+- Herramientas MCP `log_decision` y `list_decisions` (`FunWorkServer`, `LogDecisionTool`, `ListDecisionsTool`, `McpPresenter`, `tests/Feature/Mcp/DecisionToolsTest.php`):
+  - Nueva herramienta `log_decision` para registrar decisiones (ADRs) desde agentes validando `Proposed`, `Accepted` o `Rejected` (sin `Superseded`), asignando `decided_at` al día actual cuando es `Accepted` o `Rejected` y `null` cuando es `Proposed`, delegando numeración correlativa y autorización en `CreateDecisionAction`.
+  - Nueva herramienta de solo lectura `list_decisions` para listar los ADRs de un proyecto ordenados por `number` con filtro opcional por estado y autorización `DecisionPolicy::viewAny`.
+  - Incorporación de `McpPresenter::decisionSummary()` y `McpPresenter::decisionDetail()` y registro en `FunWorkServer`.
 - Consolidación del despliegue a producción en `git ship` (`scripts/deploy.sh`) y limpieza de workflows en `.github/workflows/`:
   - Eliminación de los workflows redundantes de despliegue y sincronización de documentación en GitHub Actions para dejar `git ship` como único camino de deploy al VPS.
   - Restricción de CI (`lint.yml` y `tests.yml`) a `push` y `pull_request` sobre `master`, retirando las ramas obsoletas.
