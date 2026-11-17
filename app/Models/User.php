@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Support\DateHelper;
+use Carbon\CarbonInterface;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -16,12 +17,26 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 
-#[Fillable(['name', 'username', 'email', 'password', 'timezone', 'profile_photo_path'])]
+#[Fillable([
+    'name',
+    'username',
+    'email',
+    'password',
+    'timezone',
+    'profile_photo_path',
+    'digest_enabled',
+    'digest_hour',
+    'last_digest_sent_at',
+])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, TwoFactorAuthenticatable;
+
+    public const int DEFAULT_DIGEST_HOUR = 8;
+
+    private const string S3_DISK = 's3';
 
     /**
      * Get the attributes that should be cast.
@@ -33,7 +48,25 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'digest_enabled' => 'boolean',
+            'digest_hour' => 'integer',
+            'last_digest_sent_at' => 'datetime',
         ];
+    }
+
+    public function updateDigestSettings(bool $digestEnabled, int $digestHour): void
+    {
+        $this->update([
+            'digest_enabled' => $digestEnabled,
+            'digest_hour' => $digestHour,
+        ]);
+    }
+
+    public function markDailyDigestSent(?CarbonInterface $sentAt = null): void
+    {
+        $this->update([
+            'last_digest_sent_at' => $sentAt ?? now(),
+        ]);
     }
 
     /**
@@ -53,7 +86,7 @@ class User extends Authenticatable
             $disk = config('filesystems.default');
 
             // If the disk is s3, generate a temporary signed URL valid for 1 hour
-            if ($disk === 's3') {
+            if ($disk === self::S3_DISK) {
                 return Storage::disk($disk)->temporaryUrl(
                     $this->profile_photo_path,
                     now()->addMinutes(60)

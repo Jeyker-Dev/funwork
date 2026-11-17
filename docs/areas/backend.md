@@ -111,9 +111,11 @@ Laravel 13. Skills de referencia: `laravel-conventions` y `testing-strategy`.
 - Regla de reemplazo (`Superseded`): cuando `status` es `Superseded`, `superseded_by_id` es obligatorio, debe pertenecer al mismo proyecto y no puede apuntar a la misma decisión (`InvalidSupersedingDecisionException`). Al cambiar a otro estado, `superseded_by_id` se limpia a `null`.
 - Autorización (`DecisionPolicy`): solo el dueño del proyecto puede listar (`viewAny`), crear (`create`), ver (`view`) y editar (`update`) decisiones. No existe borrado de decisiones (una decisión se reemplaza, nunca se elimina).
 
-### Cuenta
+### Cuenta y digest matutino
 - Registro público desactivado (Fortify) hasta que exista el multiusuario (Fase 5); los usuarios nuevos se crean a mano.
 - Avatares en S3 con URLs temporales firmadas (el bucket es privado y no se usan ACL públicas).
+- **Scopes compartidos de vencimiento en `Task`:** `Task::open()`, `Task::overdue($localToday)`, `Task::dueToday($localToday)`, `Task::urgent($localToday)` y `Task::dueSoon($localToday, $days = 3)` centralizan el cálculo de tareas abiertas por fecha local (`DateHelper::userToday()` / `$user->localDate()`), reutilizados tanto por `Project::dashboardStats()` y el panel del proyecto como por el digest diario.
+- **Agregador del digest (`BuildDailyDigestAction`, `DailyDigestData`):** compila únicamente proyectos activos del usuario (`$user->projects()->whereNull('archived_at')`), excluyendo tareas `Done`, segmentado en vencidas, para hoy, próximos 3 días e ítems de inbox sin procesar. Si las cuatro secciones están vacías, `DailyDigestData::isEmpty()` permite suprimir el envío.
 
 ### API tokens y servidor MCP (`laravel/mcp`, `FunWorkServer`)
 - **Emisión y almacenamiento (`CreateApiTokenAction`, `ApiToken`):**

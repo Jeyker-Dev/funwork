@@ -14,6 +14,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::livewire('settings/integrations', 'pages::settings.integrations')->name('integrations.edit');
 
+    Route::livewire('settings/notifications', 'pages::settings.notifications')->name('notifications.edit');
+
     Route::livewire('settings/security', 'pages::settings.security')
         ->middleware(
             when(

@@ -41,8 +41,9 @@ Livewire v4 SFC + Flux / Flux Pro + Alpine v3 + Tailwind. Skill de referencia: `
 - **Búsqueda global** con `wire:model.live.debounce`; durante la búsqueda las cards muestran un breadcrumb truncado con tooltip; al limpiarla se vuelve a la carpeta original.
 - **Renombrar:** el input aparece enfocado y la extensión se muestra como sufijo no editable.
 
-### Ajustes (`settings/integrations`)
+### Ajustes (`settings/integrations`, `settings/notifications`)
 - Tarjeta de conexión/desconexión con Google Docs y tarjeta **API Tokens (MCP)** (`pages::settings.integrations`): formulario para crear tokens por nombre, modal Flux (`api-token-created`) con `<flux:input readonly copyable>` que revela el token en texto plano una sola vez, listado de tokens propios con fecha de creación y último uso, y revocación con modal de confirmación (`revoke-api-token`).
+- **Notificaciones (`pages::settings.notifications`, ruta `notifications.edit`):** interruptor `Enable morning digest` (`digest_enabled`) y selector horario por hora entera `00:00`–`23:00` (`digest_hour`) evaluado en la zona horaria del perfil del usuario.
 
 ## Deuda técnica / pendientes
 

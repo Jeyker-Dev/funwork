@@ -5,28 +5,32 @@ namespace App\Models;
 use App\Enums\TaskPriority;
 use App\Enums\TaskStatus;
 use App\Support\Markdown;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 
+#[Fillable([
+    'title',
+    'description',
+    'project_id',
+    'position',
+    'status',
+    'due_date',
+    'priority',
+    'area_id',
+])]
 class Task extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'title',
-        'description',
-        'project_id',
-        'position',
-        'status',
-        'due_date',
-        'priority',
-        'area_id',
-    ];
+    public const int DUE_SOON_DAYS = 3;
 
     protected function casts(): array
     {
@@ -50,6 +54,55 @@ class Task extends Model
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class);
+    }
+
+    /**
+     * @param  Builder<Task>  $query
+     * @return Builder<Task>
+     */
+    public function scopeOpen(Builder $query): Builder
+    {
+        return $query->where('status', '!=', TaskStatus::Done->value);
+    }
+
+    /**
+     * @param  Builder<Task>  $query
+     * @return Builder<Task>
+     */
+    public function scopeOverdue(Builder $query, string $localToday): Builder
+    {
+        return $query->open()->whereDate('due_date', '<', $localToday);
+    }
+
+    /**
+     * @param  Builder<Task>  $query
+     * @return Builder<Task>
+     */
+    public function scopeDueToday(Builder $query, string $localToday): Builder
+    {
+        return $query->open()->whereDate('due_date', $localToday);
+    }
+
+    /**
+     * @param  Builder<Task>  $query
+     * @return Builder<Task>
+     */
+    public function scopeUrgent(Builder $query, string $localToday): Builder
+    {
+        return $query->open()->whereDate('due_date', '<=', $localToday);
+    }
+
+    /**
+     * @param  Builder<Task>  $query
+     * @return Builder<Task>
+     */
+    public function scopeDueSoon(Builder $query, string $localToday, int $days = self::DUE_SOON_DAYS): Builder
+    {
+        $upcomingEnd = Carbon::parse($localToday)->addDays($days)->toDateString();
+
+        return $query->open()
+            ->whereDate('due_date', '>', $localToday)
+            ->whereDate('due_date', '<=', $upcomingEnd);
     }
 
     public const int MAX_DESCRIPTION_LENGTH = 65535;

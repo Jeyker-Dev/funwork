@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use App\Enums\TaskStatus;
 use App\Support\DateHelper;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,20 +12,19 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
+#[Fillable([
+    'owner_id',
+    'name',
+    'description',
+    'icon',
+    'type',
+    'archived_at',
+    'status',
+    'due_at',
+])]
 class Project extends Model
 {
     use HasFactory;
-
-    protected $fillable = [
-        'owner_id',
-        'name',
-        'description',
-        'icon',
-        'type',
-        'archived_at',
-        'status',
-        'due_at',
-    ];
 
     public function owner(): BelongsTo
     {
@@ -82,17 +82,19 @@ class Project extends Model
 
         return [
             'tasks_count' => $this->tasks()
-                ->where('status', '!=', TaskStatus::Done->value)
+                ->open()
                 ->count(),
             'today_tasks_count' => $this->tasks()
-                ->where('status', '!=', TaskStatus::Done->value)
-                ->whereDate('due_date', $localToday)
+                ->dueToday($localToday)
                 ->count(),
             'inbox_count' => $this->inboxItems()->count(),
         ];
     }
 
-    public function getRecentActivities()
+    /**
+     * @return Collection<int, Notebook|ProjectFile>
+     */
+    public function getRecentActivities(): Collection
     {
         $notebooks = $this->notebooks()
             ->select('id', 'name', 'created_by', 'updated_at', DB::raw("'notebook' as type"));

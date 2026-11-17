@@ -2,6 +2,9 @@
 
 ## 2026-11-17
 
+- Digest diario — dominio, agregador y preferencias de usuario (`BuildDailyDigestAction`, `DailyDigestData`, `pages::settings.notifications`):
+  - Nueva migración en `users` (`digest_enabled`, `digest_hour`, `last_digest_sent_at`), scopes compartidos de vencimiento en `Task` reutilizados por el dashboard del proyecto y nuevo agregador `BuildDailyDigestAction` por proyectos activos y zona horaria del usuario.
+  - Nueva página `Settings → Notifications` (`/settings/notifications`) para activar el resumen matutino y elegir la hora de entrega preferida.
 - Módulo **Decisions** de FunWork como única fuente de verdad para ADRs (`docs/README.md`, `docs/01-architecture.md`, `docs/roadmap.md`, `AGENTS.md`, `docs/archive/decisions/`):
   - Migración de los ADRs en Markdown al módulo Decisions del proyecto FunWork (archivados como solo lectura en `docs/archive/decisions/`).
   - Actualización de la documentación y guías de agentes para consultar (`list_decisions`) y registrar (`log_decision`) ADRs directamente en FunWork.
