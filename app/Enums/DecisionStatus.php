@@ -23,4 +23,18 @@ enum DecisionStatus: string
     {
         return $this->value;
     }
+
+    /**
+     * Statuses allowed when creating a new decision via MCP.
+     *
+     * @return list<self>
+     */
+    public static function loggableCases(): array
+    {
+        return [
+            self::Proposed,
+            self::Accepted,
+            self::Rejected,
+        ];
+    }
 }
