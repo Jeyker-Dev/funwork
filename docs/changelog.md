@@ -2,6 +2,10 @@
 
 ## 2026-11-16
 
+- Consolidación del despliegue a producción en `git ship` (`scripts/deploy.sh`) y limpieza de workflows en `.github/workflows/`:
+  - Eliminación de los workflows redundantes de despliegue y sincronización de documentación en GitHub Actions para dejar `git ship` como único camino de deploy al VPS.
+  - Restricción de CI (`lint.yml` y `tests.yml`) a `push` y `pull_request` sobre `master`, retirando las ramas obsoletas.
+  - Actualización de `docs/01-architecture.md` y `docs/roadmap.md` para reflejar el flujo único de despliegue y CI en `master`.
 - Vista previa Markdown en el editor de páginas de notebooks (`pages::projects.notebooks.pages.editor`, `tests/Feature/NotebookPageEditorTest.php`):
   - Selector segmentado `Write` / `Preview` junto al título de la página (por defecto `Write`, recordado en la sesión con Alpine) y atajo de teclado `Ctrl/Cmd+Shift+P` activo solo mientras la página del editor está abierta.
   - Renderizado en servidor mediante la propiedad computada `previewHtml` usando `App\Support\Markdown::toHtml()` dentro de `.markdown-content` (con scroll horizontal para bloques de código y tablas, y mensaje atenuado `"Nothing to preview"` cuando el cuerpo está vacío), sincronizando cambios pendientes al pasar a `Preview` y preservando intacto el autoguardado en Markdown crudo dentro de `content['body']`.

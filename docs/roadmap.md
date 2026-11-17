@@ -41,7 +41,7 @@ Avance en curso: Áreas por proyecto implementadas (gestión CRUD con modal Flux
 - **Áreas como dato:** completado — áreas configurables por proyecto (`frontend`, `backend`, `database`, `design` por defecto con colores de badges Flux), etiquetas en tareas y notebooks, modal de gestión para el dueño y filtro reactivo por área en el tablero.
 - **Importador de tareas:** completado — importador en lote pegando la salida de NotebookLM en formato `- [ ] [AREA] Título — criterio — depende de: X` con vista previa, validación de errores y advertencias, resolución de áreas, asignación al usuario actual y creación transaccional.
 - **Project pack:** exportar a Markdown los notebooks, las tareas y las decisiones del proyecto para subirlo a NotebookLM. Las páginas ya son JSON `{title, body}` en texto plano.
-- **Espejo de `docs/` (adelantado, sprint del 2026-11-04):** el repo sigue siendo la fuente de verdad; un workflow de GitHub ejecuta `funwork:sync-docs` en el VPS por SSH y copia `docs/` al notebook "Docs" del proyecto FunWork. Así el Project pack incluye los docs y NotebookLM se refresca con "Sync" en Google Docs.
+- **Espejo de `docs/` (adelantado, sprint del 2026-11-04):** el repo sigue siendo la fuente de verdad; el despliegue mediante `git ship` (`scripts/deploy.sh`) ejecuta `funwork:sync-docs` en el VPS por SSH y copia `docs/` al notebook "Docs" del proyecto FunWork como único camino de deploy (la CI con `lint.yml` y `tests.yml` corre en `master` y PRs). Así el Project pack incluye los docs y NotebookLM se refresca con "Sync" en Google Docs.
 
 ## Fase 3 — FunWork como servidor MCP para Antigravity
 
