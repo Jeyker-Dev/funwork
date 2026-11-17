@@ -34,7 +34,8 @@ composer config http-basic.composer.fluxui.dev "${FLUX_USERNAME}" "${FLUX_LICENS
 
 ## Documentación
 
-`docs/` es la fuente de verdad (ver `docs/README.md`) y se mantiene según la skill `project-docs`. Las features grandes abren `odd/tasks/<feature>.md`. `docs/archive/` (OpenSpec/SDD) es solo lectura.
+`docs/` es la fuente de verdad (ver `docs/README.md`) y se mantiene según la skill `project-docs`. Las features grandes abren `odd/tasks/<feature>.md`. `docs/archive/` (OpenSpec/SDD y ADRs históricos) es solo lectura.
+Los ADRs viven en el módulo Decisions de FunWork (barra lateral del proyecto → Decisions; `list_decisions` / `log_decision` vía MCP), no en archivos Markdown dentro de `docs/`; esto prevalece sobre la skill `project-docs` para este proyecto.
 
 ## Skills
 

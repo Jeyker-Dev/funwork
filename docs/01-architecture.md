@@ -72,4 +72,4 @@
 
 ## Decisiones
 
-Las decisiones de arquitectura se registran en [`decisions/`](decisions/).
+Las decisiones de arquitectura (ADRs) viven en el módulo **Decisions** de FunWork (barra lateral del proyecto → Decisions); los agentes las consultan con `list_decisions` y las registran con `log_decision` vía MCP. Los ADRs anteriores en Markdown quedaron archivados como solo lectura en [`archive/decisions/`](archive/decisions/).

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-11-17
+
+- Módulo **Decisions** de FunWork como única fuente de verdad para ADRs (`docs/README.md`, `docs/01-architecture.md`, `docs/roadmap.md`, `AGENTS.md`, `docs/archive/decisions/`):
+  - Migración de los ADRs en Markdown al módulo Decisions del proyecto FunWork (archivados como solo lectura en `docs/archive/decisions/`).
+  - Actualización de la documentación y guías de agentes para consultar (`list_decisions`) y registrar (`log_decision`) ADRs directamente en FunWork.
+  - Corrección en `docs/areas/backend.md` sobre `NotebookPageCannotBeEmptyException` (heredera de `App\Exceptions\BusinessRuleException`).
+
 ## 2026-11-16
 
 - Herramientas MCP `log_decision` y `list_decisions` (`FunWorkServer`, `LogDecisionTool`, `ListDecisionsTool`, `McpPresenter`, `tests/Feature/Mcp/DecisionToolsTest.php`):

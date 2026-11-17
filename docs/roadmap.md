@@ -4,7 +4,7 @@
 
 ## Principios
 
-- **Tareas en FunWork, conocimiento en el repo.** El backlog, el sprint actual y el estado de las tareas se gestionan en la base de datos de FunWork (proyecto "FunWork"), y los agentes leen y crean tareas a través del servidor MCP. Visión, arquitectura y ADRs quedan en `docs/`, versionados con el código. Ver [ADR-002](decisions/ADR-002-funwork-as-workflow-hub.md).
+- **Tareas y ADRs en FunWork, documentación viva en el repo.** El backlog, el sprint actual, el estado de las tareas y los ADRs viven en la base de datos de FunWork (proyecto "FunWork", módulo Decisions en la barra lateral → Decisions), y los agentes los consultan y registran mediante el servidor MCP (`list_decisions` / `log_decision` para ADRs). Visión, arquitectura y áreas quedan en `docs/`, versionados con el código. Ver [ADR-002 archivado](archive/decisions/ADR-002-funwork-as-workflow-hub.md) (`ADR-012` en FunWork).
 - **Cada módulo produce datos estructurados y exportables a Markdown.** Ese export es el contexto para NotebookLM hoy y el dataset de los modelos por módulo en el futuro.
 - **Seguridad antes que features.** Las Policies son además la base del multiusuario futuro.
 
