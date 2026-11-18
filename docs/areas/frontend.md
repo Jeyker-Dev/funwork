@@ -42,7 +42,7 @@ Livewire v4 SFC + Flux / Flux Pro + Alpine v3 + Tailwind. Skill de referencia: `
 - **Renombrar:** el input aparece enfocado y la extensión se muestra como sufijo no editable.
 
 ### Notificaciones (`layout.notification-bell`, `pages::notifications.index`)
-- **Campana en cabecera (`components/layout/⚡notification-bell.blade.php`):** integrada junto al menú de usuario en los encabezados de proyecto (desktop y mobile) y del listado de proyectos. Muestra un `<flux:badge color="red">` cuando existen notificaciones sin leer, lista las 5 más recientes en `<flux:dropdown>`, permite marcar individualmente o todas como leídas y enlaza a `notifications.index`.
+- **Campana en cabecera (`components/layout/⚡notification-bell.blade.php`):** integrada junto al menú de usuario en los encabezados de proyecto (desktop y mobile) y del listado de proyectos. Muestra un `<flux:badge color="red">` cuando existen notificaciones sin leer, lista las 5 más recientes en `<flux:dropdown>`, permite marcar individualmente o todas como leídas y enlaza a `notifications.index`. Se actualiza sin recargar la página mediante el evento Livewire `notification-received`, despachado desde `resources/js/app.js` al recibir el mensaje `funwork:notification-received` del service worker (`public/sw.js`) tras un Web Push.
 - **Página de notificaciones (`pages::notifications.index`, ruta `/notifications`):** lista paginada de notificaciones en base de datos con secciones de tareas vencidas, para hoy, próximos 3 días e inbox, enlazando directamente a `show.task` y `project.inbox`.
 
 ### Ajustes (`settings/integrations`, `settings/notifications`)

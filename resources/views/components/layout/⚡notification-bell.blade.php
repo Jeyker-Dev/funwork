@@ -50,6 +50,7 @@ new class extends Component
     }
 
     #[On('notifications-updated')]
+    #[On('notification-received')]
     public function refreshNotifications(): void
     {
         $this->resetCache();

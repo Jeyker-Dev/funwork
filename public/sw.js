@@ -16,7 +16,17 @@ self.addEventListener('push', (event) => {
         data: payload.data || { url: '/notifications' },
     };
 
-    event.waitUntil(self.registration.showNotification(title, options));
+    event.waitUntil(
+        Promise.all([
+            self.registration.showNotification(title, options),
+            self.clients.matchAll({ type: 'window', includeUncontrolled: true })
+                .then((windowClients) => {
+                    windowClients.forEach((client) => {
+                        client.postMessage({ type: 'funwork:notification-received' });
+                    });
+                }),
+        ]),
+    );
 });
 
 self.addEventListener('notificationclick', (event) => {
