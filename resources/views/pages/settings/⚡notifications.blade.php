@@ -274,7 +274,9 @@ new #[Title('Notifications settings')] class extends Component
                     </div>
 
                     <template x-if="errorMessage">
-                        <flux:callout variant="danger" icon="x-circle" x-bind:heading="errorMessage" />
+                        <flux:callout variant="danger" icon="x-circle">
+                            <flux:callout.heading x-text="errorMessage" />
+                        </flux:callout>
                     </template>
 
                     <template x-if="state === 'unsupported'">

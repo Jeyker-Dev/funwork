@@ -32,7 +32,7 @@ Branch: `feat/daily-digest`
   - Install `laravel-notification-channels/webpush` (only approved new dependency).
   - Publish `push_subscriptions` migration and add `HasPushSubscriptions` to `User`.
   - Service worker at `public/sw.js` (scope `/` at web root; no Caddyfile/compose changes).
-  - Explicit user permission trigger in Settings → Notifications (`/settings/notifications`), note for iOS Safari installed PWAs, `POST /settings/notifications/push-subscription` via `App\Actions\Auth\SavePushSubscriptionAction`, minimal push payload (`icon: /apple-touch-icon.png`).
+  - Explicit user permission trigger in Settings → Notifications (`/settings/notifications`), note for iOS Safari installed PWAs, `POST /settings/notifications/push-subscription` via `App\Actions\Notifications\SavePushSubscriptionAction`, minimal push payload (`icon: /apple-touch-icon.png`).
   - `.env.example` gets empty `VAPID_PUBLIC_KEY=`, `VAPID_PRIVATE_KEY=`, `VAPID_SUBJECT=`.
 
 ### Corrections Applied (Precedence over Brief)
@@ -57,16 +57,18 @@ Branch: `feat/daily-digest`
   - DTO `App\Data\DailyDigestData` and invokable Action `App\Actions\Notifications\BuildDailyDigestAction`.
   - Settings page `pages::settings.notifications` (`settings/notifications`, nav link in `settings/layout.blade.php`).
   - Feature tests (`BuildDailyDigestActionTest`, `NotificationSettingsTest`, regression on `ProjectStatsTest`), Pint, docs.
-- [ ] **Slice 2 — Hourly Scheduler Command, Database Notification, In-App Bell & Notifications Page**:
-  - `App\Notifications\DailyDigestNotification` (database channel) + `App\Jobs\SendUserDailyDigestJob` + `App\Console\Commands\SendDailyDigestCommand` + `routes/console.php` hourly schedule.
-  - `layout/notification-bell` SFC + integration in headers + `pages/notifications/⚡index.blade.php` (`notifications.index`).
-  - Feature tests (`SendDailyDigestCommandTest`, `DailyDigestNotificationTest`, `NotificationBellTest`, `NotificationsIndexTest`), Pint, docs.
-- [ ] **Slice 3 — Web Push Integration & Browser Service Worker**:
-  - Install `laravel-notification-channels/webpush`, publish `push_subscriptions` migration, configure `HasPushSubscriptions` on `User`, add empty `VAPID_*` vars to `.env.example`.
-  - `public/sw.js` service worker + `App\Actions\Auth\SavePushSubscriptionAction` + `POST /settings/notifications/push-subscription` + browser toggle + iOS Safari note in `⚡notifications.blade.php`.
-  - Add `WebPushChannel::class` to `DailyDigestNotification::via()` + `toWebPush()`.
-  - Feature tests (`PushSubscriptionTest` + `DailyDigestNotificationTest` WebPush payload/channel coverage), Pint, docs, full test suite, and live browser verification.
+- [x] **Slice 2 — Hourly Scheduler Command, Database Notification, In-App Bell & Notifications Page**:
+  - **2a (`5007151`):** `App\Notifications\DailyDigestNotification` (database channel) + `App\Jobs\SendUserDailyDigestJob` + `App\Actions\Notifications\DispatchDailyDigestAction` + `App\Console\Commands\SendDailyDigestCommand` + `routes/console.php` hourly schedule + `notifications.index` route + backend tests + `docs/areas/backend.md`.
+  - **2b (`affac83`):** `layout/notification-bell` SFC + integration in headers + `pages/notifications/⚡index.blade.php` + UI tests + `docs/areas/frontend.md`, `docs/changelog.md`, `docs/roadmap.md`.
+- [x] **Slice 3 — Web Push Integration & Browser Service Worker**:
+  - **3a (`460e5c8`):** Install `laravel-notification-channels/webpush`, publish `push_subscriptions` migration, configure `HasPushSubscriptions` on `User`, add empty `VAPID_*` vars to `.env.example`, `SavePushSubscriptionAction` + `PushSubscriptionController` + form requests + `WebPushChannel::class` / `toWebPush()` on `DailyDigestNotification`, `PushSubscriptionTest` + `DailyDigestNotificationTest` WebPush coverage, `docs/areas/backend.md`.
+  - **3b (`4d02659`):** `public/sw.js` service worker + browser opt-in card + iOS Safari Home Screen note in `⚡notifications.blade.php`, `NotificationSettingsTest` VAPID visibility coverage, `docs/areas/frontend.md`, `docs/changelog.md`, `docs/roadmap.md`.
 
 ## Log
 - 2026-11-17: Created branch `feat/daily-digest`, registered FunWork tasks `#28` (Doing) and `#29` (Todo), initialized ODD task file.
-- 2026-11-17: Completed Slice 1 (user digest migration, shared `Task` due/open scopes, `DailyDigestData`, `BuildDailyDigestAction`, `pages::settings.notifications`, feature tests, docs).
+- 2026-11-17: Completed Slice 1 (`f70b608`: user digest migration, shared `Task` due/open scopes, `DailyDigestData`, `BuildDailyDigestAction`, `pages::settings.notifications`, feature tests, docs).
+- 2026-11-18: Committed Slice 2a (`5007151`: backend scheduler, job, command, database notification, `notifications.index` route, tests, `backend.md`).
+- 2026-11-18: Committed Slice 2b (`affac83`: notification bell, notifications index page, layout headers, UI tests, docs). Committed with `--no-verify` after maintainer approved bypassing GGA's false-positive finding on pre-existing `routeIs(...)` strings in `header.blade.php` and `sidebar.blade.php`.
+- 2026-11-18: Committed pre-Slice-3 refactor (`c2ea59f`: unified `SendDailyDigestCommand` single flow, removed redundant `ShouldQueue`/`Queueable` from `DailyDigestNotification`). Committed with `--no-verify` after maintainer rejected GGA findings targeting unchanged lines (`McpPresenter` vs digest presenter and `$dispatched++` counter in `lazyById` loop).
+- 2026-11-18: Maintainer explicitly authorized `git commit --no-verify` for Slice 3a (`460e5c8`) and Slice 3b (`4d02659`).
+- 2026-11-18: Verified live UI via `php -S 127.0.0.1:8787 -t public` (ephemeral SQLite + VAPID keys, `QUEUE_CONNECTION=sync`, `SESSION_DRIVER=file`) and `funwork:send-daily-digest --user=1 --force`: header bell badge (`2` -> `1` after mark as read), `/notifications` cards (`Overdue`, `Due today`, `Inbox`), `/settings/notifications` cards + iOS note, `/sw.js` (`200 OK`), and zero JS/console errors (Vite dev URL `127.0.0.1:5173` refused only because leftover `public/hot` had no `pnpm run dev` running). Fixed `<flux:callout>` heading rendering so Web Push errors (e.g. headless Chromium `Registration failed - push service not available`) display visibly; live FCM subscription delivery in a push-capable desktop browser remains unverified locally without real browser push permission/FCM service.
