@@ -1,7 +1,19 @@
 # Changelog
 
+## 2026-11-18
+
+- Digest diario — Web Push en navegador y service worker (`laravel-notification-channels/webpush`, `public/sw.js`, `PushSubscriptionController`, `pages::settings.notifications`):
+  - Soporte para suscripciones Web Push por usuario (`POST`/`DELETE /settings/notifications/push-subscription`), canal condicional `WebPushChannel` con payload mínimo por conteos y limpieza automática de suscripciones expiradas (`404`/`410`).
+  - Nuevo service worker `public/sw.js` y sección "Browser notifications" en `Settings → Notifications` con permiso bajo clic explícito, estados del navegador, botón de desactivación, nota para iOS Home Screen y ocultamiento automático si faltan llaves VAPID.
+
 ## 2026-11-17
 
+- Digest diario — scheduler horario, notificación en base de datos, campana en cabecera y página de notificaciones (`SendDailyDigestCommand`, `SendUserDailyDigestJob`, `DailyDigestNotification`, `layout.notification-bell`, `pages::notifications.index`):
+  - Registro horario de `funwork:send-daily-digest` (`{--user=} {--force}`) en `routes/console.php`, despachando `SendUserDailyDigestJob` según hora y fecha local del usuario y registrando `last_digest_sent_at` incluso cuando el digest se suprime por estar vacío.
+  - Nueva `DailyDigestNotification` (`ShouldQueue`, canal `database`) con resumen y enlaces profundos a tareas e inbox, campana reactiva `<livewire:layout.notification-bell />` en cabeceras y página `/notifications` (`notifications.index`).
+- Digest diario — dominio, agregador y preferencias de usuario (`BuildDailyDigestAction`, `DailyDigestData`, `pages::settings.notifications`):
+  - Nueva migración en `users` (`digest_enabled`, `digest_hour`, `last_digest_sent_at`), scopes compartidos de vencimiento en `Task` reutilizados por el dashboard del proyecto y nuevo agregador `BuildDailyDigestAction` por proyectos activos y zona horaria del usuario.
+  - Nueva página `Settings → Notifications` (`/settings/notifications`) para activar el resumen matutino y elegir la hora de entrega preferida.
 - Módulo **Decisions** de FunWork como única fuente de verdad para ADRs (`docs/README.md`, `docs/01-architecture.md`, `docs/roadmap.md`, `AGENTS.md`, `docs/archive/decisions/`):
   - Migración de los ADRs en Markdown al módulo Decisions del proyecto FunWork (archivados como solo lectura en `docs/archive/decisions/`).
   - Actualización de la documentación y guías de agentes para consultar (`list_decisions`) y registrar (`log_decision`) ADRs directamente en FunWork.

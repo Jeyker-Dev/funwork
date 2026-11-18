@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Support\DateHelper;
+use Carbon\CarbonImmutable;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -15,13 +16,28 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use NotificationChannels\WebPush\HasPushSubscriptions;
 
-#[Fillable(['name', 'username', 'email', 'password', 'timezone', 'profile_photo_path'])]
+#[Fillable([
+    'name',
+    'username',
+    'email',
+    'password',
+    'timezone',
+    'profile_photo_path',
+    'digest_enabled',
+    'digest_hour',
+    'last_digest_sent_at',
+])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, TwoFactorAuthenticatable;
+    use HasFactory, HasPushSubscriptions, Notifiable, TwoFactorAuthenticatable;
+
+    public const int DEFAULT_DIGEST_HOUR = 8;
+
+    private const string S3_DISK = 's3';
 
     /**
      * Get the attributes that should be cast.
@@ -33,7 +49,49 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'digest_enabled' => 'boolean',
+            'digest_hour' => 'integer',
+            'last_digest_sent_at' => 'datetime',
         ];
+    }
+
+    public function updateDigestSettings(bool $digestEnabled, int $digestHour): void
+    {
+        $this->update([
+            'digest_enabled' => $digestEnabled,
+            'digest_hour' => $digestHour,
+        ]);
+    }
+
+    public function markDailyDigestSent(): void
+    {
+        $this->update([
+            'last_digest_sent_at' => now(),
+        ]);
+    }
+
+    public function isDailyDigestDue(): bool
+    {
+        if (! $this->digest_enabled) {
+            return false;
+        }
+
+        $timezone = $this->timezone ?? config('app.timezone', 'UTC');
+        $userLocalNow = now($timezone);
+
+        if ((int) $userLocalNow->format('H') !== $this->digest_hour) {
+            return false;
+        }
+
+        if ($this->last_digest_sent_at === null) {
+            return true;
+        }
+
+        $lastSentLocalDate = CarbonImmutable::instance($this->last_digest_sent_at)
+            ->setTimezone($timezone)
+            ->toDateString();
+
+        return $lastSentLocalDate !== $userLocalNow->toDateString();
     }
 
     /**
@@ -52,15 +110,13 @@ class User extends Authenticatable
         if ($this->profile_photo_path) {
             $disk = config('filesystems.default');
 
-            // If the disk is s3, generate a temporary signed URL valid for 1 hour
-            if ($disk === 's3') {
+            if ($disk === self::S3_DISK) {
                 return Storage::disk($disk)->temporaryUrl(
                     $this->profile_photo_path,
                     now()->addMinutes(60)
                 );
             }
 
-            // Otherwise, for local disk, use standard Storage::url()
             return Storage::disk($disk)->url($this->profile_photo_path);
         }
 
@@ -75,7 +131,7 @@ class User extends Authenticatable
         return Str::of($this->name)
             ->explode(' ')
             ->take(2)
-            ->map(fn ($word) => Str::substr($word, 0, 1))
+            ->map(fn (string $word): string => Str::substr($word, 0, 1))
             ->implode('');
     }
 

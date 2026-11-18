@@ -4,7 +4,7 @@
 
 | Tabla | Notas |
 |---|---|
-| `users` | Incluye columnas de 2FA, `username`, `profile_photo_path` y `timezone`. |
+| `users` | Incluye columnas de 2FA, `username`, `profile_photo_path`, `timezone` y preferencias del digest (`digest_enabled` bool, `digest_hour` tinyint, `last_digest_sent_at` timestamp nullable). |
 | `projects` | Usa `archived_at` (no `archive_at`). |
 | `api_tokens` | Tokens personales de API para el servidor MCP (`user_id`, `name`, `token` único de 64 caracteres con hash SHA-256, `last_used_at`, `expires_at`). El token en texto plano (`fw_...`) nunca se persiste. |
 | `google_accounts` | Una cuenta de Google por usuario (`user_id` único). `access_token` y `refresh_token` se guardan con el cast `encrypted` (dependen de `APP_KEY`). |
@@ -14,7 +14,8 @@
 | `inbox_items` | Capturas rápidas por proyecto. |
 | `notebooks` / `notebook_pages` | Un notebook tiene muchas páginas; pertenece a un proyecto y a su creador. Guarda clave foránea nullable `area_id` (`nullOnDelete`) a nivel notebook completo (no por página). Guarda además `google_doc_id`, `google_doc_synced_at` y `content_changed_at` (nullable) para la sincronización con Google Docs. `notebook_pages` cuenta con la columna nullable `source_path` y un índice único compuesto `(notebook_id, source_path)` para el espejado de docs vía `funwork:sync-docs` (commit `1d782a3`). |
 | `folders` / `project_files` | Jerarquía de carpetas y archivos por proyecto. |
-| `notifications` | Notificaciones en base de datos (por ejemplo, la descarga de ZIP). |
+| `notifications` | Notificaciones en base de datos (por ejemplo, el digest diario). |
+| `push_subscriptions` | Suscripciones Web Push (`subscribable_type`, `subscribable_id`, `endpoint` único, `public_key`, `auth_token`, `content_encoding`). |
 | `jobs` / `cache` | Infraestructura de Laravel. |
 
 ## Reglas

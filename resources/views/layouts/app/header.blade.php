@@ -29,6 +29,8 @@
 
         <flux:button icon="cog-6-tooth" variant="ghost" class="size-10!"/>
 
+        <livewire:layout.notification-bell />
+
         <x-desktop-user-menu/>
     </div>
 </flux:header>

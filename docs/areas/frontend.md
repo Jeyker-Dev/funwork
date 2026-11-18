@@ -41,8 +41,13 @@ Livewire v4 SFC + Flux / Flux Pro + Alpine v3 + Tailwind. Skill de referencia: `
 - **Búsqueda global** con `wire:model.live.debounce`; durante la búsqueda las cards muestran un breadcrumb truncado con tooltip; al limpiarla se vuelve a la carpeta original.
 - **Renombrar:** el input aparece enfocado y la extensión se muestra como sufijo no editable.
 
-### Ajustes (`settings/integrations`)
+### Notificaciones (`layout.notification-bell`, `pages::notifications.index`)
+- **Campana en cabecera (`components/layout/⚡notification-bell.blade.php`):** integrada junto al menú de usuario en los encabezados de proyecto (desktop y mobile) y del listado de proyectos. Muestra un `<flux:badge color="red">` cuando existen notificaciones sin leer, lista las 5 más recientes en `<flux:dropdown>`, permite marcar individualmente o todas como leídas y enlaza a `notifications.index`.
+- **Página de notificaciones (`pages::notifications.index`, ruta `/notifications`):** lista paginada de notificaciones en base de datos con secciones de tareas vencidas, para hoy, próximos 3 días e inbox, enlazando directamente a `show.task` y `project.inbox`.
+
+### Ajustes (`settings/integrations`, `settings/notifications`)
 - Tarjeta de conexión/desconexión con Google Docs y tarjeta **API Tokens (MCP)** (`pages::settings.integrations`): formulario para crear tokens por nombre, modal Flux (`api-token-created`) con `<flux:input readonly copyable>` que revela el token en texto plano una sola vez, listado de tokens propios con fecha de creación y último uso, y revocación con modal de confirmación (`revoke-api-token`).
+- **Notificaciones (`pages::settings.notifications`, ruta `notifications.edit`):** interruptor `Enable morning digest` (`digest_enabled`), selector horario por hora entera `00:00`–`23:00` (`digest_hour`) evaluado en la zona horaria del perfil del usuario, y sección **Browser notifications** (oculta cuando falta `VAPID_PUBLIC_KEY`). La sección registra `/sw.js` (`public/sw.js`), solicita permiso exclusivamente al hacer clic en `Enable push on this browser`, muestra los estados no soportado, bloqueado (con guía de reactivación), activo (`Disable` desuscribe y llama `DELETE`) y desactivado, e incluye una nota indicando que en iOS Safari solo funciona si FunWork se instala en la pantalla de inicio.
 
 ## Deuda técnica / pendientes
 

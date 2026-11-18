@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\TaskStatus;
 use App\Livewire\Forms\QuickCaptureForm;
 use App\Models\Project;
 use App\Support\DateHelper;
@@ -37,8 +36,7 @@ class extends Component {
         return [
             'recentActivities' => $this->project->getRecentActivities()->take(5),
             'urgentTasks' => $this->project->tasks()
-                ->whereDate('due_date', '<=', $localToday)
-                ->where('status', '!=', TaskStatus::Done->value)
+                ->urgent($localToday)
                 ->orderBy('due_date', 'asc')
                 ->take(5)
                 ->get(),

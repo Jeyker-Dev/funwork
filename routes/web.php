@@ -3,9 +3,11 @@
 use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\NotebookExportController;
 use App\Http\Controllers\ProjectFilePreviewController;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', static function () {
+Route::get('/', static function (): RedirectResponse {
     if (Auth::check()) {
         return redirect(route('projects'));
     }
@@ -18,6 +20,7 @@ Route::view('/privacy', 'privacy')->name('privacy');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::livewire('/projects', 'pages::projects.index')->name('projects');
+    Route::livewire('/notifications', 'pages::notifications.index')->name('notifications.index');
 
     Route::livewire('projects/{project}', 'pages::projects.show')
         ->can('view', 'project')
