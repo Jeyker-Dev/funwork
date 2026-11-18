@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PushSubscriptionController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
@@ -15,6 +16,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::livewire('settings/integrations', 'pages::settings.integrations')->name('integrations.edit');
 
     Route::livewire('settings/notifications', 'pages::settings.notifications')->name('notifications.edit');
+
+    Route::post('settings/notifications/push-subscription', [PushSubscriptionController::class, 'store'])
+        ->name('notifications.push-subscription.store');
+    Route::delete('settings/notifications/push-subscription', [PushSubscriptionController::class, 'destroy'])
+        ->name('notifications.push-subscription.destroy');
 
     Route::livewire('settings/security', 'pages::settings.security')
         ->middleware(

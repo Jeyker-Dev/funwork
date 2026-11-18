@@ -8,8 +8,15 @@ use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;
 use App\Notifications\DailyDigestNotification;
+use GuzzleHttp\Psr7\Request as Psr7Request;
+use GuzzleHttp\Psr7\Response as Psr7Response;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Notification;
+use Minishlink\WebPush\MessageSentReport;
+use Minishlink\WebPush\WebPush;
+use NotificationChannels\WebPush\PushSubscription;
+use NotificationChannels\WebPush\ReportHandler;
+use NotificationChannels\WebPush\WebPushChannel;
 
 it('dispatches DailyDigestNotification when the user has items', function () {
     Notification::fake();
@@ -39,7 +46,7 @@ it('suppresses notification when the digest is empty', function () {
     Notification::assertNothingSent();
 });
 
-it('uses the database delivery channel', function () {
+it('uses only the database channel when the user has no push subscriptions', function () {
     $this->travelTo(Carbon::parse('2026-11-17 08:00:00', 'UTC'));
 
     $user = User::factory()->create(['timezone' => 'UTC']);
@@ -48,6 +55,86 @@ it('uses the database delivery channel', function () {
 
     expect($notification->via($user))->toBe(['database']);
 });
+
+it('includes WebPushChannel when the user has an active push subscription', function () {
+    $this->travelTo(Carbon::parse('2026-11-17 08:00:00', 'UTC'));
+
+    $user = User::factory()->create(['timezone' => 'UTC']);
+    $user->updatePushSubscription('https://fcm.googleapis.com/fcm/send/sub1', 'key', 'auth');
+
+    $digest = app(BuildDailyDigestAction::class)($user);
+    $notification = new DailyDigestNotification($digest);
+
+    expect($notification->via($user))->toBe(['database', WebPushChannel::class]);
+});
+
+it('formats a minimal Web Push payload with counts only and notification index url', function () {
+    $this->travelTo(Carbon::parse('2026-11-17 08:00:00', 'UTC'));
+
+    $user = User::factory()->create(['timezone' => 'UTC']);
+    $project = Project::factory()->create(['owner_id' => $user->id, 'name' => 'Secret Project']);
+
+    Task::factory()->create([
+        'project_id' => $project->id,
+        'title' => 'Confidential Task Title',
+        'status' => TaskStatus::Todo,
+        'due_date' => '2026-11-17 00:00:00',
+    ]);
+
+    $digest = app(BuildDailyDigestAction::class)($user);
+    $notification = new DailyDigestNotification($digest);
+    $payload = $notification->toWebPush($user, $notification)->toArray();
+
+    expect($payload['title'])->toBe('FunWork Daily Digest')
+        ->and($payload['body'])->toBe('You have 1 task due today.')
+        ->and($payload['body'])->not->toContain('Confidential Task Title')
+        ->and($payload['body'])->not->toContain('Secret Project')
+        ->and($payload['icon'])->toBe('/apple-touch-icon.png')
+        ->and($payload['data'])->toBe(['url' => route('notifications.index')]);
+});
+
+it('deletes expired push subscriptions when the push service returns 404 or 410', function (int $statusCode) {
+    $this->travelTo(Carbon::parse('2026-11-17 08:00:00', 'UTC'));
+
+    $user = User::factory()->create(['timezone' => 'UTC']);
+    $project = Project::factory()->create(['owner_id' => $user->id]);
+
+    Task::factory()->create([
+        'project_id' => $project->id,
+        'status' => TaskStatus::Todo,
+        'due_date' => '2026-11-17 00:00:00',
+    ]);
+
+    $subscription = $user->updatePushSubscription(
+        endpoint: 'https://fcm.googleapis.com/fcm/send/expired-sub',
+        key: 'public-key',
+        token: 'auth-token',
+    );
+
+    $digest = app(BuildDailyDigestAction::class)($user);
+    $notification = new DailyDigestNotification($digest);
+
+    $report = new MessageSentReport(
+        new Psr7Request('POST', $subscription->endpoint),
+        new Psr7Response($statusCode),
+        false,
+        'Expired subscription',
+    );
+
+    $webPush = Mockery::mock(WebPush::class);
+    $webPush->shouldReceive('queueNotification')->once();
+    $webPush->shouldReceive('flush')->once()->andReturn((function () use ($report): Generator {
+        yield $report;
+    })());
+
+    $channel = new WebPushChannel($webPush, app(ReportHandler::class));
+    $channel->send($user, $notification);
+
+    expect(PushSubscription::find($subscription->id))->toBeNull();
+})->with([
+    'not found (404)' => 404,
+    'gone (410)' => 410,
+]);
 
 it('formats database payload metadata and counts', function () {
     $this->travelTo(Carbon::parse('2026-11-17 08:00:00', 'UTC'));

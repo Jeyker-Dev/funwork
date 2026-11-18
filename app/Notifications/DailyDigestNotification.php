@@ -5,8 +5,11 @@ namespace App\Notifications;
 use App\Data\DailyDigestData;
 use App\Models\InboxItem;
 use App\Models\Task;
+use App\Models\User;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Collection;
+use NotificationChannels\WebPush\WebPushChannel;
+use NotificationChannels\WebPush\WebPushMessage;
 
 class DailyDigestNotification extends Notification
 {
@@ -53,7 +56,22 @@ class DailyDigestNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['database'];
+        $channels = ['database'];
+
+        if ($notifiable instanceof User && $notifiable->pushSubscriptions()->exists()) {
+            $channels[] = WebPushChannel::class;
+        }
+
+        return $channels;
+    }
+
+    public function toWebPush(object $notifiable, Notification $notification): WebPushMessage
+    {
+        return (new WebPushMessage)
+            ->title('FunWork Daily Digest')
+            ->body($this->summary)
+            ->icon('/apple-touch-icon.png')
+            ->data(['url' => route('notifications.index')]);
     }
 
     /**
