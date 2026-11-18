@@ -65,3 +65,29 @@ test('digest hour must be between 0 and 23', function (int $invalidHour) {
     'negative' => -1,
     'too high' => 24,
 ]);
+
+test('browser notifications section is hidden when VAPID public key is missing', function () {
+    config(['webpush.vapid.public_key' => null]);
+
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->get(route('notifications.edit'))
+        ->assertSuccessful()
+        ->assertDontSee('Browser notifications')
+        ->assertDontSee('Enable push on this browser');
+});
+
+test('browser notifications section is visible with iOS note when VAPID public key is configured', function () {
+    config(['webpush.vapid.public_key' => 'test-vapid-public-key']);
+
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->get(route('notifications.edit'))
+        ->assertSuccessful()
+        ->assertSee('Browser notifications')
+        ->assertSee('Enable push on this browser')
+        ->assertSee('installed to the Home Screen')
+        ->assertSee('test-vapid-public-key');
+});

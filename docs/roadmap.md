@@ -57,7 +57,7 @@ Avance: **completada** — API tokens personales (SHA-256) en Settings → Integ
 - Editor Markdown para las páginas de los notebooks: completado — vista previa server-rendered (`Write` / `Preview`) con `App\Support\Markdown::toHtml()` manteniendo Markdown crudo en `content['body']`.
 - Módulo **Diseño**: links de Stitch y `DESIGN.md` por pantalla.
 - Captura rápida global (atajo de teclado → inbox de cualquier proyecto).
-- Digest diario con el scheduler (vencimientos, tareas del día, próximos 3 días e inbox; campana in-app completada, Web Push en curso).
+- Digest diario con el scheduler: completado — vencimientos, tareas del día, próximos 3 días e inbox; campana in-app, `/notifications` y Web Push en Settings → Notifications.
 
 ## Fase 5 — Visión a largo plazo
 

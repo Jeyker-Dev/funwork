@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-11-18
+
+- Digest diario — Web Push en navegador y service worker (`laravel-notification-channels/webpush`, `public/sw.js`, `PushSubscriptionController`, `pages::settings.notifications`):
+  - Soporte para suscripciones Web Push por usuario (`POST`/`DELETE /settings/notifications/push-subscription`), canal condicional `WebPushChannel` con payload mínimo por conteos y limpieza automática de suscripciones expiradas (`404`/`410`).
+  - Nuevo service worker `public/sw.js` y sección "Browser notifications" en `Settings → Notifications` con permiso bajo clic explícito, estados del navegador, botón de desactivación, nota para iOS Home Screen y ocultamiento automático si faltan llaves VAPID.
+
 ## 2026-11-17
 
 - Digest diario — scheduler horario, notificación en base de datos, campana en cabecera y página de notificaciones (`SendDailyDigestCommand`, `SendUserDailyDigestJob`, `DailyDigestNotification`, `layout.notification-bell`, `pages::notifications.index`):

@@ -47,7 +47,7 @@ Livewire v4 SFC + Flux / Flux Pro + Alpine v3 + Tailwind. Skill de referencia: `
 
 ### Ajustes (`settings/integrations`, `settings/notifications`)
 - Tarjeta de conexión/desconexión con Google Docs y tarjeta **API Tokens (MCP)** (`pages::settings.integrations`): formulario para crear tokens por nombre, modal Flux (`api-token-created`) con `<flux:input readonly copyable>` que revela el token en texto plano una sola vez, listado de tokens propios con fecha de creación y último uso, y revocación con modal de confirmación (`revoke-api-token`).
-- **Notificaciones (`pages::settings.notifications`, ruta `notifications.edit`):** interruptor `Enable morning digest` (`digest_enabled`) y selector horario por hora entera `00:00`–`23:00` (`digest_hour`) evaluado en la zona horaria del perfil del usuario.
+- **Notificaciones (`pages::settings.notifications`, ruta `notifications.edit`):** interruptor `Enable morning digest` (`digest_enabled`), selector horario por hora entera `00:00`–`23:00` (`digest_hour`) evaluado en la zona horaria del perfil del usuario, y sección **Browser notifications** (oculta cuando falta `VAPID_PUBLIC_KEY`). La sección registra `/sw.js` (`public/sw.js`), solicita permiso exclusivamente al hacer clic en `Enable push on this browser`, muestra los estados no soportado, bloqueado (con guía de reactivación), activo (`Disable` desuscribe y llama `DELETE`) y desactivado, e incluye una nota indicando que en iOS Safari solo funciona si FunWork se instala en la pantalla de inicio.
 
 ## Deuda técnica / pendientes
 
