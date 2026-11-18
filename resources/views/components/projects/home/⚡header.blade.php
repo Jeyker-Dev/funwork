@@ -40,6 +40,8 @@ new class extends Component
             <livewire:projects.create-project :elementName="$elementName"/>
         @endif
 
+        <livewire:layout.notification-bell />
+
         <!-- User Dropdown content -->
         <x-desktop-user-menu/>
     </flux:header>

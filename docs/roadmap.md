@@ -45,19 +45,19 @@ Avance en curso: Áreas por proyecto implementadas (gestión CRUD con modal Flux
 
 ## Fase 3 — FunWork como servidor MCP para Antigravity
 
-Avance en curso: API tokens personales (SHA-256) en Settings → Integrations y servidor MCP (`FunWorkServer` con `laravel/mcp` en `/mcp/funwork`) implementados con las herramientas de la v1 (`list_projects`, `list_tasks`, `get_task`, `update_task_status`, `update_task_description`, `add_task`, `add_inbox_item`, `read_notebook`).
+Avance: **completada** — API tokens personales (SHA-256) en Settings → Integrations y servidor MCP (`FunWorkServer` con `laravel/mcp` en `POST /mcp/funwork`) implementados con las 10 herramientas (`list_projects`, `list_tasks`, `get_task`, `update_task_status`, `update_task_description`, `add_task`, `add_inbox_item`, `read_notebook`, `list_decisions`, `log_decision`).
 
 - API tokens + servidor MCP (`laravel/mcp`): completado.
-- Herramientas v1: `list_projects`, `list_tasks`, `get_task`, `update_task_status`, `update_task_description`, `add_task`, `add_inbox_item`, `read_notebook` (`log_decision` queda para la Fase 4 cuando exista el módulo Brain / Decisiones).
+- Herramientas MCP: `list_projects`, `list_tasks`, `get_task`, `update_task_status`, `update_task_description`, `add_task`, `add_inbox_item`, `read_notebook`, `list_decisions` y `log_decision`: completado.
 - Antigravity se configura en `~/.gemini/config/mcp_config.json`. Los agentes leen y crean tareas a través del servidor MCP de FunWork y actualizan su estado al terminarlas; `docs/tasks/*.md` ha sido retirado y el backlog/sprint vive en la aplicación.
 
 ## Fase 4 — Brain, notebooks y diseño
 
-- Módulo **Brain / Decisiones**: completado — ADRs por proyecto con numeración correlativa (`ADR-001`), estados (`Proposed`, `Accepted`, `Rejected`, `Superseded`), renderizado seguro de Markdown y aislamiento por propietario (el futuro "NotebookLM interno" y `log_decision` MCP quedan como siguientes pasos).
-- Editor Markdown para las páginas de los notebooks.
+- Módulo **Brain / Decisiones**: completado — ADRs por proyecto con numeración correlativa (`ADR-001`), estados (`Proposed`, `Accepted`, `Rejected`, `Superseded`), renderizado seguro de Markdown, aislamiento por propietario y herramientas MCP `list_decisions` / `log_decision` (el futuro "NotebookLM interno" queda como siguiente paso).
+- Editor Markdown para las páginas de los notebooks: completado — vista previa server-rendered (`Write` / `Preview`) con `App\Support\Markdown::toHtml()` manteniendo Markdown crudo en `content['body']`.
 - Módulo **Diseño**: links de Stitch y `DESIGN.md` por pantalla.
 - Captura rápida global (atajo de teclado → inbox de cualquier proyecto).
-- Digest diario con el scheduler (vencimientos y tareas del día).
+- Digest diario con el scheduler (vencimientos, tareas del día, próximos 3 días e inbox; campana in-app completada, Web Push en curso).
 
 ## Fase 5 — Visión a largo plazo
 

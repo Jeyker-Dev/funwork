@@ -2,6 +2,9 @@
 
 ## 2026-11-17
 
+- Digest diario — scheduler horario, notificación en base de datos, campana en cabecera y página de notificaciones (`SendDailyDigestCommand`, `SendUserDailyDigestJob`, `DailyDigestNotification`, `layout.notification-bell`, `pages::notifications.index`):
+  - Registro horario de `funwork:send-daily-digest` (`{--user=} {--force}`) en `routes/console.php`, despachando `SendUserDailyDigestJob` según hora y fecha local del usuario y registrando `last_digest_sent_at` incluso cuando el digest se suprime por estar vacío.
+  - Nueva `DailyDigestNotification` (`ShouldQueue`, canal `database`) con resumen y enlaces profundos a tareas e inbox, campana reactiva `<livewire:layout.notification-bell />` en cabeceras y página `/notifications` (`notifications.index`).
 - Digest diario — dominio, agregador y preferencias de usuario (`BuildDailyDigestAction`, `DailyDigestData`, `pages::settings.notifications`):
   - Nueva migración en `users` (`digest_enabled`, `digest_hour`, `last_digest_sent_at`), scopes compartidos de vencimiento en `Task` reutilizados por el dashboard del proyecto y nuevo agregador `BuildDailyDigestAction` por proyectos activos y zona horaria del usuario.
   - Nueva página `Settings → Notifications` (`/settings/notifications`) para activar el resumen matutino y elegir la hora de entrega preferida.
