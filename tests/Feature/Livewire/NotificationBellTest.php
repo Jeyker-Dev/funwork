@@ -11,7 +11,7 @@ use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Support\Carbon;
 use Livewire\Livewire;
 
-function sendDigestNotification(User $user, string $date = '2026-11-17'): DatabaseNotification
+function createDigestNotification(User $user, string $date = '2026-11-17'): void
 {
     Carbon::setTestNow(Carbon::parse("{$date} 08:00:00", 'UTC'));
 
@@ -27,29 +27,54 @@ function sendDigestNotification(User $user, string $date = '2026-11-17'): Databa
     $user->notifyNow(new DailyDigestNotification($digest));
 
     Carbon::setTestNow();
+}
 
+function latestDigestNotification(User $user): DatabaseNotification
+{
     return $user->notifications()->latest()->firstOrFail();
 }
 
-it('renders unread count badge and latest 5 notifications', function () {
+it('renders unread count badge for unread notifications', function () {
     $user = User::factory()->create();
 
     foreach (range(1, 6) as $day) {
-        sendDigestNotification($user, sprintf('2026-11-%02d', 10 + $day));
+        createDigestNotification($user, sprintf('2026-11-%02d', 10 + $day));
     }
 
     Livewire::actingAs($user)
         ->test('layout.notification-bell')
         ->assertSet('unreadCount', 6)
+        ->assertSeeInOrder(['Notifications', '6']);
+});
+
+it('limits dropdown notifications to 5 items', function () {
+    $user = User::factory()->create();
+
+    foreach (range(1, 6) as $day) {
+        createDigestNotification($user, sprintf('2026-11-%02d', 10 + $day));
+    }
+
+    Livewire::actingAs($user)
+        ->test('layout.notification-bell')
         ->assertCount('notifications', 5)
-        ->assertSeeInOrder(['Notifications', '6', 'Daily Digest for 2026-11-16'])
         ->assertDontSee('Daily Digest for 2026-11-11');
+});
+
+it('orders dropdown notifications newest first', function () {
+    $user = User::factory()->create();
+
+    createDigestNotification($user, '2026-11-15');
+    createDigestNotification($user, '2026-11-16');
+
+    Livewire::actingAs($user)
+        ->test('layout.notification-bell')
+        ->assertSeeInOrder(['Daily Digest for 2026-11-16', 'Daily Digest for 2026-11-15']);
 });
 
 it('hides unread badge when user has no unread notifications', function () {
     $user = User::factory()->create();
-    $notification = sendDigestNotification($user);
-    $notification->markAsRead();
+    createDigestNotification($user);
+    latestDigestNotification($user)->markAsRead();
 
     Livewire::actingAs($user)
         ->test('layout.notification-bell')
@@ -59,7 +84,8 @@ it('hides unread badge when user has no unread notifications', function () {
 
 it('marks a single notification as read', function () {
     $user = User::factory()->create();
-    $notification = sendDigestNotification($user);
+    createDigestNotification($user);
+    $notification = latestDigestNotification($user);
 
     Livewire::actingAs($user)
         ->test('layout.notification-bell')
@@ -74,9 +100,14 @@ it('marks all unread notifications as read only for the authenticated user', fun
     $user = User::factory()->create();
     $otherUser = User::factory()->create();
 
-    $morningDigest = sendDigestNotification($user, '2026-11-16');
-    $todayDigest = sendDigestNotification($user, '2026-11-17');
-    $otherDigest = sendDigestNotification($otherUser, '2026-11-17');
+    createDigestNotification($user, '2026-11-16');
+    $morningDigest = latestDigestNotification($user);
+
+    createDigestNotification($user, '2026-11-17');
+    $todayDigest = latestDigestNotification($user);
+
+    createDigestNotification($otherUser, '2026-11-17');
+    $otherDigest = latestDigestNotification($otherUser);
 
     Livewire::actingAs($user)
         ->test('layout.notification-bell')
@@ -92,7 +123,8 @@ it('marks all unread notifications as read only for the authenticated user', fun
 it('rejects marking another users notification as read', function () {
     $user = User::factory()->create();
     $otherUser = User::factory()->create();
-    $otherNotification = sendDigestNotification($otherUser);
+    createDigestNotification($otherUser);
+    $otherNotification = latestDigestNotification($otherUser);
 
     expect(fn () => Livewire::actingAs($user)
         ->test('layout.notification-bell')
@@ -100,4 +132,21 @@ it('rejects marking another users notification as read', function () {
         ->toThrow(ModelNotFoundException::class);
 
     expect($otherNotification->fresh()->read_at)->toBeNull();
+});
+
+it('refreshes unread count and list when notification-received is dispatched', function () {
+    $user = User::factory()->create();
+
+    $component = Livewire::actingAs($user)
+        ->test('layout.notification-bell')
+        ->assertSet('unreadCount', 0)
+        ->assertCount('notifications', 0);
+
+    createDigestNotification($user, '2026-11-18');
+
+    $component
+        ->dispatch('notification-received')
+        ->assertSet('unreadCount', 1)
+        ->assertCount('notifications', 1)
+        ->assertSee('Daily Digest for 2026-11-18');
 });
