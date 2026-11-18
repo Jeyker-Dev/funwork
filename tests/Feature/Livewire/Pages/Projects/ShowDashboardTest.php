@@ -338,3 +338,14 @@ test('dashboard displays up to five most recent activities from notebooks and fi
         ])
         ->assertDontSee($oldestNotebook->name);
 });
+
+test('project header renders areas button without unused settings gear button', function () {
+    $user = User::factory()->create();
+    $project = Project::factory()->create(['owner_id' => $user->id]);
+
+    $this->actingAs($user)
+        ->get(route('projects.show', $project))
+        ->assertOk()
+        ->assertSee('Areas')
+        ->assertDontSeeHtml('M7.84 1.804A1 1 0 0 1 8.82 1h2.36');
+});
