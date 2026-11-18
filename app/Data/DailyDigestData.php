@@ -33,6 +33,26 @@ readonly class DailyDigestData
             && $this->inboxItems->isEmpty();
     }
 
+    public function overdueCount(): int
+    {
+        return $this->overdueTasks->count();
+    }
+
+    public function todayCount(): int
+    {
+        return $this->todayTasks->count();
+    }
+
+    public function upcomingCount(): int
+    {
+        return $this->upcomingTasks->count();
+    }
+
+    public function inboxCount(): int
+    {
+        return $this->inboxItems->count();
+    }
+
     public function summaryText(): string
     {
         $parts = array_values(array_filter([

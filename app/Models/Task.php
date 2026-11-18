@@ -46,6 +46,11 @@ class Task extends Model
         return $this->belongsTo(Project::class);
     }
 
+    public function projectName(): string
+    {
+        return $this->project->name;
+    }
+
     public function area(): BelongsTo
     {
         return $this->belongsTo(Area::class);
