@@ -21,14 +21,18 @@ class SendDailyDigestCommand extends Command
     public function handle(): int
     {
         $userId = $this->option('user');
+        $targetUser = $userId !== null ? User::find((string) $userId) : null;
 
-        if ($userId !== null) {
-            return $this->option('force')
-                ? $this->forceSingleUser((string) $userId)
-                : $this->dispatchSingleUserIfDue((string) $userId);
+        if ($userId !== null && ! $targetUser instanceof User) {
+            $this->error("User [{$userId}] not found.");
+
+            return self::FAILURE;
         }
 
-        $users = User::query()->where('digest_enabled', true)->lazyById();
+        $users = $targetUser instanceof User
+            ? collect([$targetUser])
+            : User::query()->where('digest_enabled', true)->lazyById();
+
         $targets = $this->option('force')
             ? $users
             : $users->filter(fn (User $user): bool => $user->isDailyDigestDue());
@@ -41,44 +45,6 @@ class SendDailyDigestCommand extends Command
         }
 
         $this->info("Daily digest dispatched for {$dispatched} user(s).");
-
-        return self::SUCCESS;
-    }
-
-    private function forceSingleUser(string $userId): int
-    {
-        $user = User::find($userId);
-
-        if (! $user instanceof User) {
-            $this->error("User [{$userId}] not found.");
-
-            return self::FAILURE;
-        }
-
-        ($this->dispatchDigest)($user);
-        $this->info('Daily digest dispatched for 1 user(s).');
-
-        return self::SUCCESS;
-    }
-
-    private function dispatchSingleUserIfDue(string $userId): int
-    {
-        $user = User::find($userId);
-
-        if (! $user instanceof User) {
-            $this->error("User [{$userId}] not found.");
-
-            return self::FAILURE;
-        }
-
-        if (! $user->isDailyDigestDue()) {
-            $this->info("Daily digest skipped for user [{$user->id}].");
-
-            return self::SUCCESS;
-        }
-
-        ($this->dispatchDigest)($user);
-        $this->info('Daily digest dispatched for 1 user(s).');
 
         return self::SUCCESS;
     }

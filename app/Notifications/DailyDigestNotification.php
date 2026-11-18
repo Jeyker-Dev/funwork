@@ -5,15 +5,11 @@ namespace App\Notifications;
 use App\Data\DailyDigestData;
 use App\Models\InboxItem;
 use App\Models\Task;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Collection;
 
-class DailyDigestNotification extends Notification implements ShouldQueue
+class DailyDigestNotification extends Notification
 {
-    use Queueable;
-
     public string $date;
 
     public string $summary;

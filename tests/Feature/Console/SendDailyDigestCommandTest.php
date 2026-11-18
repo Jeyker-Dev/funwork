@@ -85,7 +85,7 @@ it('skips a targeted user without --force when not due', function () {
     ]);
 
     $this->artisan('funwork:send-daily-digest', ['--user' => $user->id])
-        ->expectsOutput("Daily digest skipped for user [{$user->id}].")
+        ->expectsOutput('Daily digest dispatched for 0 user(s).')
         ->assertSuccessful();
 
     Queue::assertNothingPushed();
