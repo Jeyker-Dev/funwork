@@ -22,7 +22,7 @@ class AddTaskTool extends FunWorkTool
     protected string $authorizationMessage = 'You are not authorized to create tasks in this project.';
 
     public function __construct(
-        private CreateTaskAction $createTask,
+        private readonly CreateTaskAction $createTask,
     ) {}
 
     public function schema(JsonSchema $schema): array
@@ -52,6 +52,9 @@ class AddTaskTool extends FunWorkTool
         ];
     }
 
+    /**
+     * @throws \JsonException
+     */
     protected function execute(Request $request, User $user): Response
     {
         $input = AddTaskData::fromRequest($request);
