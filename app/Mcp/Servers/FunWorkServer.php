@@ -6,6 +6,7 @@ use App\Mcp\Tools\AddInboxItemTool;
 use App\Mcp\Tools\AddTaskTool;
 use App\Mcp\Tools\GetTaskTool;
 use App\Mcp\Tools\ListDecisionsTool;
+use App\Mcp\Tools\ListInboxItemsTool;
 use App\Mcp\Tools\ListProjectsTool;
 use App\Mcp\Tools\ListTasksTool;
 use App\Mcp\Tools\LogDecisionTool;
@@ -34,6 +35,7 @@ class FunWorkServer extends Server
         UpdateTaskDescriptionTool::class,
         AddTaskTool::class,
         AddInboxItemTool::class,
+        ListInboxItemsTool::class,
         ReadNotebookTool::class,
         ListDecisionsTool::class,
         LogDecisionTool::class,

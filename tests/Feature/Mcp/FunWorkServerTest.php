@@ -1,5 +1,6 @@
 <?php
 
+use App\Actions\Auth\CreateApiTokenAction;
 use App\Actions\Projects\CreateDefaultAreasAction;
 use App\Enums\TaskPriority;
 use App\Enums\TaskStatus;
@@ -7,6 +8,7 @@ use App\Mcp\Servers\FunWorkServer;
 use App\Mcp\Tools\AddInboxItemTool;
 use App\Mcp\Tools\AddTaskTool;
 use App\Mcp\Tools\GetTaskTool;
+use App\Mcp\Tools\ListInboxItemsTool;
 use App\Mcp\Tools\ListProjectsTool;
 use App\Mcp\Tools\ListTasksTool;
 use App\Mcp\Tools\ReadNotebookTool;
@@ -327,6 +329,141 @@ test('add_inbox_item rejects adding an inbox item to a project owned by another 
         ->assertHasErrors(['You are not authorized to add inbox items to this project.']);
 
     expect(InboxItem::where('project_id', $project->id)->exists())->toBeFalse();
+});
+
+test('FunWorkServer registers list_inbox_items', function (): void {
+    $user = User::factory()->create();
+    $created = app(CreateApiTokenAction::class)($user, 'Inbox Client');
+
+    $this->withHeader('Authorization', 'Bearer '.$created->plainTextToken)
+        ->postJson(route('mcp.funwork'), [
+            'jsonrpc' => '2.0',
+            'id' => 1,
+            'method' => 'tools/list',
+        ])
+        ->assertSuccessful()
+        ->assertJsonFragment(['name' => 'list_inbox_items']);
+});
+
+test('list_inbox_items returns inbox items newest first and excludes soft-deleted items', function (): void {
+    $user = User::factory()->create();
+    $project = Project::factory()->create(['owner_id' => $user->id]);
+
+    $olderItem = InboxItem::factory()->create([
+        'user_id' => $user->id,
+        'project_id' => $project->id,
+        'content' => 'Older inbox note',
+        'created_at' => now()->subHour(),
+    ]);
+
+    $newerItem = InboxItem::factory()->create([
+        'user_id' => $user->id,
+        'project_id' => $project->id,
+        'content' => 'Newer inbox note',
+        'created_at' => now(),
+    ]);
+
+    $deletedItem = InboxItem::factory()->create([
+        'user_id' => $user->id,
+        'project_id' => $project->id,
+        'content' => 'Deleted inbox note',
+    ]);
+    $deletedItem->delete();
+
+    $token = app(CreateApiTokenAction::class)($user, 'Inbox Order Client')->plainTextToken;
+
+    $httpResponse = $this->withHeader('Authorization', 'Bearer '.$token)
+        ->postJson(route('mcp.funwork'), [
+            'jsonrpc' => '2.0',
+            'id' => 1,
+            'method' => 'tools/call',
+            'params' => [
+                'name' => 'list_inbox_items',
+                'arguments' => ['project_id' => $project->id],
+            ],
+        ])
+        ->assertSuccessful();
+
+    $payload = json_decode($httpResponse->json('result.content.0.text'), true);
+
+    expect(array_column($payload['inbox_items'], 'id'))->toBe([$newerItem->id, $olderItem->id]);
+});
+
+test('list_inbox_items scopes results to the requested project', function (): void {
+    $user = User::factory()->create();
+    $project = Project::factory()->create(['owner_id' => $user->id]);
+    $otherProject = Project::factory()->create(['owner_id' => $user->id]);
+
+    InboxItem::factory()->create([
+        'user_id' => $user->id,
+        'project_id' => $project->id,
+        'content' => 'Target project note',
+    ]);
+
+    InboxItem::factory()->create([
+        'user_id' => $user->id,
+        'project_id' => $otherProject->id,
+        'content' => 'Other project note',
+    ]);
+
+    FunWorkServer::actingAs($user)
+        ->tool(ListInboxItemsTool::class, ['project_id' => $project->id])
+        ->assertOk()
+        ->assertName('list_inbox_items')
+        ->assertSee('Target project note')
+        ->assertDontSee('Other project note');
+});
+
+test('list_inbox_items scopes results to the authenticated user', function (): void {
+    $user = User::factory()->create();
+    $otherUser = User::factory()->create();
+    $project = Project::factory()->create(['owner_id' => $user->id]);
+
+    InboxItem::factory()->create([
+        'user_id' => $user->id,
+        'project_id' => $project->id,
+        'content' => 'Owner inbox note',
+    ]);
+
+    InboxItem::factory()->create([
+        'user_id' => $otherUser->id,
+        'project_id' => $project->id,
+        'content' => 'Other user note',
+    ]);
+
+    FunWorkServer::actingAs($user)
+        ->tool(ListInboxItemsTool::class, ['project_id' => $project->id])
+        ->assertOk()
+        ->assertSee('Owner inbox note')
+        ->assertDontSee('Other user note');
+});
+
+test('list_inbox_items rejects listing inbox items of a project owned by another user', function (): void {
+    $userA = User::factory()->create();
+    $userB = User::factory()->create();
+    $project = Project::factory()->create(['owner_id' => $userA->id]);
+
+    InboxItem::factory()->create([
+        'user_id' => $userA->id,
+        'project_id' => $project->id,
+        'content' => 'Private note',
+    ]);
+
+    FunWorkServer::actingAs($userB)
+        ->tool(ListInboxItemsTool::class, [
+            'project_id' => $project->id,
+        ])
+        ->assertHasErrors(['You are not authorized to access this project.']);
+});
+
+test('list_inbox_items returns Project not found for an unknown project id', function (): void {
+    $user = User::factory()->create();
+
+    FunWorkServer::actingAs($user)
+        ->tool(ListInboxItemsTool::class, [
+            'project_id' => 999999,
+        ])
+        ->assertHasErrors(['Project not found.']);
 });
 
 test('read_notebook returns exported Markdown by project and name for the owner', function () {
