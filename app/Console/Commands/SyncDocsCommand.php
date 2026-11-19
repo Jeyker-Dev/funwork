@@ -2,13 +2,10 @@
 
 namespace App\Console\Commands;
 
-use App\Jobs\SyncNotebookToGoogleDocJob;
-use App\Models\Notebook;
-use App\Models\NotebookPage;
+use App\Actions\Notebooks\SyncDocsNotebookAction;
+use App\Models\Area;
 use App\Models\Project;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
-use Symfony\Component\Finder\Finder;
 
 class SyncDocsCommand extends Command
 {
@@ -17,7 +14,7 @@ class SyncDocsCommand extends Command
      *
      * @var string
      */
-    protected $signature = "funwork:sync-docs {project : ID del proyecto} {--path= : carpeta de docs, por defecto base_path('docs')}";
+    protected $signature = "funwork:sync-docs {project : ID del proyecto} {--path= : carpeta de docs, por defecto base_path('docs')} {--area= : area slug; mirrors into notebook \"Docs · <Area name>\" linked to that area}";
 
     /**
      * The console command description.
@@ -26,126 +23,51 @@ class SyncDocsCommand extends Command
      */
     protected $description = "Mirror repository docs into the project's Docs notebook";
 
+    public function __construct(
+        private SyncDocsNotebookAction $syncDocsNotebook,
+    ) {
+        parent::__construct();
+    }
+
     /**
      * Execute the console command.
      */
     public function handle(): int
     {
         $projectId = $this->argument('project');
-        $docsPath = $this->option('path') ?: base_path('docs');
+        $project = Project::find($projectId);
 
-        return DB::transaction(function () use ($projectId, $docsPath) {
-            $project = Project::find($projectId);
+        if (! $project instanceof Project) {
+            $this->error("Project [{$projectId}] not found.");
 
-            if (! $project) {
-                $this->error("Project [{$projectId}] not found.");
+            return self::FAILURE;
+        }
+
+        $areaSlug = $this->option('area');
+        $area = null;
+
+        if (is_string($areaSlug) && $areaSlug !== '') {
+            $area = $project->areaByKey($areaSlug);
+
+            if (! $area instanceof Area) {
+                $this->error("Area [{$areaSlug}] not found in project [{$project->id}].");
 
                 return self::FAILURE;
             }
+        }
 
-            if (! is_dir($docsPath)) {
-                $this->error("Docs directory [{$docsPath}] not found.");
+        $docsPath = (string) ($this->option('path') ?: base_path('docs'));
 
-                return self::FAILURE;
-            }
+        if (! is_dir($docsPath)) {
+            $this->error("Docs directory [{$docsPath}] not found.");
 
-            $notebook = Notebook::firstOrCreate(
-                [
-                    'project_id' => $project->id,
-                    'name' => 'Docs',
-                ],
-                [
-                    'created_by' => $project->owner_id,
-                ]
-            );
+            return self::FAILURE;
+        }
 
-            $files = [];
-            $finder = (new Finder)
-                ->files()
-                ->in($docsPath)
-                ->name('*.md')
-                ->exclude('archive');
+        $counts = ($this->syncDocsNotebook)($project, $docsPath, $area);
 
-            foreach ($finder as $file) {
-                $relativePath = str_replace('\\', '/', $file->getRelativePathname());
+        $this->info("Docs sincronizados: {$counts['created']} creadas, {$counts['updated']} actualizadas, {$counts['deleted']} borradas.");
 
-                if (str_starts_with($relativePath, 'archive/') || $relativePath === 'archive') {
-                    continue;
-                }
-
-                $sourcePath = 'docs/'.ltrim($relativePath, '/');
-                $files[$sourcePath] = $file->getRealPath();
-            }
-
-            ksort($files, SORT_NATURAL | SORT_FLAG_CASE);
-
-            $created = 0;
-            $updated = 0;
-            $order = 1;
-            $syncedSourcePaths = [];
-
-            NotebookPage::withoutEvents(function () use ($files, $notebook, $project, &$created, &$updated, &$order, &$syncedSourcePaths) {
-                foreach ($files as $sourcePath => $filePath) {
-                    $syncedSourcePaths[] = $sourcePath;
-                    $body = file_get_contents($filePath);
-                    $content = [
-                        'title' => $sourcePath,
-                        'body' => $body,
-                    ];
-
-                    $page = $notebook->pages()->where('source_path', $sourcePath)->first();
-
-                    if (! $page) {
-                        $notebook->pages()->create([
-                            'source_path' => $sourcePath,
-                            'content' => $content,
-                            'created_by' => $project->owner_id,
-                            'order' => $order,
-                        ]);
-                        $created++;
-                    } else {
-                        $isContentDifferent = ! is_array($page->content)
-                            || ($page->content['title'] ?? null) !== $content['title']
-                            || ($page->content['body'] ?? null) !== $content['body'];
-
-                        $isOrderDifferent = (int) $page->order !== $order;
-                        $isOwnerDifferent = (int) $page->created_by !== (int) $project->owner_id;
-
-                        if ($isContentDifferent || $isOrderDifferent || $isOwnerDifferent) {
-                            $page->update([
-                                'content' => $content,
-                                'created_by' => $project->owner_id,
-                                'order' => $order,
-                            ]);
-                            $updated++;
-                        }
-                    }
-
-                    $order++;
-                }
-            });
-
-            $deleteQuery = $notebook->pages()->whereNotNull('source_path');
-
-            if (! empty($syncedSourcePaths)) {
-                $deleteQuery->whereNotIn('source_path', $syncedSourcePaths);
-            }
-
-            $deleted = $deleteQuery->delete();
-
-            if ($created + $updated + $deleted > 0) {
-                $notebook->forceFill([
-                    'content_changed_at' => now(),
-                ])->save();
-
-                if ($notebook->google_doc_id) {
-                    SyncNotebookToGoogleDocJob::dispatch($notebook)->delay(now()->addMinutes(2));
-                }
-            }
-
-            $this->info("Docs sincronizados: {$created} creadas, {$updated} actualizadas, {$deleted} borradas.");
-
-            return self::SUCCESS;
-        });
+        return self::SUCCESS;
     }
 }
