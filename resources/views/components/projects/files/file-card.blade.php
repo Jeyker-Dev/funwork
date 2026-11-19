@@ -1,5 +1,11 @@
 @props(['file', 'isSelected' => false, 'isSearching' => false])
 
+@php
+    use App\Enums\FileCategory;
+
+    $category = $file->category;
+@endphp
+
 <flux:card wire:key="file-{{ $file->id }}"
     @class([
         'relative cursor-pointer transition-colors p-0 overflow-hidden flex flex-col group',
@@ -46,41 +52,26 @@
 
     <!-- File Preview Area -->
     <div class="h-32 border-b border-ghost flex items-center justify-center relative overflow-hidden {{ $isSelected ? 'bg-brand-tint' : 'bg-surface-low' }}">
-        @if(str_contains($file->mime_type, 'image'))
+        @if($category === FileCategory::Image)
             <div class="absolute inset-0 bg-gradient-to-tr from-brand-tint/60 to-surface-card z-0"></div>
-            <flux:icon.photo class="w-12 h-12 text-brand relative z-10" />
-        @elseif(str_contains($file->mime_type, 'pdf'))
-            <div class="text-red-500 bg-red-50 dark:bg-red-950/30 p-3 rounded-xl shadow-sm relative z-10">
-                <flux:icon.document-text variant="solid" class="w-10 h-10" />
-            </div>
-        @else
-            <div class="text-blue-500 bg-blue-50 dark:bg-blue-950/30 p-3 rounded-xl shadow-sm relative z-10">
-                <flux:icon.document class="w-10 h-10" />
-            </div>
         @endif
+        <div class="relative z-10 {{ $category->previewClasses() }}">
+            <flux:icon :icon="$category->icon()" class="w-10 h-10" />
+        </div>
     </div>
 
     <!-- File Metadata -->
     <div class="p-4 flex gap-3 items-start relative z-10 transition-colors {{ $isSelected ? 'bg-brand-tint' : 'bg-surface-card' }}">
-        <div class="mt-1 {{ str_contains($file->mime_type, 'image') ? 'text-brand' : (str_contains($file->mime_type, 'pdf') ? 'text-red-500' : 'text-blue-500') }}">
-            @if(str_contains($file->mime_type, 'image'))
-                <flux:icon.photo class="w-5 h-5" />
-            @elseif(str_contains($file->mime_type, 'pdf'))
-                <flux:icon.document-text class="w-5 h-5" />
-            @else
-                <flux:icon.document class="w-5 h-5" />
-            @endif
+        <div class="mt-1 {{ $category->iconColor() }}">
+            <flux:icon :icon="$category->icon()" class="w-5 h-5" />
         </div>
         <div class="min-w-0 flex-1">
             <div class="font-semibold text-ink truncate" title="{{ $file->name }}">{{ $file->name }}</div>
-            @if($isSearching && $file->folder)
-                @php
-                    $path = collect($file->folder->breadcrumbs)->pluck('name')->join(' / ');
-                @endphp
-                <div class="text-xs text-ink-subtle truncate mt-0.5" title="{{ $path }}">{{ $path }}</div>
+            @if($isSearching && $file->folder_path)
+                <div class="text-xs text-ink-subtle truncate mt-0.5" title="{{ $file->folder_path }}">{{ $file->folder_path }}</div>
             @endif
             <div class="text-xs text-ink-muted mt-1 uppercase tracking-wide">
-                {{ explode('/', $file->mime_type)[1] ?? 'File' }} • {{ number_format($file->size / 1024 / 1024, 2) }} MB
+                {{ $file->extension_label }} • {{ $file->size_in_megabytes }} MB
             </div>
         </div>
     </div>

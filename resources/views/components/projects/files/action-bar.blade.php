@@ -3,6 +3,14 @@
     'hasItems' => false,
 ])
 
+@php
+    $maxVisibleBreadcrumbs = 3;
+    $crumbs = collect($breadcrumbs);
+    $currentCrumb = $crumbs->last();
+    $ancestorCrumbs = $crumbs->slice(0, -1);
+    $parentCrumb = $ancestorCrumbs->last();
+@endphp
+
 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
     <!-- Breadcrumbs -->
     <div class="flex flex-wrap items-center gap-2 text-sm text-ink-muted font-medium">
@@ -11,23 +19,20 @@
         @if(!empty($breadcrumbs))
             <flux:icon.chevron-right class="w-4 h-4 text-ink-subtle" />
 
-            @if(count($breadcrumbs) > 3)
-                <button wire:click="navigateToFolder({{ $breadcrumbs[0]->id }})" class="hover:text-ink transition-colors">{{ $breadcrumbs[0]->name }}</button>
+            @if($crumbs->count() > $maxVisibleBreadcrumbs)
+                <button wire:click="navigateToFolder({{ $crumbs->first()->id }})" class="hover:text-ink transition-colors">{{ $crumbs->first()->name }}</button>
                 <flux:icon.chevron-right class="w-4 h-4 text-ink-subtle" />
                 <span class="text-ink-subtle">...</span>
                 <flux:icon.chevron-right class="w-4 h-4 text-ink-subtle" />
-                <button wire:click="navigateToFolder({{ $breadcrumbs[count($breadcrumbs)-2]->id }})" class="hover:text-ink transition-colors">{{ $breadcrumbs[count($breadcrumbs)-2]->name }}</button>
+                <button wire:click="navigateToFolder({{ $parentCrumb->id }})" class="hover:text-ink transition-colors">{{ $parentCrumb->name }}</button>
                 <flux:icon.chevron-right class="w-4 h-4 text-ink-subtle" />
-                <span class="text-ink font-semibold">{{ $breadcrumbs[count($breadcrumbs)-1]->name }}</span>
+                <span class="text-ink font-semibold">{{ $currentCrumb->name }}</span>
             @else
-                @foreach($breadcrumbs as $index => $crumb)
-                    @if($index === count($breadcrumbs) - 1)
-                        <span class="text-ink font-semibold">{{ $crumb->name }}</span>
-                    @else
-                        <button wire:click="navigateToFolder({{ $crumb->id }})" class="hover:text-ink transition-colors">{{ $crumb->name }}</button>
-                        <flux:icon.chevron-right class="w-4 h-4 text-ink-subtle" />
-                    @endif
+                @foreach($ancestorCrumbs as $crumb)
+                    <button wire:click="navigateToFolder({{ $crumb->id }})" class="hover:text-ink transition-colors">{{ $crumb->name }}</button>
+                    <flux:icon.chevron-right class="w-4 h-4 text-ink-subtle" />
                 @endforeach
+                <span class="text-ink font-semibold">{{ $currentCrumb->name }}</span>
             @endif
         @endif
     </div>

@@ -1,5 +1,7 @@
 <?php
 
+use App\Actions\Projects\GetDashboardStatsAction;
+use App\Actions\Projects\ListRecentActivitiesAction;
 use App\Livewire\Forms\QuickCaptureForm;
 use App\Models\Project;
 use App\Support\DateHelper;
@@ -9,6 +11,8 @@ use Livewire\Component;
 
 new #[Layout('layouts.app', ['title' => 'Home'])]
 class extends Component {
+    private const int DASHBOARD_LIST_LIMIT = 5;
+
     public Project $project;
     
     public QuickCaptureForm $captureForm;
@@ -34,13 +38,13 @@ class extends Component {
         $localToday = DateHelper::userToday();
 
         return [
-            'recentActivities' => $this->project->getRecentActivities()->take(5),
+            'recentActivities' => app(ListRecentActivitiesAction::class)($this->project, self::DASHBOARD_LIST_LIMIT),
             'urgentTasks' => $this->project->tasks()
                 ->urgent($localToday)
                 ->orderBy('due_date', 'asc')
-                ->take(5)
+                ->take(self::DASHBOARD_LIST_LIMIT)
                 ->get(),
-            'stats' => $this->project->dashboardStats(),
+            'stats' => app(GetDashboardStatsAction::class)($this->project),
         ];
     }
 };
@@ -60,7 +64,7 @@ class extends Component {
                     <flux:icon name="check-circle" variant="solid" class="w-6 h-6" />
                 </div>
                 <div class="flex flex-col min-w-0">
-                    <span class="text-2xl font-bold text-ink leading-none">{{ $stats['today_tasks_count'] > 0 ? $stats['today_tasks_count'] : $stats['tasks_count'] }}</span>
+                    <span class="text-2xl font-bold text-ink leading-none">{{ $stats->highlightedTasksCount() }}</span>
                     <span class="text-sm text-ink-muted font-medium">Tareas para hoy</span>
                 </div>
             </div>
@@ -71,7 +75,7 @@ class extends Component {
                     <flux:icon name="light-bulb" variant="solid" class="w-6 h-6" />
                 </div>
                 <div class="flex flex-col min-w-0">
-                    <span class="text-2xl font-bold text-ink leading-none">{{ $stats['inbox_count'] }}</span>
+                    <span class="text-2xl font-bold text-ink leading-none">{{ $stats->inboxCount }}</span>
                     <span class="text-sm text-ink-muted font-medium">Ideas en Inbox</span>
                 </div>
             </div>

@@ -1,5 +1,6 @@
 <?php
 
+use App\Data\DashboardStatsData;
 use App\Enums\TaskStatus;
 use App\Models\InboxItem;
 use App\Models\Notebook;
@@ -7,6 +8,7 @@ use App\Models\Project;
 use App\Models\ProjectFile;
 use App\Models\Task;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Livewire\Livewire;
@@ -40,13 +42,13 @@ test('dashboard filters out done tasks from urgent tasks and stats counters', fu
     $this->actingAs($user);
 
     Livewire::test('pages::projects.show', ['project' => $project])
-        ->assertViewHas('urgentTasks', function ($urgentTasks) use ($overdueTodoTask, $overdueDoneTask) {
+        ->assertViewHas('urgentTasks', function (Collection $urgentTasks) use ($overdueTodoTask, $overdueDoneTask): bool {
             return $urgentTasks->contains($overdueTodoTask)
                 && ! $urgentTasks->contains($overdueDoneTask);
         })
-        ->assertViewHas('stats', function ($stats) {
-            return $stats['tasks_count'] === 2
-                && $stats['today_tasks_count'] === 1;
+        ->assertViewHas('stats', function (DashboardStatsData $stats): bool {
+            return $stats->openTasksCount === 2
+                && $stats->todayTasksCount === 1;
         });
 });
 
@@ -70,11 +72,11 @@ test('America/New_York user sees task due on local day as Due today, not Overdue
     $this->actingAs($user);
 
     Livewire::test('pages::projects.show', ['project' => $project])
-        ->assertViewHas('urgentTasks', function ($urgentTasks) use ($task) {
+        ->assertViewHas('urgentTasks', function (Collection $urgentTasks) use ($task): bool {
             return $urgentTasks->contains($task);
         })
-        ->assertViewHas('stats', function ($stats) {
-            return $stats['today_tasks_count'] === 1;
+        ->assertViewHas('stats', function (DashboardStatsData $stats): bool {
+            return $stats->todayTasksCount === 1;
         })
         ->assertSee('Due today')
         ->assertDontSee('Overdue');
@@ -100,7 +102,7 @@ test('America/New_York user sees task due on previous day as Overdue', function 
     $this->actingAs($user);
 
     Livewire::test('pages::projects.show', ['project' => $project])
-        ->assertViewHas('urgentTasks', function ($urgentTasks) use ($task) {
+        ->assertViewHas('urgentTasks', function (Collection $urgentTasks) use ($task): bool {
             return $urgentTasks->contains($task);
         })
         ->assertSee('Overdue')
@@ -127,11 +129,11 @@ test('regression: UTC user sees task due on current day as Due today, not Overdu
     $this->actingAs($user);
 
     Livewire::test('pages::projects.show', ['project' => $project])
-        ->assertViewHas('urgentTasks', function ($urgentTasks) use ($task) {
+        ->assertViewHas('urgentTasks', function (Collection $urgentTasks) use ($task): bool {
             return $urgentTasks->contains($task);
         })
-        ->assertViewHas('stats', function ($stats) {
-            return $stats['today_tasks_count'] === 1;
+        ->assertViewHas('stats', function (DashboardStatsData $stats): bool {
+            return $stats->todayTasksCount === 1;
         })
         ->assertSee('Due today')
         ->assertDontSee('Overdue');
@@ -157,7 +159,7 @@ test('UTC user sees task due on previous day as Overdue', function () {
     $this->actingAs($user);
 
     Livewire::test('pages::projects.show', ['project' => $project])
-        ->assertViewHas('urgentTasks', function ($urgentTasks) use ($task) {
+        ->assertViewHas('urgentTasks', function (Collection $urgentTasks) use ($task): bool {
             return $urgentTasks->contains($task);
         })
         ->assertSee('Overdue')
@@ -212,20 +214,15 @@ test('dashboard displays greeting, rendered stats, and falls back to total open 
     $this->actingAs($user);
 
     // When today_tasks_count > 0, displays today_tasks_count (1) and inbox_count (4)
-    $html = Livewire::test('pages::projects.show', ['project' => $project])
+    Livewire::test('pages::projects.show', ['project' => $project])
         ->assertSee('¡Buenos días, '.$user->display_name.'!')
-        ->html();
-
-    expect($html)->toContain('>1</span>')
-        ->toContain('>4</span>');
+        ->assertViewHas('stats', fn (DashboardStatsData $stats): bool => $stats->highlightedTasksCount() === 1 && $stats->inboxCount === 4);
 
     // When today_tasks_count === 0, falls back to total open tasks_count (2)
     $project->tasks()->whereDate('due_date', '2026-11-04')->delete();
 
-    $fallbackHtml = Livewire::test('pages::projects.show', ['project' => $project])
-        ->html();
-
-    expect($fallbackHtml)->toContain('>2</span>');
+    Livewire::test('pages::projects.show', ['project' => $project])
+        ->assertViewHas('stats', fn (DashboardStatsData $stats): bool => $stats->highlightedTasksCount() === 2);
 });
 
 test('urgent tasks excludes future and undated tasks, orders by due date ascending, and limits to five', function () {
