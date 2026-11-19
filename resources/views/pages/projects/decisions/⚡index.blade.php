@@ -71,8 +71,8 @@ class extends Component
             </flux:text>
         </div>
 
-        <div class="flex items-center gap-3">
-            <div class="w-48">
+        <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+            <div class="w-full sm:w-48">
                 <flux:select wire:model.live="statusFilter" aria-label="Filter by status">
                     <flux:select.option value="">{{ __('All statuses') }}</flux:select.option>
                     @foreach ($statuses as $status)
@@ -82,7 +82,7 @@ class extends Component
             </div>
 
             <flux:modal.trigger name="create-decision">
-                <flux:button variant="primary" icon="plus">
+                <flux:button variant="primary" icon="plus" class="max-md:min-h-11">
                     {{ __('New Decision') }}
                 </flux:button>
             </flux:modal.trigger>
@@ -105,9 +105,9 @@ class extends Component
                         wire:key="decision-{{ $decision->id }}"
                         href="{{ route('project.decisions.show', ['project' => $project, 'decision' => $decision]) }}"
                         wire:navigate
-                        class="flex flex-wrap items-center justify-between gap-4 px-5 py-4 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition"
+                        class="flex flex-wrap items-center justify-between gap-4 px-5 py-4 hover:bg-surface-low transition"
                     >
-                        <div class="flex items-center gap-3 min-w-0">
+                        <div class="flex items-center gap-3 min-w-0 flex-1">
                             <span class="font-mono text-xs font-semibold text-zinc-500 dark:text-zinc-400 shrink-0">
                                 {{ $decision->code }}
                             </span>
@@ -131,7 +131,7 @@ class extends Component
         </flux:card>
     @endif
 
-    <flux:modal name="create-decision" class="md:w-2xl">
+    <flux:modal name="create-decision" class="w-[calc(100vw-2rem)] md:max-w-2xl">
         <form wire:submit="createDecision" class="space-y-6">
             <div>
                 <flux:heading size="lg">{{ __('New Decision') }}</flux:heading>

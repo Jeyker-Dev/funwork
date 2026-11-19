@@ -239,9 +239,9 @@ class extends Component {
 ?>
 
 <div>
-    <div class="h-[calc(100vh-120px)] flex flex-col">
-        <div class="bg-gray-100 rounded-xl flex-1 flex flex-col overflow-hidden">
-            <div @class(['flex-1 overflow-y-auto px-6 pt-6', 'pb-32' => count($selectedIds) > 0, 'pb-6' => empty($selectedIds)])>
+    <div class="min-h-[calc(100vh-120px)] flex flex-col">
+        <div class="bg-surface-low border border-ghost rounded-2xl flex-1 flex flex-col overflow-hidden">
+            <div @class(['flex-1 overflow-y-auto px-4 sm:px-6 pt-6', 'pb-32' => count($selectedIds) > 0, 'pb-6' => empty($selectedIds)])>
                 <div wire:loading.remove.delay wire:target="navigateToFolder, navigateToRoot">
                     @if($currentFolderId !== null || $folders->isNotEmpty() || $files->isNotEmpty() || $isSearching)
                         <!-- Contextual Action Bar -->
@@ -257,46 +257,46 @@ class extends Component {
                     <div>
                         <!-- Folders Section -->
                         <div class="mb-8">
-                            <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center justify-between gap-2 mb-4">
                                 <flux:heading size="lg">{{ $isSearching ? 'Folders found' : 'Folders' }}</flux:heading>
                                 @if($folders->isNotEmpty())
                                     @php
                                         $allFoldersSelected = count(array_filter($selectedIds, fn($id) => str_starts_with($id, 'folder_'))) === $folders->count();
                                     @endphp
-                                    <button wire:click="toggleSelectAllFolders" class="text-sm font-medium flex items-center gap-1.5 transition-colors {{ $allFoldersSelected ? 'text-orange-600' : 'text-gray-400 hover:text-gray-900' }}">
+                                    <button wire:click="toggleSelectAllFolders" class="text-sm font-medium flex items-center gap-1.5 transition-colors max-md:min-h-11 {{ $allFoldersSelected ? 'text-accent-content' : 'text-ink-muted hover:text-ink' }}">
                                         <flux:icon.check-circle class="w-4 h-4" variant="{{ $allFoldersSelected ? 'solid' : 'outline' }}" />
                                         {{ $allFoldersSelected ? 'Deselect all' : 'Select all folders' }}
                                     </button>
                                 @endif
                             </div>
-                            <div class="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4">
+                            <div class="grid grid-cols-[repeat(auto-fill,minmax(min(250px,100%),1fr))] gap-4">
                                 @forelse($folders as $folder)
                                     <x-projects.files.folder-card :folder="$folder" :isSelected="in_array('folder_' . $folder->id, $selectedIds)" :isSearching="$isSearching" />
                                 @empty
-                                    <div class="col-span-full text-sm text-gray-500 italic">{{ $isSearching ? 'No folders found.' : 'No folders created yet.' }}</div>
+                                    <div class="col-span-full text-sm text-ink-muted italic">{{ $isSearching ? 'No folders found.' : 'No folders created yet.' }}</div>
                                 @endforelse
                             </div>
                         </div>
 
                         <!-- Files Section -->
                         <div>
-                            <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center justify-between gap-2 mb-4">
                                 <flux:heading size="lg">{{ $isSearching ? 'Files found' : 'Files in this location' }}</flux:heading>
                                 @if($files->isNotEmpty())
                                     @php
                                         $allFilesSelected = count(array_filter($selectedIds, fn($id) => str_starts_with($id, 'file_'))) === $files->count();
                                     @endphp
-                                    <button wire:click="toggleSelectAllFiles" class="text-sm font-medium flex items-center gap-1.5 transition-colors {{ $allFilesSelected ? 'text-orange-600' : 'text-gray-400 hover:text-gray-900' }}">
+                                    <button wire:click="toggleSelectAllFiles" class="text-sm font-medium flex items-center gap-1.5 transition-colors max-md:min-h-11 {{ $allFilesSelected ? 'text-accent-content' : 'text-ink-muted hover:text-ink' }}">
                                         <flux:icon.check-circle class="w-4 h-4" variant="{{ $allFilesSelected ? 'solid' : 'outline' }}" />
                                         {{ $allFilesSelected ? 'Deselect all' : 'Select all files' }}
                                     </button>
                                 @endif
                             </div>
-                            <div class="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4">
+                            <div class="grid grid-cols-[repeat(auto-fill,minmax(min(250px,100%),1fr))] gap-4">
                                 @forelse($files as $file)
                                     <x-projects.files.file-card :file="$file" :isSelected="in_array('file_' . $file->id, $selectedIds)" :isSearching="$isSearching" />
                                 @empty
-                                    <div class="col-span-full text-sm text-gray-500 italic">{{ $isSearching ? 'No files found.' : 'No files uploaded yet.' }}</div>
+                                    <div class="col-span-full text-sm text-ink-muted italic">{{ $isSearching ? 'No files found.' : 'No files uploaded yet.' }}</div>
                                 @endforelse
                             </div>
 

@@ -226,10 +226,12 @@ new class extends Component
 
 <div>
     <flux:modal.trigger name="manage-areas-modal">
-        <flux:button icon="tag" variant="ghost">Areas</flux:button>
+        <flux:button icon="tag" variant="ghost" aria-label="Areas" class="max-md:min-h-11 max-md:min-w-11 max-md:gap-0 max-md:px-2.5">
+            <span class="hidden md:inline">Areas</span>
+        </flux:button>
     </flux:modal.trigger>
 
-    <flux:modal name="manage-areas-modal" class="w-xl space-y-6">
+    <flux:modal name="manage-areas-modal" class="w-[calc(100vw-2rem)] max-w-xl space-y-6">
         <div>
             <flux:heading size="lg">Project Areas</flux:heading>
             <flux:text class="mt-1">

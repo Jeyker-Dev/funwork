@@ -113,10 +113,10 @@ new class extends Component
 
 <div>
     <flux:modal.trigger name="import-tasks-modal-{{ $project->id }}">
-        <flux:button size="sm" icon="arrow-up-tray" variant="ghost">Import</flux:button>
+        <flux:button size="sm" icon="arrow-up-tray" variant="ghost" class="max-md:min-h-11">Import</flux:button>
     </flux:modal.trigger>
 
-    <flux:modal name="import-tasks-modal-{{ $project->id }}" class="w-4xl space-y-6">
+    <flux:modal name="import-tasks-modal-{{ $project->id }}" class="w-[calc(100vw-2rem)] max-w-4xl space-y-6">
         <div>
             <flux:heading size="lg">Import Tasks from NotebookLM</flux:heading>
             <flux:text class="mt-1">

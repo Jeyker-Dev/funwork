@@ -14,13 +14,13 @@
             @endif
             
             @if ($highlight)
-                <span class="text-orange-500 mt-4 block">{{ $highlight }}</span>
+                <span class="text-accent-content mt-4 block">{{ $highlight }}</span>
             @endif
         </h1>
     @endif
 
     @if ($description)
-        <p class="text-gray-500 font-normal text-sm md:text-base max-w-96 md:max-w-lg">
+        <p class="text-ink-muted font-normal text-sm md:text-base max-w-96 md:max-w-lg">
             {{ $description }}
         </p>
     @endif

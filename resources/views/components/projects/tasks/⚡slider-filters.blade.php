@@ -62,13 +62,13 @@ new class extends Component
 ?>
 
 <div>
-    <div class="flex justify-between items-center w-9/12 gap-4 my-6">
+    <div class="flex flex-wrap justify-between items-center w-full gap-4 my-6">
         <button
             type="button"
             @class([
-                'text-sm font-bold uppercase transition-colors duration-200 cursor-pointer group relative hover:text-orange-500',
-                'text-orange-500' => $activeFilter === 'all',
-                'text-gray-500' => $activeFilter !== 'all',
+                'text-sm font-bold uppercase transition-colors duration-200 cursor-pointer group relative hover:text-accent-content max-md:min-h-11',
+                'text-accent-content' => $activeFilter === 'all',
+                'text-ink-muted' => $activeFilter !== 'all',
             ])
             wire:click="setFilter('all')"
         >
@@ -77,7 +77,7 @@ new class extends Component
                 <livewire:projects.tasks.filter-count :count="$counts['all']" :active="$activeFilter === 'all'" :key="'count-all-'.$counts['all'].'-'.($activeFilter === 'all' ? '1' : '0')" />
             </span>
             <span @class([
-                'absolute left-0 -bottom-1 w-full h-0.5 bg-orange-500 transition-transform duration-200 origin-left',
+                'absolute left-0 -bottom-1 w-full h-0.5 bg-brand transition-transform duration-200 origin-left',
                 'scale-x-100' => $activeFilter === 'all',
                 'scale-x-0 group-hover:scale-x-100' => $activeFilter !== 'all',
             ])></span>
@@ -86,9 +86,9 @@ new class extends Component
         <button
             type="button"
             @class([
-                'text-sm font-bold uppercase transition-colors duration-200 cursor-pointer group relative hover:text-orange-500',
-                'text-orange-500' => $activeFilter === TaskStatus::Todo->value,
-                'text-gray-500' => $activeFilter !== TaskStatus::Todo->value,
+                'text-sm font-bold uppercase transition-colors duration-200 cursor-pointer group relative hover:text-accent-content max-md:min-h-11',
+                'text-accent-content' => $activeFilter === TaskStatus::Todo->value,
+                'text-ink-muted' => $activeFilter !== TaskStatus::Todo->value,
             ])
             wire:click="setFilter('{{ TaskStatus::Todo->value }}')"
         >
@@ -97,7 +97,7 @@ new class extends Component
                 <livewire:projects.tasks.filter-count :count="$counts[TaskStatus::Todo->value]" :active="$activeFilter === TaskStatus::Todo->value" :key="'count-todo-'.$counts[TaskStatus::Todo->value].'-'.($activeFilter === TaskStatus::Todo->value ? '1' : '0')" />
             </span>
             <span @class([
-                'absolute left-0 -bottom-1 w-full h-0.5 bg-orange-500 transition-transform duration-200 origin-left',
+                'absolute left-0 -bottom-1 w-full h-0.5 bg-brand transition-transform duration-200 origin-left',
                 'scale-x-100' => $activeFilter === TaskStatus::Todo->value,
                 'scale-x-0 group-hover:scale-x-100' => $activeFilter !== TaskStatus::Todo->value,
             ])></span>
@@ -106,9 +106,9 @@ new class extends Component
         <button
             type="button"
             @class([
-                'text-sm font-bold uppercase transition-colors duration-200 cursor-pointer group relative hover:text-orange-500',
-                'text-orange-500' => $activeFilter === TaskStatus::Doing->value,
-                'text-gray-500' => $activeFilter !== TaskStatus::Doing->value,
+                'text-sm font-bold uppercase transition-colors duration-200 cursor-pointer group relative hover:text-accent-content max-md:min-h-11',
+                'text-accent-content' => $activeFilter === TaskStatus::Doing->value,
+                'text-ink-muted' => $activeFilter !== TaskStatus::Doing->value,
             ])
             wire:click="setFilter('{{ TaskStatus::Doing->value }}')"
         >
@@ -117,7 +117,7 @@ new class extends Component
                 <livewire:projects.tasks.filter-count :count="$counts[TaskStatus::Doing->value]" :active="$activeFilter === TaskStatus::Doing->value" :key="'count-doing-'.$counts[TaskStatus::Doing->value].'-'.($activeFilter === TaskStatus::Doing->value ? '1' : '0')" />
             </span>
             <span @class([
-                'absolute left-0 -bottom-1 w-full h-0.5 bg-orange-500 transition-transform duration-200 origin-left',
+                'absolute left-0 -bottom-1 w-full h-0.5 bg-brand transition-transform duration-200 origin-left',
                 'scale-x-100' => $activeFilter === TaskStatus::Doing->value,
                 'scale-x-0 group-hover:scale-x-100' => $activeFilter !== TaskStatus::Doing->value,
             ])></span>
@@ -126,9 +126,9 @@ new class extends Component
         <button
             type="button"
             @class([
-                'text-sm font-bold uppercase transition-colors duration-200 cursor-pointer group relative hover:text-orange-500',
-                'text-orange-500' => $activeFilter === TaskStatus::Done->value,
-                'text-gray-500' => $activeFilter !== TaskStatus::Done->value,
+                'text-sm font-bold uppercase transition-colors duration-200 cursor-pointer group relative hover:text-accent-content max-md:min-h-11',
+                'text-accent-content' => $activeFilter === TaskStatus::Done->value,
+                'text-ink-muted' => $activeFilter !== TaskStatus::Done->value,
             ])
             wire:click="setFilter('{{ TaskStatus::Done->value }}')"
         >
@@ -137,7 +137,7 @@ new class extends Component
                 <livewire:projects.tasks.filter-count :count="$counts[TaskStatus::Done->value]" :active="$activeFilter === TaskStatus::Done->value" :key="'count-done-'.$counts[TaskStatus::Done->value].'-'.($activeFilter === TaskStatus::Done->value ? '1' : '0')" />
             </span>
             <span @class([
-                'absolute left-0 -bottom-1 w-full h-0.5 bg-orange-500 transition-transform duration-200 origin-left',
+                'absolute left-0 -bottom-1 w-full h-0.5 bg-brand transition-transform duration-200 origin-left',
                 'scale-x-100' => $activeFilter === TaskStatus::Done->value,
                 'scale-x-0 group-hover:scale-x-100' => $activeFilter !== TaskStatus::Done->value,
             ])></span>

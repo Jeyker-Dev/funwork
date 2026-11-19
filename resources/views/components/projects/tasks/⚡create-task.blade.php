@@ -65,7 +65,7 @@ new class extends Component
         </div>
     </flux:modal.trigger>
 
-    <flux:modal name="{{ $modalName }}" class="w-xl">
+    <flux:modal name="{{ $modalName }}" class="w-[calc(100vw-2rem)] max-w-xl">
         <form wire:submit.prevent="save">
             <div class="space-y-6">
                 <div>
@@ -80,8 +80,8 @@ new class extends Component
 
                 <flux:textarea label="Description" placeholder="Add details..." wire:model="form.description" />
 
-                <div class="flex justify-between items-center w-full gap-4 my-6">
-                    <div class="w-1/2">
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center w-full gap-4 my-6">
+                    <div class="w-full sm:w-1/2">
                         <flux:select variant="listbox" label="Status" placeholder="Choose status..." wire:model="form.status">
                             <flux:select.option>{{ TaskStatus::Todo->value }}</flux:select.option>
                             <flux:select.option>{{ TaskStatus::Doing->value }}</flux:select.option>
@@ -89,15 +89,15 @@ new class extends Component
                         </flux:select>
                     </div>
 
-                    <div class="w-1/2">
+                    <div class="w-full sm:w-1/2">
                         <flux:select variant="listbox" label="Priority" placeholder="Choose priority..." wire:model="form.priority">
                             <flux:select.option>{{ TaskPriority::Low->value }}</flux:select.option>
                         </flux:select>
                     </div>
                 </div>
 
-                <div class="flex justify-between items-center w-full gap-4 my-6">
-                    <div class="w-1/2">
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center w-full gap-4 my-6">
+                    <div class="w-full sm:w-1/2">
                         <flux:select variant="listbox" label="Area" placeholder="No area" wire:model="form.areaId">
                             <flux:select.option :value="null">No area</flux:select.option>
                             @foreach($project->areas as $area)
@@ -106,7 +106,7 @@ new class extends Component
                         </flux:select>
                     </div>
 
-                    <div class="w-1/2">
+                    <div class="w-full sm:w-1/2">
                         <flux:input label="Due date" type="date" wire:model="form.dueDate"/>
                     </div>
                 </div>

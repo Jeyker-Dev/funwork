@@ -33,30 +33,30 @@ new class extends Component {
 <div>
     @if($this->elementName === 'header')
         <flux:modal.trigger name="create-project">
-            <flux:button icon="plus" class="bg-orange-500! text-white! border-0! hover:bg-orange-600! mx-6" href="#">
-                New project
+            <flux:button icon="plus" variant="primary" aria-label="New project" class="max-md:min-h-11 max-sm:min-w-11 max-sm:gap-0 max-sm:px-2.5" href="#">
+                <span class="hidden sm:inline">New project</span>
             </flux:button>
         </flux:modal.trigger>
     @else
         <flux:modal.trigger name="create-project">
             <div
-                class="flex flex-col items-center justify-center gap-4 border-2 border-dashed border-gray-300 rounded-lg p-6 mt-6 max-w-96 cursor-pointer">
-                <div class="flex flex-col items-center justify-center bg-gray-300 rounded-full w-10 h-10 md:w-12 md:h-12">
-                    <flux:icon.plus variant="solid" class="text-black size-6 md:size-7"/>
+                class="flex flex-col items-center justify-center gap-4 border-2 border-dashed border-ghost bg-surface-card rounded-2xl p-6 mt-6 max-w-96 cursor-pointer">
+                <div class="flex flex-col items-center justify-center bg-surface-high rounded-full w-10 h-10 md:w-12 md:h-12">
+                    <flux:icon.plus variant="solid" class="text-ink size-6 md:size-7"/>
                 </div>
 
-                <p class="text-black font-bold md:text-lg">
+                <p class="text-ink font-bold md:text-lg">
                     Create your first project
                 </p>
 
-                <p class="text-gray-500 font-normal text-center w-8/12 text-sm md:text-base">
+                <p class="text-ink-muted font-normal text-center w-8/12 text-sm md:text-base">
                     Start your first workspace and organize your tasks effortlessly.
                 </p>
             </div>
         </flux:modal.trigger>
     @endif
 
-    <flux:modal name="create-project" class="w-72 md:w-full">
+    <flux:modal name="create-project" class="w-[calc(100vw-2rem)] max-w-xl">
         <form wire:submit.prevent="save">
             <div class="space-y-6">
                 <div>
@@ -75,8 +75,7 @@ new class extends Component {
                     </div>
 
                     <div class="">
-                        <flux:radio.group label="Icon" wire:model="form.icon" variant="segmented"
-                                          class="bg-linear-to-r from-orange-500 to-yellow-500">
+                        <flux:radio.group label="Icon" wire:model="form.icon" variant="segmented">
                             <flux:radio icon="wrench" value="wrench"/>
                             <flux:radio icon="pencil-square" value="pencil-square"/>
                             <flux:radio icon="eye" value="eye"/>
@@ -128,7 +127,7 @@ new class extends Component {
 
                     <flux:spacer/>
 
-                    <flux:button type="submit" variant="primary" class="hover:bg-orange-600">Create</flux:button>
+                    <flux:button type="submit" variant="primary">Create</flux:button>
                 </div>
             </div>
         </form>

@@ -6,10 +6,10 @@
      x-transition:leave="transition ease-in duration-200"
      x-transition:leave-start="opacity-100 translate-y-0"
      x-transition:leave-end="opacity-0 translate-y-8"
-     class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center bg-gray-900 text-white rounded-full shadow-xl px-4 py-2 gap-4">
+     class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 max-w-[calc(100vw-2rem)] flex flex-wrap items-center justify-center bg-gray-900 text-white rounded-2xl sm:rounded-full shadow-xl px-4 py-2 gap-3 sm:gap-4">
 
     <div class="flex items-center gap-2 pr-4 border-r border-gray-700">
-        <div class="bg-orange-500 rounded p-1 flex items-center justify-center h-5 w-5">
+        <div class="bg-brand-strong rounded p-1 flex items-center justify-center h-5 w-5">
             <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
             </svg>

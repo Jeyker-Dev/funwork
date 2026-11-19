@@ -92,9 +92,10 @@ new class extends Component {
 
 <div>
     {{-- Area filter tabs --}}
-    <div class="flex items-center gap-2 mb-6 overflow-x-auto pb-1">
+    <div class="flex flex-wrap items-center gap-2 mb-6">
         <flux:button
             size="sm"
+            class="max-md:min-h-11"
             :variant="$area === 'all' || empty($area) ? 'filled' : 'ghost'"
             wire:click="setArea('all')"
         >
@@ -104,6 +105,7 @@ new class extends Component {
         @foreach($project->areas as $projectArea)
             <flux:button
                 size="sm"
+                class="max-md:min-h-11"
                 :variant="$area === $projectArea->slug ? 'filled' : 'ghost'"
                 wire:click="setArea('{{ $projectArea->slug }}')"
             >
@@ -114,18 +116,19 @@ new class extends Component {
 
         <flux:button
             size="sm"
+            class="max-md:min-h-11"
             :variant="in_array($area, ['no-area', 'none', 'No area']) ? 'filled' : 'ghost'"
             wire:click="setArea('no-area')"
         >
             No area
         </flux:button>
 
-        <flux:spacer />
-
-        <livewire:projects.tasks.import-tasks :project="$project" />
+        <div class="ml-auto">
+            <livewire:projects.tasks.import-tasks :project="$project" />
+        </div>
     </div>
 
-    <div class="grid grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         @foreach($this->columns as $column)
 
             @php
@@ -135,13 +138,15 @@ new class extends Component {
                 $hiddenCount = max(0, $count - 3);
 
                 $taskStatus = TaskStatus::tryFrom($status);
-                $countClass = $taskStatus?->dot() ?? 'bg-gray-500';
+                $countClass = $taskStatus === TaskStatus::Todo
+                    ? 'bg-brand-strong'
+                    : ($taskStatus?->dot() ?? 'bg-gray-500');
                 $indicatorClass = $taskStatus?->badge() ?? 'border-gray-200 bg-gray-50 hover:bg-gray-200 text-gray-500';
 
                 $modalName = 'show-more-tasks-'.$projectId.'-'.$status;
             @endphp
 
-            <x-projects.tasks.card class="{{ $column['border'] }} {{ $column['bg'] }}">
+            <x-projects.tasks.card class="min-w-0 {{ $column['border'] }} {{ $column['bg'] }}">
                 {{-- Header: status + count --}}
                 <div class="flex items-center gap-2 mb-4">
                     <div class="{{ $column['dot'] }} w-2 h-2 rounded-full"></div>
@@ -193,8 +198,8 @@ new class extends Component {
                                     class="space-y-6 w-full hover:cursor-pointer hover:shadow-md transition-shadow duration-200"
                                     x-on:click="window.location='{{ route('show.task', ['project' => $project, 'task' => $task->id]) }}'"
                                 >
-                                    <div class="flex items-center justify-between">
-                                        <div class="flex items-center gap-2">
+                                    <div class="flex items-center justify-between gap-2 flex-wrap">
+                                        <div class="flex items-center gap-2 flex-wrap min-w-0">
                                             <flux:badge size="lg" class="uppercase" color="orange">
                                                 {{ $task->priority->value }}
                                             </flux:badge>

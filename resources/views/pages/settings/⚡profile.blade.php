@@ -100,15 +100,15 @@ new #[Title('Profile settings')] class extends Component {
 
     <x-pages::settings.layout :heading="__('Profile')" :subheading="__('Update your name and email address')">
         <form wire:submit="updateProfileInformation" class="my-6 w-full space-y-6">
-            <div class="flex items-center gap-6 mb-6">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-6 mb-6">
                 @if ($photo)
                     <flux:avatar size="xl" src="{{ $photo->temporaryUrl() }}" />
                 @else
                     <flux:avatar size="xl" :src="auth()->user()->avatar_url" />
                 @endif
-                <div class="flex flex-col gap-2">
+                <div class="flex flex-col gap-2 min-w-0">
                     <label class="text-sm font-medium">{{ __('Profile Photo') }}</label>
-                    <input type="file" wire:model="photo" accept="image/*" class="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100" />
+                    <input type="file" wire:model="photo" accept="image/*" class="w-full text-sm text-ink-muted file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-brand-tint file:text-accent-content hover:file:bg-surface-high" />
                     @error('photo') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                 </div>
             </div>

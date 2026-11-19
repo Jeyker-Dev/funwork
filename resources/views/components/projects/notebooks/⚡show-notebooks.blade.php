@@ -152,15 +152,15 @@ new class extends Component
 ?>
 
 <div>
-    <div class="grid grid-cols-3 gap-4 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
         @foreach($notebooks as $notebook)
-            <flux:card class="space-y-6 cursor-pointer hover:ring-2 hover:ring-zinc-800/10 dark:hover:ring-white/20 transition" wire:click="openNotebook({{ $notebook->id }})">
+            <flux:card class="space-y-6 cursor-pointer hover:ring-2 hover:ring-zinc-800/10 dark:hover:ring-white/20 transition min-w-0" wire:click="openNotebook({{ $notebook->id }})">
 
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <flux:heading size="lg">{{ $notebook->name }}</flux:heading>
+                <div class="flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <flux:heading size="lg" class="truncate">{{ $notebook->name }}</flux:heading>
                         @if($notebook->area)
-                            <flux:badge size="sm" :color="$notebook->area->color">{{ $notebook->area->name }}</flux:badge>
+                            <flux:badge size="sm" :color="$notebook->area->color" class="shrink-0">{{ $notebook->area->name }}</flux:badge>
                         @endif
                     </div>
 
@@ -215,7 +215,7 @@ new class extends Component
 
     <flux:pagination :paginator="$notebooks" />
 
-    <flux:modal name="change-notebook-area" class="w-md">
+    <flux:modal name="change-notebook-area" class="w-[calc(100vw-2rem)] max-w-md">
         <form wire:submit.prevent="saveNotebookArea" class="space-y-6">
             <div>
                 <flux:heading size="lg">Change Area</flux:heading>
