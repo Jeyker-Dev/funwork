@@ -12,9 +12,31 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
     --font-manrope: 'Manrope', sans-serif;
     --font-inter: 'Inter', sans-serif;
+
+    --color-surface: #f6f6f8;
+    --color-surface-low: #f0f1f3;
+    --color-surface-card: #ffffff;
+    --color-surface-high: #e1e2e5;
+    --color-surface-highest: #dbdde0;
+
+    --color-ink: #2d2f31;
+    --color-ink-muted: #5a5c5d;
+    --color-ink-subtle: #757779;
+
+    --color-brand: #ff6d00;
+    --color-brand-strong: #c2410c;
+    --color-brand-deep: #9b3f00;
+    --color-brand-tint: #fff0ea;
+    --color-brand-glow: #ffc96f;
+
+    --color-ghost: rgb(172 173 175 / 0.2);
+    --color-danger: #b02500;
+    --color-danger-tint: #ffefec;
+
+    --shadow-ambient: 0 20px 40px rgb(12 14 16 / 0.05);
 
     --color-zinc-50: #fafafa;
     --color-zinc-100: #f5f5f5;
@@ -28,16 +50,29 @@
     --color-zinc-900: #171717;
     --color-zinc-950: #0a0a0a;
 
-    --color-accent: var(--color-orange-500);
-    --color-accent-content: var(--color-neutral-800);
+    --color-accent: var(--color-brand-strong);
+    --color-accent-content: var(--color-brand-strong);
     --color-accent-foreground: var(--color-white);
 }
 
 @layer theme {
     .dark {
-        --color-accent: var(--color-white);
-        --color-accent-content: var(--color-white);
-        --color-accent-foreground: var(--color-neutral-800);
+        --color-surface: var(--color-zinc-950);
+        --color-surface-low: var(--color-zinc-900);
+        --color-surface-card: var(--color-zinc-900);
+        --color-surface-high: var(--color-zinc-800);
+        --color-surface-highest: var(--color-zinc-700);
+
+        --color-ink: var(--color-zinc-100);
+        --color-ink-muted: var(--color-zinc-400);
+        --color-ink-subtle: var(--color-zinc-500);
+
+        --color-brand-tint: rgb(194 65 12 / 0.15);
+        --color-ghost: rgb(255 255 255 / 0.1);
+
+        --color-accent: var(--color-brand-strong);
+        --color-accent-content: var(--color-orange-400);
+        --color-accent-foreground: var(--color-white);
     }
 }
 
@@ -47,6 +82,7 @@ h3,
 h4,
 [data-flux-heading] {
     font-family: var(--font-manrope);
+    letter-spacing: -0.01em;
 }
 
 p,
@@ -61,7 +97,12 @@ p,
     ::before,
     ::backdrop,
     ::file-selector-button {
-        border-color: var(--color-gray-200, currentColor);
+        border-color: var(--color-ghost, currentColor);
+    }
+
+    body {
+        background-color: var(--color-surface);
+        color: var(--color-ink);
     }
 }
 
@@ -76,45 +117,48 @@ p,
 input:focus[data-flux-control],
 textarea:focus[data-flux-control],
 select:focus[data-flux-control] {
-    @apply outline-hidden ring-1 ring-accent ring-offset-2 ring-offset-accent-foreground;
+    @apply outline-hidden;
+    border-color: var(--color-brand-strong);
+    box-shadow: 0 0 0 4px rgb(255 109 0 / 0.15);
 }
 
-input:focus[data-flux-control] {
-    @apply ring-0 ring-offset-0;
+/* Flux renders primary buttons with no variant attribute, so they are matched by the accent background class it emits. */
+[data-flux-button][class*="bg-[var(--color-accent)]"] {
+    background-image: linear-gradient(90deg, var(--color-brand-strong), var(--color-brand-deep));
+    border-color: transparent;
+    font-weight: 600;
+
+    &:hover {
+        background-image: linear-gradient(90deg, var(--color-brand-deep), var(--color-brand-deep));
+    }
 }
 
-.form-line::before {
-    content: "";
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 4px;
-    background: linear-gradient(to right, #f59e42, #facc15);
-    border-radius: 10px;
-}
-
+.form-line::before,
 .line-card::before {
     content: "";
     position: absolute;
     top: 0; left: 0; right: 0;
     height: 4px;
-    background: linear-gradient(to right, #f59e42, #facc15);
+    background: linear-gradient(90deg, var(--color-brand), var(--color-brand-glow));
     border-radius: 100px;
 }
 
 .gray-search > [data-flux-control] {
-    background-color: oklch(96.7% 0.003 264.542);
+    background-color: var(--color-surface-low);
     border: none !important;
     border-radius: 20px !important;
 }
 
 .gray-search-2 > [data-flux-control] {
-    background-color: oklch(96.7% 0.003 264.542);
+    background-color: var(--color-surface-low);
     border: none !important;
     border-radius: 5px !important;
 }
 
 [data-current] {
-    @apply bg-gray-300 text-orange-500 border-r-6 border-r-orange-500;
+    background-color: var(--color-surface-card);
+    color: var(--color-accent-content);
+    box-shadow: inset 3px 0 0 var(--color-brand);
 }
 
 .markdown-content {
@@ -252,19 +296,15 @@ input:focus[data-flux-control] {
     }
 
     a {
-        color: var(--color-orange-500);
+        color: var(--color-accent-content);
         text-decoration: underline;
 
         &:hover {
-            color: var(--color-orange-600);
+            color: var(--color-brand-deep);
         }
 
-        &:is(.dark, .dark *) {
-            color: var(--color-orange-400);
-
-            &:hover {
-                color: var(--color-orange-300);
-            }
+        &:is(.dark, .dark *):hover {
+            color: var(--color-orange-300);
         }
     }
 

@@ -6,23 +6,40 @@
     }
 @endphp
 
-<flux:header class="bg-white flex items-center justify-between px-16!">
-    <flux:sidebar.toggle class="lg:hidden mr-2" icon="bars-2" inset="left"/>
+<flux:header class="bg-surface-low flex items-center justify-between gap-2 sm:gap-4 px-4 lg:px-8 xl:px-16">
+    <div class="flex gap-2 sm:gap-3 items-center min-w-0">
+        <flux:sidebar.toggle class="lg:hidden shrink-0 min-h-11 min-w-11" icon="bars-2" inset="left"/>
 
-    <div class="flex gap-4 items-center">
-        <x-projects.icon-project :project="$project"/>
+        <x-projects.icon-project :project="$project" containerClass="shrink-0 max-sm:w-9 max-sm:h-9"/>
 
-        <flux:heading class="text-xl lg:text-2xl">
+        <flux:heading class="text-lg sm:text-xl lg:text-2xl truncate min-w-0">
             {{ $project->name }}
         </flux:heading>
     </div>
 
     @if(!request()->routeIs('projects.show'))
-        <livewire:utilities.search-input containerClass="min-w-xs" inputPlaceholder="{{ $placeholder }}" />
+        <livewire:utilities.search-input
+            :key="'header-search-desktop'"
+            containerClass="hidden md:block min-w-0 flex-1 max-w-xs"
+            inputPlaceholder="{{ $placeholder }}"
+        />
     @endif
 
+    <div class="flex items-center gap-1 sm:gap-2 shrink-0">
+        @if(!request()->routeIs('projects.show'))
+            <flux:dropdown position="bottom" align="end" class="md:hidden">
+                <flux:button variant="ghost" icon="magnifying-glass" aria-label="Search" class="min-h-11 min-w-11" />
 
-    <div class="flex items-center gap-2">
+                <flux:menu class="w-72 p-3">
+                    <livewire:utilities.search-input
+                        :key="'header-search-mobile'"
+                        containerClass="w-full"
+                        inputPlaceholder="{{ $placeholder }}"
+                    />
+                </flux:menu>
+            </flux:dropdown>
+        @endif
+
         <livewire:projects.project-finder :project="$project"/>
 
         <livewire:projects.manage-areas :project="$project"/>
@@ -32,33 +49,3 @@
         <x-desktop-user-menu/>
     </div>
 </flux:header>
-
-<!-- Mobile Menu -->
-<flux:sidebar collapsible="mobile" sticky
-              class="lg:hidden border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
-    <flux:sidebar.header>
-        <x-app-logo :sidebar="true" href="{{ route('projects') }}" wire:navigate/>
-        <flux:sidebar.collapse
-            class="in-data-flux-sidebar-on-desktop:not-in-data-flux-sidebar-collapsed-desktop:-mr-2"/>
-    </flux:sidebar.header>
-
-    <flux:sidebar.nav>
-        <flux:sidebar.group :heading="__('Platform')">
-            <flux:sidebar.item icon="layout-grid" :href="route('projects')" :current="request()->routeIs('projects')"
-                               wire:navigate>
-                {{ __('Dashboard')  }}
-            </flux:sidebar.item>
-        </flux:sidebar.group>
-    </flux:sidebar.nav>
-
-    <flux:spacer/>
-
-    <flux:sidebar.nav>
-        <flux:sidebar.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
-            {{ __('Repository') }}
-        </flux:sidebar.item>
-        <flux:sidebar.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
-            {{ __('Documentation') }}
-        </flux:sidebar.item>
-    </flux:sidebar.nav>
-</flux:sidebar>
