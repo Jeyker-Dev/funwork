@@ -17,18 +17,12 @@
             @foreach($activities as $activity)
                 <div class="flex items-center justify-between p-3 rounded-xl border border-ghost bg-surface-low">
                     <div class="flex items-center gap-3 min-w-0">
-                        @if($activity->type === 'notebook')
-                            <div class="p-2 bg-blue-100 text-blue-600 rounded-lg dark:bg-blue-900/30 dark:text-blue-400 shrink-0">
-                                <flux:icon.book-open class="w-5 h-5" />
-                            </div>
-                        @else
-                            <div class="p-2 bg-purple-100 text-purple-600 rounded-lg dark:bg-purple-900/30 dark:text-purple-400 shrink-0">
-                                <flux:icon.document class="w-5 h-5" />
-                            </div>
-                        @endif
+                        <div class="p-2 rounded-lg shrink-0 {{ $activity->type->iconClasses() }}">
+                            <flux:icon :icon="$activity->type->icon()" class="w-5 h-5" />
+                        </div>
                         <div class="flex flex-col min-w-0">
                             <span class="text-sm font-medium text-ink truncate">{{ $activity->name }}</span>
-                            <span class="text-xs text-ink-muted">Updated {{ \Carbon\Carbon::parse($activity->updated_at)->diffForHumans() }}</span>
+                            <span class="text-xs text-ink-muted">Updated {{ $activity->updated_at->diffForHumans() }}</span>
                         </div>
                     </div>
                 </div>

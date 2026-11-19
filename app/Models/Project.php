@@ -2,14 +2,11 @@
 
 namespace App\Models;
 
-use App\Support\DateHelper;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 #[Fillable([
@@ -71,39 +68,5 @@ class Project extends Model
     public function decisions(): HasMany
     {
         return $this->hasMany(Decision::class, 'project_id');
-    }
-
-    /**
-     * @return array{tasks_count: int, today_tasks_count: int, inbox_count: int}
-     */
-    public function dashboardStats(?User $user = null): array
-    {
-        $localToday = DateHelper::userToday($user);
-
-        return [
-            'tasks_count' => $this->tasks()
-                ->open()
-                ->count(),
-            'today_tasks_count' => $this->tasks()
-                ->dueToday($localToday)
-                ->count(),
-            'inbox_count' => $this->inboxItems()->count(),
-        ];
-    }
-
-    /**
-     * @return Collection<int, Notebook|ProjectFile>
-     */
-    public function getRecentActivities(): Collection
-    {
-        $notebooks = $this->notebooks()
-            ->select('id', 'name', 'created_by', 'updated_at', DB::raw("'notebook' as type"));
-
-        $files = $this->files()
-            ->select('id', 'name', 'created_by', 'updated_at', DB::raw("'file' as type"));
-
-        return $notebooks->unionAll($files)
-            ->orderBy('updated_at', 'desc')
-            ->get();
     }
 }

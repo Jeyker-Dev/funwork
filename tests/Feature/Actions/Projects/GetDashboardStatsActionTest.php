@@ -1,5 +1,6 @@
 <?php
 
+use App\Actions\Projects\GetDashboardStatsAction;
 use App\Enums\TaskStatus;
 use App\Models\InboxItem;
 use App\Models\Project;
@@ -10,7 +11,7 @@ use Illuminate\Support\Carbon;
 
 uses(RefreshDatabase::class);
 
-test('dashboardStats counts open tasks, today tasks in user timezone, and inbox items via relation', function () {
+test('it counts open tasks, today tasks in user timezone, and inbox items via relation', function () {
     $this->travelTo(Carbon::parse('2026-11-04 02:00:00'));
 
     $user = User::factory()->create([
@@ -61,16 +62,15 @@ test('dashboardStats counts open tasks, today tasks in user timezone, and inbox 
     ]);
     $deletedItem->delete();
 
-    $stats = $project->dashboardStats($user);
+    $stats = (new GetDashboardStatsAction)($project, $user);
 
-    expect($stats)->toBe([
-        'tasks_count' => 3,
-        'today_tasks_count' => 1,
-        'inbox_count' => 2,
-    ]);
+    expect($stats->openTasksCount)->toBe(3)
+        ->and($stats->todayTasksCount)->toBe(1)
+        ->and($stats->inboxCount)->toBe(2)
+        ->and($stats->highlightedTasksCount())->toBe(1);
 });
 
-test('dashboardStats respects UTC when user has UTC timezone', function () {
+test('it respects UTC when user has UTC timezone', function () {
     $this->travelTo(Carbon::parse('2026-11-04 02:00:00'));
 
     $user = User::factory()->create([
@@ -93,8 +93,8 @@ test('dashboardStats respects UTC when user has UTC timezone', function () {
         'due_date' => '2026-11-03 00:00:00',
     ]);
 
-    $stats = $project->dashboardStats($user);
+    $stats = (new GetDashboardStatsAction)($project, $user);
 
-    expect($stats['today_tasks_count'])->toBe(1)
-        ->and($stats['tasks_count'])->toBe(2);
+    expect($stats->todayTasksCount)->toBe(1)
+        ->and($stats->openTasksCount)->toBe(2);
 });
