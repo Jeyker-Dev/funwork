@@ -23,7 +23,7 @@ class extends Component {
 ?>
 
 <div>
-    <flux:main class="bg-gray-100">
+    <flux:main class="bg-surface">
 
         <x-title-text 
             title="All Your Projects," 

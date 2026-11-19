@@ -41,12 +41,12 @@ new class extends Component
 };
 ?>
 
-<div class="flex items-center gap-4">
+<div class="flex flex-wrap items-center gap-3 sm:gap-4">
     <button type="button"
         @class([
-            'text-sm font-bold uppercase transition-colors duration-200 cursor-pointer group relative hover:text-orange-500',
-            'text-orange-500' => $activeFilter === 'all',
-            'text-gray-500' => $activeFilter !== 'all',
+            'text-sm font-bold uppercase transition-colors duration-200 cursor-pointer group relative hover:text-accent-content max-md:min-h-11 inline-flex items-center',
+            'text-accent-content' => $activeFilter === 'all',
+            'text-ink-muted' => $activeFilter !== 'all',
         ])
         wire:click="setFilter('all')"
     >
@@ -55,9 +55,9 @@ new class extends Component
 
     <button type="button"
         @class([
-            'text-sm font-bold uppercase transition-colors duration-200 cursor-pointer group relative hover:text-orange-500',
-            'text-orange-500' => $activeFilter === 'shared',
-            'text-gray-500' => $activeFilter !== 'shared',
+            'text-sm font-bold uppercase transition-colors duration-200 cursor-pointer group relative hover:text-accent-content max-md:min-h-11 inline-flex items-center',
+            'text-accent-content' => $activeFilter === 'shared',
+            'text-ink-muted' => $activeFilter !== 'shared',
         ])
         wire:click="setFilter('shared')"
     >
@@ -66,22 +66,22 @@ new class extends Component
 
     <button type="button"
         @class([
-            'text-sm font-bold uppercase transition-colors duration-200 cursor-pointer group relative hover:text-orange-500',
-            'text-orange-500' => $activeFilter === 'archived',
-            'text-gray-500' => $activeFilter !== 'archived',
+            'text-sm font-bold uppercase transition-colors duration-200 cursor-pointer group relative hover:text-accent-content max-md:min-h-11 inline-flex items-center',
+            'text-accent-content' => $activeFilter === 'archived',
+            'text-ink-muted' => $activeFilter !== 'archived',
         ])
         wire:click="setFilter('archived')"
     >
         Archived (<span>{{ $counts['archived'] }}</span>)
     </button>
 
-    <div class="w-0.5 h-6 bg-gray-300"></div>
+    <div class="hidden sm:block w-px h-6 bg-ghost"></div>
 
     <button type="button"
         @class([
-            'text-sm font-bold uppercase transition-colors duration-200 cursor-pointer group relative hover:text-orange-500',
-            'text-orange-500' => $sort === 'recent',
-            'text-gray-500' => $sort !== 'recent',
+            'text-sm font-bold uppercase transition-colors duration-200 cursor-pointer group relative hover:text-accent-content max-md:min-h-11 inline-flex items-center',
+            'text-accent-content' => $sort === 'recent',
+            'text-ink-muted' => $sort !== 'recent',
         ])
         wire:click="setSort('recent')"
     >
@@ -89,9 +89,9 @@ new class extends Component
     </button>
     <button type="button"
         @class([
-            'text-sm font-bold uppercase transition-colors duration-200 cursor-pointer group relative hover:text-orange-500',
-            'text-orange-500' => $sort === 'oldest',
-            'text-gray-500' => $sort !== 'oldest',
+            'text-sm font-bold uppercase transition-colors duration-200 cursor-pointer group relative hover:text-accent-content max-md:min-h-11 inline-flex items-center',
+            'text-accent-content' => $sort === 'oldest',
+            'text-ink-muted' => $sort !== 'oldest',
         ])
         wire:click="setSort('oldest')"
     >

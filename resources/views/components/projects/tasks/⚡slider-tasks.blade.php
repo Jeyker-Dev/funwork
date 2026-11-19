@@ -78,7 +78,7 @@ new class extends Component {
 };
 ?>
 
-<div class="grid grid-cols-2 gap-7 max-w-lg">
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 w-full">
     @forelse($tasks as $task)
         @php
             $statusEnum = $task->status instanceof TaskStatus ? $task->status : TaskStatus::tryFrom((string) $task->status);
@@ -89,7 +89,7 @@ new class extends Component {
         @endphp
 
         <div
-            class="relative bg-white rounded-2xl p-7 border shadow-sm transition-shadow duration-200 hover:shadow-md cursor-pointer"
+            class="relative bg-surface-card rounded-2xl p-6 sm:p-7 border border-ghost shadow-ambient transition-shadow duration-200 hover:shadow-md cursor-pointer min-w-0"
             x-on:click="window.location='{{ route('show.task', ['project' => $project, 'task' => $task->id]) }}'">
             <span class="absolute left-0 top-0 h-full w-1.5 rounded-l-2xl {{ $accentBar }}"></span>
 

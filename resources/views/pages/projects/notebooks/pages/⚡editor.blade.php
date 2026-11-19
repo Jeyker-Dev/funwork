@@ -198,26 +198,26 @@ class extends Component {
 }" @keydown.window="handleKeydown">
 
     <!-- Header -->
-    <div class="flex justify-between items-center mb-16">
+    <div class="flex flex-wrap justify-between items-center gap-2 mb-8 sm:mb-16">
         <!-- Left: Back -->
-        <div class="flex-1">
+        <div class="flex-1 min-w-0">
             <a href="{{ route('project.notebooks', ['project' => $project]) }}"
                class="text-sm font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition flex items-center gap-2"
                wire:navigate>
-                <flux:icon.arrow-left class="size-4" stroke-width="2.5"/>
-                Back to Notebook
+                <flux:icon.arrow-left class="size-4 shrink-0" stroke-width="2.5"/>
+                <span class="truncate">Back to Notebook</span>
             </a>
         </div>
 
         <!-- Center: Document Name -->
         <div
-            class="flex items-center gap-2 text-zinc-500 dark:text-zinc-400 uppercase tracking-widest text-xs font-bold">
-            <flux:icon.document-text class="size-4"/>
-            <span>{{ $notebook->name }}</span>
+            class="flex items-center gap-2 text-zinc-500 dark:text-zinc-400 uppercase tracking-widest text-xs font-bold min-w-0 max-w-full">
+            <flux:icon.document-text class="size-4 shrink-0"/>
+            <span class="truncate">{{ $notebook->name }}</span>
         </div>
 
         <!-- Right: Autosaved & Menu -->
-        <div class="flex-1 flex justify-end items-center gap-4">
+        <div class="flex-1 flex justify-end items-center gap-2 sm:gap-4">
             <div
                 class="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 transition-opacity duration-300"
                 wire:loading.class="opacity-50" wire:target="title, content, save">
@@ -226,7 +226,7 @@ class extends Component {
                     <span class="text-red-600">{{ $errorMessage }}</span>
                     <button wire:click="retrySave" class="text-red-700 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 font-bold underline ml-1">Retry</button>
                 @else
-                    <flux:icon.cloud class="size-4 text-orange-600 dark:text-orange-500"/>
+                    <flux:icon.cloud class="size-4 text-brand"/>
                     <span>Autosaved</span>
                 @endif
             </div>

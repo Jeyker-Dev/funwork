@@ -51,9 +51,9 @@ new class extends Component
 
 @php
     $countClasses = match ($status) {
-        TaskStatus::Todo->value => 'bg-orange-500',
-        TaskStatus::Doing->value => 'bg-yellow-500',
-        TaskStatus::Done->value => 'bg-green-500',
+        TaskStatus::Todo->value => 'bg-brand-strong',
+        TaskStatus::Doing->value => 'bg-yellow-600',
+        TaskStatus::Done->value => 'bg-green-600',
         default => 'bg-gray-500',
     };
 @endphp

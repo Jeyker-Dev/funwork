@@ -96,20 +96,20 @@ new class extends Component
         <div class="flex items-center justify-between max-w-lg">
             <button
                 type="button"
-                class="text-sm font-semibold text-gray-500 hover:text-orange-500 transition-colors"
+                class="text-sm font-semibold text-ink-muted hover:text-accent-content transition-colors max-md:min-h-11 px-2"
                 wire:click="previousPage"
                 @disabled($page <= 1)
             >
                 Previous
             </button>
 
-            <p class="text-sm text-gray-500">
+            <p class="text-sm text-ink-muted">
                 Page {{ $page }} of {{ $totalPages }}
             </p>
 
             <button
                 type="button"
-                class="text-sm font-semibold text-gray-500 hover:text-orange-500 transition-colors"
+                class="text-sm font-semibold text-ink-muted hover:text-accent-content transition-colors max-md:min-h-11 px-2"
                 wire:click="nextPage"
                 @disabled($page >= $totalPages)
             >

@@ -40,7 +40,7 @@ new class extends Component {
         </flux:button>
     </flux:modal.trigger>
 
-    <flux:modal name="create-notebook" class="w-xl">
+    <flux:modal name="create-notebook" class="w-[calc(100vw-2rem)] max-w-xl">
         <form wire:submit.prevent="save">
             <div class="space-y-6">
                 <div>

@@ -111,7 +111,7 @@ x-on:open-lightbox.window="open($event.detail.id)"
                     
                     <!-- Navigation Previous -->
                     <button 
-                        class="absolute left-4 z-50 p-2 rounded-full bg-white/80 shadow-md text-gray-700 hover:bg-white hover:text-orange-600 transition disabled:opacity-30 disabled:cursor-not-allowed"
+                        class="absolute left-4 z-50 p-2 rounded-full bg-white/80 shadow-md text-gray-700 hover:bg-white hover:text-accent-content transition disabled:opacity-30 disabled:cursor-not-allowed"
                         x-on:click="prev()"
                         x-bind:disabled="currentIndex === 0"
                         title="Previous (Left Arrow)"
@@ -159,12 +159,12 @@ x-on:open-lightbox.window="open($event.detail.id)"
 
                         <!-- Fallback / Unsupported -->
                         <template x-if="!canPreview">
-                            <div class="flex flex-col items-center justify-center p-8 bg-white/90 backdrop-blur-md rounded-2xl shadow-xl max-w-sm text-center">
-                                <div class="w-20 h-20 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mb-6">
+                            <div class="flex flex-col items-center justify-center p-8 bg-surface-card/90 backdrop-blur-md rounded-2xl shadow-xl max-w-sm text-center">
+                                <div class="w-20 h-20 bg-brand-tint text-accent-content rounded-full flex items-center justify-center mb-6">
                                     <flux:icon.document-arrow-down variant="solid" class="w-10 h-10" />
                                 </div>
-                                <h4 class="text-xl font-semibold text-gray-900 mb-2">Preview not available</h4>
-                                <p class="text-gray-500 mb-6 text-sm">
+                                <h4 class="text-xl font-semibold text-ink mb-2">Preview not available</h4>
+                                <p class="text-ink-muted mb-6 text-sm">
                                     <span x-show="currentFile.size >= (15 * 1024 * 1024)">This file exceeds the 15MB preview limit.</span>
                                     <span x-show="currentFile.size < (15 * 1024 * 1024) && currentFile.mime_type === 'application/pdf' && isMobile">PDF previews are not supported on mobile devices.</span>
                                     <span x-show="currentFile.size < (15 * 1024 * 1024) && currentFile.mime_type !== 'application/pdf' && !currentFile.mime_type.startsWith('image/')">This file format is not supported for inline preview.</span>
@@ -178,7 +178,7 @@ x-on:open-lightbox.window="open($event.detail.id)"
 
                     <!-- Navigation Next -->
                     <button 
-                        class="absolute right-4 z-50 p-2 rounded-full bg-white/80 shadow-md text-gray-700 hover:bg-white hover:text-orange-600 transition disabled:opacity-30 disabled:cursor-not-allowed"
+                        class="absolute right-4 z-50 p-2 rounded-full bg-white/80 shadow-md text-gray-700 hover:bg-white hover:text-accent-content transition disabled:opacity-30 disabled:cursor-not-allowed"
                         x-on:click="next()"
                         x-bind:disabled="currentIndex === files.length - 1"
                         title="Next (Right Arrow)"

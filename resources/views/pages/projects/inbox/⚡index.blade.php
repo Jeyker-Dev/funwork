@@ -55,23 +55,23 @@ class extends Component {
         <flux:subheading size="lg" class="mb-6">Capture ideas, tasks, and notes quickly.</flux:subheading>
 
         <form wire:submit="addItem" class="mb-8">
-            <flux:input wire:model="form.content" placeholder="What's on your mind?" />
+            <flux:input wire:model="form.content" placeholder="What's on your mind?" aria-label="Inbox item" />
             <div class="mt-4 flex justify-end">
-                <flux:button type="submit" variant="primary">Add to Inbox</flux:button>
+                <flux:button type="submit" variant="primary" class="max-md:min-h-11">Add to Inbox</flux:button>
             </div>
         </form>
 
         <div class="space-y-4">
             @forelse($items as $item)
-                <flux:card class="flex justify-between items-center">
-                    <div>
-                        <p>{{ $item->content }}</p>
-                        <p class="text-xs text-zinc-500 mt-1">{{ $item->created_at->diffForHumans() }}</p>
+                <flux:card class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+                    <div class="min-w-0 flex-1">
+                        <p class="break-words">{{ $item->content }}</p>
+                        <p class="text-xs text-ink-muted mt-1">{{ $item->created_at->diffForHumans() }}</p>
                     </div>
-                    <div class="flex space-x-2 gap-2">
-                        <flux:button size="sm" variant="ghost" wire:click="$dispatch('open-convert-to-task', { item: {{ $item->id }} })">Task</flux:button>
-                        <flux:button size="sm" variant="ghost" wire:click="$dispatch('open-convert-to-notebook', { item: {{ $item->id }} })">Note</flux:button>
-                        <flux:button size="sm" variant="danger" wire:click="$dispatch('open-delete-item-modal', { id: {{ $item->id }} })">Delete</flux:button>
+                    <div class="flex flex-wrap gap-2 shrink-0">
+                        <flux:button size="sm" variant="ghost" class="max-md:min-h-11" wire:click="$dispatch('open-convert-to-task', { item: {{ $item->id }} })">Task</flux:button>
+                        <flux:button size="sm" variant="ghost" class="max-md:min-h-11" wire:click="$dispatch('open-convert-to-notebook', { item: {{ $item->id }} })">Note</flux:button>
+                        <flux:button size="sm" variant="danger" class="max-md:min-h-11" wire:click="$dispatch('open-delete-item-modal', { id: {{ $item->id }} })">Delete</flux:button>
                     </div>
                 </flux:card>
             @empty

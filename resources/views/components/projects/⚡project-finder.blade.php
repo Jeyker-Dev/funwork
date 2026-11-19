@@ -28,12 +28,12 @@ new class extends Component {
 
 <div>
     <flux:dropdown position="bottom" align="end">
-        <flux:button variant="ghost" class="flex items-center! justify-center!" icon:trailing="chevron-down">
+        <flux:button variant="ghost" class="flex items-center! justify-center! max-md:min-h-11 max-md:px-2" icon:trailing="chevron-down">
             <div class="flex items-center gap-2">
-                <x-projects.icon-project :project="$project" iconClass="size-4 text-gray-500!"
+                <x-projects.icon-project :project="$project" iconClass="size-4 text-ink-muted!"
                                          containerClass="w-6! h-6! bg-transparent!"/>
 
-                <flux:heading class="text-sm">
+                <flux:heading class="text-sm hidden md:block">
                     {{ $project->name }}
                 </flux:heading>
             </div>
@@ -49,7 +49,7 @@ new class extends Component {
                 @foreach($projects as $project)
                     <a href="{{ route('projects.show', ['project' => $project]) }}">
                         <flux:menu.item
-                            class="flex items-center gap-2 hover:border-r-3 hover:border-r-orange-500 cursor-pointer">
+                            class="flex items-center gap-2 hover:border-r-3 hover:border-r-brand cursor-pointer">
                             <x-projects.icon-project
                                 :project="$project"
                                 iconClass="size-4"

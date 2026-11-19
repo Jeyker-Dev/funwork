@@ -58,10 +58,10 @@ class extends Component {
                 <livewire:projects.notebooks.create-notebook :project="$project"/>
 
                 <div
-                    class="w-3/12 border border-gray-200 rounded-lg p-4 mt-4 bg-white flex gap-2 items-center justify-center">
-                    <flux:icon.light-bulb variant="solid" class="size-5 text-orange-500"/>
+                    class="w-full max-w-md border border-ghost rounded-2xl p-4 mt-4 bg-surface-card shadow-ambient flex gap-3 items-center justify-center">
+                    <flux:icon.light-bulb variant="solid" class="size-5 text-brand shrink-0"/>
 
-                    <flux:text class="text-gray-500 text-xs mt-2 font-bold">
+                    <flux:text class="text-ink-muted text-xs font-semibold">
                         Notebooks allow you to group and structure important information for your project.
                     </flux:text>
                 </div>
@@ -80,7 +80,7 @@ class extends Component {
         </div>
 
         <div>
-            <div class="flex items-center justify-between">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <flux:heading size="xl" class="mt-4 mb-2">All Notebook</flux:heading>
 
                 <livewire:projects.notebooks.filters/>

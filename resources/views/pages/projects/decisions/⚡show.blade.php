@@ -73,7 +73,7 @@ class extends Component
         </flux:modal.trigger>
     </div>
 
-    <flux:card class="space-y-6">
+    <flux:card class="space-y-6 min-w-0">
         <div class="flex flex-wrap items-center justify-between gap-4">
             <div class="flex items-center gap-3">
                 <span class="font-mono text-sm font-semibold text-zinc-500 dark:text-zinc-400">
@@ -135,7 +135,7 @@ class extends Component
         </div>
     </flux:card>
 
-    <flux:modal name="edit-decision" class="md:w-2xl">
+    <flux:modal name="edit-decision" class="w-[calc(100vw-2rem)] md:max-w-2xl">
         <form wire:submit="save" class="space-y-6">
             <div>
                 <flux:heading size="lg">{{ __('Edit') }} {{ $decision->code }}</flux:heading>

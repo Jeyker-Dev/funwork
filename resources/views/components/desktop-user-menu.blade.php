@@ -4,6 +4,7 @@
         :initials="auth()->user()->initials()"
         :avatar="auth()->user()->avatar_url"
         icon:trailing="chevrons-up-down"
+        class="max-md:[&>span]:hidden max-md:[&>div:last-child]:hidden max-md:min-h-11 max-md:min-w-11 justify-center shrink-0"
         data-test="sidebar-menu-button"
     />
 

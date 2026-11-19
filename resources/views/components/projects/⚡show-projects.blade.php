@@ -47,29 +47,29 @@ new class extends Component {
 
                 <div>
                     <flux:heading size="lg"
-                                  class="group-hover:text-orange-500 font-bold!">{{ $project->name }}</flux:heading>
+                                  class="group-hover:text-accent-content font-bold!">{{ $project->name }}</flux:heading>
                     <flux:text
                         class="mt-2 leading-normal line-clamp-8 md:line-clamp-10 lg:line-clamp-12">{{ $project->description }}</flux:text>
                 </div>
 
-                <flux:spacer class="bg-gray-100 h-0.5"/>
+                <flux:spacer class="bg-ghost h-px"/>
 
                 <div>
                     <div class="flex flex-col items-start justify-start gap-3">
-                        <div class="mt-6 flex items-center gap-4 overflow-hidden">
-                            <flux:avatar size="lg" :src="$project->owner->avatar_url" />
+                        <div class="mt-6 flex items-center gap-4 overflow-hidden w-full min-w-0">
+                            <flux:avatar size="lg" :src="$project->owner->avatar_url" class="shrink-0" />
 
-                            <div class="overflow-hidden">
+                            <div class="overflow-hidden min-w-0">
                                 <flux:heading size="lg" class="truncate" title="{{ $project->owner->display_name }}">{{ $project->owner->display_name }}</flux:heading>
                                 <flux:text class="truncate text-sm" title="{{ $project->owner->email }}">{{ $project->owner->email }}</flux:text>
                             </div>
                         </div>
 
-                        <div class="flex items-center justify-between w-full gap-2">
+                        <div class="flex flex-wrap items-center justify-between w-full gap-2">
                             <div class="flex items-center gap-2 my-2">
-                                <flux:icon.bolt variant="solid" class="text-green-500 size-5"/>
+                                <flux:icon.bolt variant="solid" class="text-green-600 dark:text-green-400 size-5"/>
 
-                                <flux:text class="text-green-500 font-normal">
+                                <flux:text class="text-green-600 dark:text-green-400 font-normal">
                                     {{ $project->status }}
                                 </flux:text>
                             </div>
@@ -77,11 +77,11 @@ new class extends Component {
                             @if($project->due_at)
                                 <div>
                                     <div class="flex items-center gap-2 my-2">
-                                        <flux:icon.calendar variant="solid" class="text-gray-500 size-5"/>
+                                        <flux:icon.calendar variant="solid" class="text-ink-muted size-5"/>
 
-                                        <flux:text class="text-gray-500 font-normal">
+                                        <flux:text class="text-ink-muted font-normal">
                                             <span
-                                                class="text-orange-500 font-bold">Due:</span> {{ \Carbon\Carbon::parse($project->due_at)->format('Y-m-d') }}
+                                                class="text-accent-content font-bold">Due:</span> {{ \Carbon\Carbon::parse($project->due_at)->format('Y-m-d') }}
                                         </flux:text>
                                     </div>
                                 </div>

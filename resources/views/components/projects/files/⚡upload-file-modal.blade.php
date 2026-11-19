@@ -38,12 +38,12 @@ new class extends Component {
 
         <div class="mb-2">
             <flux:label>Select files</flux:label>
-            <input type="file" multiple wire:model="form.files" class="block w-full text-sm text-gray-500 mt-2
+            <input type="file" multiple wire:model="form.files" class="block w-full text-sm text-ink-muted mt-2
                 file:mr-4 file:py-2 file:px-4
                 file:rounded-md file:border-0
                 file:text-sm file:font-semibold
-                file:bg-orange-50 file:text-orange-700
-                hover:file:bg-orange-100" />
+                file:bg-brand-tint file:text-accent-content
+                hover:file:bg-surface-high" />
         </div>
         <flux:error name="form.files" />
         <flux:error name="form.files.*" />
