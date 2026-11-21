@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Actions\Notebooks\SyncDocsNotebookAction;
-use App\Models\Area;
+use App\Exceptions\AreaNotFound;
 use App\Models\Project;
 use Illuminate\Console\Command;
 
@@ -47,10 +47,10 @@ class SyncDocsCommand extends Command
         $area = null;
 
         if (is_string($areaSlug) && $areaSlug !== '') {
-            $area = $project->areaByKey($areaSlug);
-
-            if (! $area instanceof Area) {
-                $this->error("Area [{$areaSlug}] not found in project [{$project->id}].");
+            try {
+                $area = $project->areaByKey($areaSlug);
+            } catch (AreaNotFound $exception) {
+                $this->error($exception->getMessage());
 
                 return self::FAILURE;
             }

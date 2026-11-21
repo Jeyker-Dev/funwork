@@ -9,6 +9,7 @@ use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;
 use Illuminate\Contracts\JsonSchema\JsonSchema;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Gate;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
@@ -52,17 +53,7 @@ class ListTasksTool extends FunWorkTool
         }
 
         if ($input->area !== null) {
-            if (strtolower($input->area) === self::NO_AREA_FILTER) {
-                $query->whereNull('area_id');
-            } else {
-                $area = $project->areaByKey($input->area);
-
-                if ($area === null) {
-                    return Response::error("Area [{$input->area}] not found in this project.");
-                }
-
-                $query->where('area_id', $area->id);
-            }
+            $this->applyAreaFilter($query, $project, $input->area);
         }
 
         $tasks = $query->get()
@@ -73,5 +64,16 @@ class ListTasksTool extends FunWorkTool
         return Response::json([
             'tasks' => $tasks,
         ]);
+    }
+
+    private function applyAreaFilter(HasMany $query, Project $project, string $areaKey): void
+    {
+        if (strtolower($areaKey) === self::NO_AREA_FILTER) {
+            $query->whereNull('area_id');
+
+            return;
+        }
+
+        $query->where('area_id', $project->areaByKey($areaKey)->id);
     }
 }

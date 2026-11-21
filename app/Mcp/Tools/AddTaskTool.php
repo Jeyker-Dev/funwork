@@ -8,8 +8,10 @@ use App\Enums\TaskPriority;
 use App\Enums\TaskStatus;
 use App\Mcp\Support\McpPresenter;
 use App\Models\Project;
+use App\Models\Task;
 use App\Models\User;
 use Illuminate\Contracts\JsonSchema\JsonSchema;
+use Illuminate\Support\Facades\Gate;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Attributes\Description;
@@ -61,15 +63,11 @@ class AddTaskTool extends FunWorkTool
 
         $project = Project::findOrFail($input->projectId);
 
-        $area = null;
+        Gate::forUser($user)->authorize('create', [Task::class, $project]);
 
-        if ($input->areaKey !== null) {
-            $area = $project->areaByKey($input->areaKey);
-
-            if ($area === null) {
-                return Response::error("Area [{$input->areaKey}] not found in this project.");
-            }
-        }
+        $area = $input->areaKey !== null
+            ? $project->areaByKey($input->areaKey)
+            : null;
 
         $task = ($this->createTask)($project, $user, $input, $area);
 
