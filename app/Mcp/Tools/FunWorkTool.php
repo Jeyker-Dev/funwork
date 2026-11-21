@@ -2,6 +2,7 @@
 
 namespace App\Mcp\Tools;
 
+use App\Exceptions\BusinessRuleException;
 use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -39,10 +40,12 @@ abstract class FunWorkTool extends Tool
             return $this->execute($request, $user);
         } catch (AuthorizationException) {
             return Response::error($this->authorizationMessage());
-        } catch (ModelNotFoundException $e) {
-            $model = $e->getModel() !== '' ? class_basename($e->getModel()) : 'Resource';
+        } catch (ModelNotFoundException $exception) {
+            $model = $exception->getModel() !== '' ? class_basename($exception->getModel()) : 'Resource';
 
             return Response::error(sprintf('%s not found.', $model));
+        } catch (BusinessRuleException $exception) {
+            return Response::error($exception->getMessage());
         }
     }
 

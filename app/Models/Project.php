@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Exceptions\AreaNotFound;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -33,11 +34,19 @@ class Project extends Model
         return $this->hasMany(Area::class)->orderBy('position');
     }
 
-    public function areaByKey(string $key): ?Area
+    public function findAreaByKey(string $key): ?Area
     {
         $normalized = strtolower(Str::slug($key));
 
         return $this->areas()->whereRaw('LOWER(slug) = ?', [$normalized])->first();
+    }
+
+    /**
+     * @throws AreaNotFound
+     */
+    public function areaByKey(string $key): Area
+    {
+        return $this->findAreaByKey($key) ?? throw AreaNotFound::for($key, $this);
     }
 
     public function tasks(): HasMany

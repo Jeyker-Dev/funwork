@@ -1,11 +1,14 @@
 <?php
 
 use App\Actions\Projects\CreateDefaultAreasAction;
+use App\Exceptions\AreaNotFound;
+use App\Exceptions\BusinessRuleException;
 use App\Models\Area;
 use App\Models\Notebook;
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;
+use Illuminate\Support\Facades\Exceptions;
 use Livewire\Livewire;
 
 test('creating a project through the create-project component creates 4 default areas in order', function () {
@@ -49,20 +52,60 @@ test('creating a project through the create-project component creates 4 default 
         ->and($areas[3]->position)->toBe(4);
 });
 
-test('areaByKey matches slug case-insensitively and returns null for unknown key', function () {
+test('areaByKey matches the slug case-insensitively', function () {
     $user = User::factory()->create();
     $project = Project::factory()->create(['owner_id' => $user->id]);
     app(CreateDefaultAreasAction::class)($project);
 
-    expect($project->areaByKey('BACKEND'))->not->toBeNull()
-        ->and($project->areaByKey('BACKEND')->slug)->toBe('backend')
+    expect($project->areaByKey('BACKEND')->slug)->toBe('backend')
         ->and($project->areaByKey('Backend')->slug)->toBe('backend')
         ->and($project->areaByKey('backend')->slug)->toBe('backend')
-        ->and($project->areaByKey('FRONTEND')->slug)->toBe('frontend')
-        ->and($project->areaByKey('unknown'))->toBeNull();
+        ->and($project->areaByKey('FRONTEND')->slug)->toBe('frontend');
 });
 
-test('the owner can create, rename, recolor, reorder and delete areas', function () {
+test('areaByKey throws AreaNotFound for an unknown key', function () {
+    $user = User::factory()->create();
+    $project = Project::factory()->create(['owner_id' => $user->id]);
+    app(CreateDefaultAreasAction::class)($project);
+
+    expect(fn () => $project->areaByKey('unknown'))
+        ->toThrow(
+            function (AreaNotFound $exception): void {
+                expect($exception)->toBeInstanceOf(BusinessRuleException::class);
+            },
+            "Area [unknown] not found in project [{$project->id}].",
+        );
+});
+
+test('findAreaByKey matches the slug case-insensitively', function () {
+    $user = User::factory()->create();
+    $project = Project::factory()->create(['owner_id' => $user->id]);
+    app(CreateDefaultAreasAction::class)($project);
+
+    expect($project->findAreaByKey('BACKEND'))->not->toBeNull()
+        ->and($project->findAreaByKey('BACKEND')->slug)->toBe('backend');
+});
+
+test('findAreaByKey returns null for an unknown key', function () {
+    $user = User::factory()->create();
+    $project = Project::factory()->create(['owner_id' => $user->id]);
+    app(CreateDefaultAreasAction::class)($project);
+
+    expect($project->findAreaByKey('unknown'))->toBeNull();
+});
+
+test('AreaNotFound is not reported', function () {
+    Exceptions::fake();
+    $user = User::factory()->create();
+    $project = Project::factory()->create(['owner_id' => $user->id]);
+
+    report(AreaNotFound::for('unknown', $project));
+
+    Exceptions::assertNotReported(AreaNotFound::class);
+});
+
+function createManageAreasFixture(): array
+{
     $user = User::factory()->create();
     $project = Project::factory()->create(['owner_id' => $user->id]);
     app(CreateDefaultAreasAction::class)($project);
@@ -70,7 +113,12 @@ test('the owner can create, rename, recolor, reorder and delete areas', function
     $component = Livewire::actingAs($user)
         ->test('projects.⚡manage-areas', ['project' => $project]);
 
-    // Create a new area
+    return [$project, $component];
+}
+
+test('the owner can create an area', function () {
+    [$project, $component] = createManageAreasFixture();
+
     $component->set('newName', 'DevOps')
         ->set('newColor', 'cyan')
         ->call('createArea')
@@ -81,14 +129,34 @@ test('the owner can create, rename, recolor, reorder and delete areas', function
         ->and($devops->name)->toBe('DevOps')
         ->and($devops->color)->toBe('cyan')
         ->and($devops->position)->toBe(5);
+});
 
-    // Duplicate slug in same project is rejected
+test('duplicate area slug in the same project is rejected', function () {
+    [$project, $component] = createManageAreasFixture();
+    Area::factory()->create([
+        'project_id' => $project->id,
+        'name' => 'DevOps',
+        'slug' => 'devops',
+        'color' => 'cyan',
+        'position' => 5,
+    ]);
+
     $component->set('newName', 'DevOps')
         ->set('newColor', 'red')
         ->call('createArea')
         ->assertHasErrors(['newName']);
+});
 
-    // Rename and recolor
+test('the owner can rename and recolor an area', function () {
+    [$project, $component] = createManageAreasFixture();
+    $devops = Area::factory()->create([
+        'project_id' => $project->id,
+        'name' => 'DevOps',
+        'slug' => 'devops',
+        'color' => 'cyan',
+        'position' => 5,
+    ]);
+
     $component->call('startEditing', $devops->id)
         ->set('editingName', 'Infrastructure')
         ->set('editingColor', 'pink')
@@ -99,18 +167,37 @@ test('the owner can create, rename, recolor, reorder and delete areas', function
     expect($devops->name)->toBe('Infrastructure')
         ->and($devops->slug)->toBe('infrastructure')
         ->and($devops->color)->toBe('pink');
+});
 
-    // Move up
+test('the owner can reorder areas', function () {
+    [$project, $component] = createManageAreasFixture();
+    $devops = Area::factory()->create([
+        'project_id' => $project->id,
+        'name' => 'DevOps',
+        'slug' => 'devops',
+        'color' => 'cyan',
+        'position' => 5,
+    ]);
+
     $component->call('moveUp', $devops->id);
     $devops->refresh();
     expect($devops->position)->toBe(4);
 
-    // Move down
     $component->call('moveDown', $devops->id);
     $devops->refresh();
     expect($devops->position)->toBe(5);
+});
 
-    // Delete area
+test('the owner can delete an area', function () {
+    [$project, $component] = createManageAreasFixture();
+    $devops = Area::factory()->create([
+        'project_id' => $project->id,
+        'name' => 'DevOps',
+        'slug' => 'devops',
+        'color' => 'cyan',
+        'position' => 5,
+    ]);
+
     $component->call('confirmDelete', $devops->id)
         ->call('deleteArea')
         ->assertHasNoErrors();

@@ -104,9 +104,9 @@ class ParseTaskImportAction
 
         $areaTag = trim($matches[1]);
         $remainder = (string) substr($line, strlen($matches[0]));
-        $area = $project->areaByKey($areaTag);
+        $area = $project->findAreaByKey($areaTag);
 
-        if ($area) {
+        if ($area !== null) {
             return new ResolvedAreaData(
                 areaTag: $areaTag,
                 area: $area,
