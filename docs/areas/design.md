@@ -29,6 +29,8 @@ Herramienta: **Stitch** (proyecto `14584368472277721493`). Componentes de UI: Fl
 | Archivos | "Files - Website Relaunch" y "Files - Drag and Drop Upload State" | Diseño aprobado; pendiente de implementar |
 | Settings de la cuenta | "Account Settings - FunWork" y "Account Settings - Integrations" | Diseño aprobado; pendiente de implementar |
 | Settings del proyecto (nueva) | "Project Settings - Website Relaunch" | Diseño aprobado; pendiente de implementar |
+| Historial del proyecto (nueva) | "History - Website Relaunch" | Diseño aprobado; pendiente de implementar |
+| What's new (nueva) | "What's new in FunWork" | Diseño aprobado; pendiente de implementar |
 
 ## Login: decisiones y ajustes para el código
 
@@ -259,6 +261,44 @@ Diferencias de Stitch que se corrigen en el código:
 - [ ] "ID: PRJ-RELAUNCH-01" es un identificador inventado: se quita.
 - [ ] "Change icon" abre un selector con los íconos que ya soporta `icon-project`; no se suben imágenes.
 - [ ] El acceso a Areas de la barra superior lleva a esta tarjeta en lugar de abrir el modal suelto, o se mantiene el modal y se enlaza desde acá: decidir uno solo para no duplicar.
+- [ ] Definir el modo oscuro y mobile.
+
+## Historial del proyecto (pantalla nueva): decisiones y ajustes para el código
+
+Diseño aprobado: una página "History" dentro del proyecto, con un ítem en el sidebar (ícono de reloj) después de Decisions. Muestra cómo avanzó el proyecto, agrupado por semana.
+
+Decisiones:
+
+- **Se genera sola:** a partir de tareas completadas, decisiones aceptadas, notebooks creados y archivos subidos del proyecto. No se escribe a mano.
+- **`completed_at` en tareas:** columna nueva, se completa cuando la tarea pasa a Done y se limpia si vuelve atrás. Las tareas que ya están en Done se rellenan con `updated_at`.
+- **Resumen por semana:** se cuentan los eventos reales de esa semana ("8 tasks done, 2 decisions, 1 notebook"); se omiten los tipos en cero.
+- **Filtros por tipo:** "All", "Tasks", "Decisions", "Notebooks", "Files".
+- **Paginación:** "Show earlier weeks" carga más semanas.
+
+Diferencias de Stitch que se corrigen en el código:
+
+- [ ] El chip seleccionado "All" es negro: usar el estilo de chip seleccionado del resto de la app.
+- [ ] La barra superior no es la real (sin búsqueda, "Areas" como texto, otro logo): usar el header actual del proyecto.
+- [ ] Estado vacío: "Nothing has happened yet" con una línea de ayuda, sin datos inventados.
+- [ ] Definir el modo oscuro y mobile.
+
+## What's new (pantalla nueva): decisiones y ajustes para el código
+
+Diseño aprobado: una página de la app, fuera de los proyectos, con las novedades de FunWork para el usuario. Reemplaza el botón "Change Log" del sidebar por "What's new" (ícono sparkle) con un punto naranja de no leído.
+
+Decisiones:
+
+- **Se escribe a mano, en inglés:** cada entrega en su propio archivo (por ejemplo `resources/changelog/*.md`) con fecha y entradas etiquetadas "New", "Improved" o "Fixed". No reutiliza `docs/changelog.md`, que es técnico.
+- **No leído:** columna `last_seen_changelog_at` en `users`. El punto aparece si hay una entrega posterior; abrir la página actualiza la fecha.
+- **"New since your last visit":** marca los grupos posteriores a la visita anterior.
+- **Link opcional por entrada** a la pantalla relacionada.
+
+Diferencias de Stitch que se corrigen en el código:
+
+- [ ] Los pills "New" e "Improved" salieron grises: "New" verde tenue, "Improved" azul tenue, "Fixed" ámbar tenue, siempre con texto.
+- [ ] "Open Tasks" lleva una flecha: se quita.
+- [ ] El footer "FUNWORK CHANGELOG • CURATED CONTINUOUSLY" en mayúsculas es inventado: se quita.
+- [ ] La barra superior es blanca: usar la misma de Account Settings.
 - [ ] Definir el modo oscuro y mobile.
 
 ## Pendientes
