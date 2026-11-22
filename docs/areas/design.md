@@ -19,8 +19,8 @@ Herramienta: **Stitch** (proyecto `14584368472277721493`). Componentes de UI: Fl
 
 | Pantalla | Pantalla de Stitch | Estado |
 |---|---|---|
-| Login | "Login - Refined Board Preview" | Implementado en `feat/login-redesign` |
-| Lista de proyectos | | |
+| Login | "Login - Refined Board Preview" | Implementado |
+| Lista de proyectos | "Projects Dashboard - Luminous Editorial" | Implementado |
 | Dashboard del proyecto | | |
 | Tablero de tareas | | |
 | Inbox | | |
@@ -45,6 +45,27 @@ Diferencias de Stitch que se corrigen en el código:
 - [x] El logo en Stitch es un placeholder: usar el logo real de FunWork, también en modo oscuro.
 - [x] Definir el modo oscuro, que Stitch no tiene: tarjetas con `surface-high` y borde ghost.
 - [x] En mobile se oculta el tablero y queda solo el formulario.
+
+## Lista de proyectos: decisiones y ajustes para el código
+
+Diseño aprobado: "Retomá donde estabas". Arriba, un saludo con el nombre del usuario y un resumen real ("N active projects, M tasks due this week"). Debajo, una tarjeta destacada "Continue" con el proyecto que se tocó por última vez. Después, la sección "All projects" con tarjetas compactas y un selector de vista grilla/lista.
+
+Decisiones:
+
+- **Sin owner en las tarjetas:** la lista solo muestra proyectos del usuario, así que el avatar y el email del owner se repetían en todas las tarjetas.
+- **Datos reales:** progreso de tareas (`Done` sobre el total), próxima tarea pendiente, fecha de entrega y última edición. Se calculan sin consultas N+1.
+- **Sin elementos de plantilla:** sin línea naranja superior, sin título con una frase resaltada, sin animación de las tarjetas al pasar el mouse, sin tarjeta punteada de "Create new project".
+
+Diferencias de Stitch que se corrigen en el código:
+
+- [x] "Open project" lleva una flecha: se quita, igual que en el login.
+- [x] En la tarjeta "Continue", la barra de progreso ocupa la mitad del ancho y deja un hueco en el centro: debe ocupar el ancho del contenido hasta el botón.
+- [x] La etiqueta "Progress" repite lo que ya dice "3 of 8 tasks": se quita y queda solo el conteo.
+- [x] La etiqueta de tipo "Programming" usa el mismo naranja que la marca y se confunde con el acento: los colores de tipo no usan el naranja de la marca.
+- [x] El saludo usa "Alex" de ejemplo: en la app muestra el nombre del usuario logueado y cambia según la hora del día.
+- [x] La vista de lista no está diseñada en Stitch: tabla simple con ícono, nombre, tipo, progreso, estado y fecha de entrega.
+- [x] Definir el modo oscuro y mobile, que Stitch no muestra: la tarjeta "Continue" usa `brand-tint`; en mobile, una columna y el selector de vista oculto.
+- [x] Estado vacío: sin proyectos, mostrar un mensaje y una sola acción "Create your first project".
 
 ## Pendientes
 
