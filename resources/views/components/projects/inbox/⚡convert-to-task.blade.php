@@ -9,28 +9,59 @@ use Livewire\Component;
 new class extends Component {
     public ConvertInboxToTaskForm $form;
 
+    public bool $redirectAfterConvert = true;
+
     #[On('open-convert-to-task')]
     public function loadModal($item = null): void
     {
-        if ($item) {
-            $inboxItem = InboxItem::where('user_id', auth()->id())->find($item);
-            abort_unless($inboxItem, 404);
+        $this->redirectAfterConvert = true;
+        $this->prepareModal($item);
+    }
 
-            $this->authorize('update', $inboxItem);
-
-            $this->form->setItem($inboxItem);
-
-            Flux::modal('convert-to-task')->show();
-        }
+    #[On('open-convert-to-task-for-process')]
+    public function loadModalForProcess($item = null): void
+    {
+        $this->redirectAfterConvert = false;
+        $this->prepareModal($item);
     }
 
     public function convert(): void
     {
+        $convertedItemId = $this->form->item?->id;
         $this->form->store();
 
         Flux::modal('convert-to-task')->close();
-        
-        $this->redirect(route('project.tasks', $this->form->projectId));
+
+        if ($this->redirectAfterConvert) {
+            $this->redirect(route('project.tasks', $this->form->projectId));
+
+            return;
+        }
+
+        Flux::toast(
+            heading: 'Task Created',
+            text: 'The inbox item has been converted to a task.',
+            variant: 'success',
+            duration: 3000,
+        );
+
+        $this->dispatch('item-converted', id: $convertedItemId);
+    }
+
+    private function prepareModal($item = null): void
+    {
+        if (! $item) {
+            return;
+        }
+
+        $inboxItem = InboxItem::where('user_id', auth()->id())->find($item);
+        abort_unless($inboxItem, 404);
+
+        $this->authorize('update', $inboxItem);
+
+        $this->form->setItem($inboxItem);
+
+        Flux::modal('convert-to-task')->show();
     }
 
     public function with(): array

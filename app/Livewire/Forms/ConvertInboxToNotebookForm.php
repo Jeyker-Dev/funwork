@@ -37,7 +37,7 @@ class ConvertInboxToNotebookForm extends Form
         $this->item = $item;
         $this->name = 'Note from Inbox';
         $this->description = $item->content;
-        $this->projectId = null;
+        $this->projectId = $item->project_id;
         $this->areaId = null;
     }
 

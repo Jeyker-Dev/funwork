@@ -23,7 +23,7 @@ Herramienta: **Stitch** (proyecto `14584368472277721493`). Componentes de UI: Fl
 | Lista de proyectos | "Projects Dashboard - Luminous Editorial" | Implementado |
 | Home del proyecto | "Home - Website Relaunch" | Implementado |
 | Tablero de tareas | "Tasks - Website Relaunch" y "Tasks - Task Detail Side Panel" | Diseño aprobado; pendiente de implementar |
-| Inbox | "Inbox - Website Relaunch" y "Inbox - Process Mode Focus Panel" | Diseño aprobado; pendiente de implementar |
+| Inbox | "Inbox - Website Relaunch" y "Inbox - Process Mode Focus Panel" | Implementado |
 | Notebooks / editor | | |
 | Archivos | | |
 
@@ -103,10 +103,10 @@ Decisiones:
 
 Diferencias de Stitch que se corrigen en el código:
 
-- [ ] En el sidebar, "Inbox" no aparece como ítem activo en ninguna de las dos pantallas: debe usar el resaltado activo.
-- [ ] "FunWork Studio" al pie del sidebar y el cohete del selector de proyecto: igual que en el Home, se quitan o se usa el ícono real.
-- [ ] Los atajos T, N y D deben funcionar solo dentro del modo "Process", con Escape para cerrar, y nunca mientras se escribe en un campo.
-- [ ] Definir el modo oscuro, mobile (el panel de "Process" ocupa casi toda la pantalla y los botones se apilan) y el estado vacío.
+- [x] En el sidebar, "Inbox" no aparece como ítem activo en ninguna de las dos pantallas: debe usar el resaltado activo.
+- [x] "FunWork Studio" al pie del sidebar y el cohete del selector de proyecto: igual que en el Home, se quitan o se usa el ícono real.
+- [x] Los atajos T, N y D deben funcionar solo dentro del modo "Process", con Escape para cerrar, y nunca mientras se escribe en un campo.
+- [x] Definir el modo oscuro, mobile (el panel de "Process" ocupa casi toda la pantalla y los botones se apilan) y el estado vacío.
 
 ## Tablero de tareas: decisiones y ajustes para el código
 
@@ -131,6 +131,20 @@ Diferencias de Stitch que se corrigen en el código:
 - [ ] La zona "Drop here to complete" solo aparece mientras se arrastra.
 - [ ] Definir la vista de lista, el modo oscuro, mobile (columnas con scroll horizontal o una columna con selector de estado; el panel ocupa toda la pantalla) y los estados vacíos de cada columna.
 - [ ] Accesibilidad: mover tareas sin mouse (por ejemplo, el selector de estado del panel) y anunciar el cambio.
+
+## Layout del proyecto y ajustes del Home (segunda pasada)
+
+Referencia: el sidebar y la barra superior de "Home - Website Relaunch" en Stitch. No se itera más en Stitch: el ancho y la altura de columnas dependen del tamaño de pantalla y de los datos, así que se validan en la app, con capturas a 1440 y 2560 px en claro y oscuro, antes de mergear.
+
+Cambios:
+
+- [ ] **Sidebar más legible** (afecta a todas las pantallas del proyecto): texto de unos 16 px, íconos de 20 px, filas más altas (al menos 44 px en mobile) y el logo con más peso. Se mantienen el resaltado activo, Change Log y el crédito del pie, en tamaño discreto.
+- [ ] **Barra superior sin repetir el proyecto:** el nombre aparece una sola vez, en un selector con forma de píldora a la izquierda con el ícono real del proyecto. A la derecha quedan "Areas", la campana, el nombre del usuario y el avatar. Se quita el título duplicado.
+- [ ] **Home más ancho:** el contenido pasa del ancho actual (unos 1000 px) a `max-w-7xl`, para que no queden franjas vacías en pantallas anchas.
+- [ ] **Columnas del Home de igual altura:** "Today" se estira a la altura de la columna derecha. Si sobra espacio, muestra las próximas tareas pendientes ("Upcoming"), nunca contenido inventado.
+- [ ] **Áreas sin tareas:** en lugar de "0 of 0 tasks done" y una barra vacía, dicen "No tasks yet".
+
+No se toma de Stitch: la tarjeta "Design guidelines", el anillo de progreso ni el texto del sprint.
 
 ## Pendientes
 
