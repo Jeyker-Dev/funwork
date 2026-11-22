@@ -21,9 +21,9 @@ Herramienta: **Stitch** (proyecto `14584368472277721493`). Componentes de UI: Fl
 |---|---|---|
 | Login | "Login - Refined Board Preview" | Implementado |
 | Lista de proyectos | "Projects Dashboard - Luminous Editorial" | Implementado |
-| Dashboard del proyecto | | |
+| Home del proyecto | "Home - Website Relaunch" | Diseño aprobado; pendiente de implementar |
 | Tablero de tareas | | |
-| Inbox | | |
+| Inbox | "Inbox - Website Relaunch" y "Inbox - Process Mode Focus Panel" | Diseño aprobado; pendiente de implementar |
 | Notebooks / editor | | |
 | Archivos | | |
 
@@ -66,6 +66,47 @@ Diferencias de Stitch que se corrigen en el código:
 - [x] La vista de lista no está diseñada en Stitch: tabla simple con ícono, nombre, tipo, progreso, estado y fecha de entrega.
 - [x] Definir el modo oscuro y mobile, que Stitch no muestra: la tarjeta "Continue" usa `brand-tint`; en mobile, una columna y el selector de vista oculto.
 - [x] Estado vacío: sin proyectos, mostrar un mensaje y una sola acción "Create your first project".
+
+## Home del proyecto: decisiones y ajustes para el código
+
+Diseño aprobado: "Estado del proyecto + qué hago hoy". Arriba, el encabezado del proyecto con progreso y conteo por estado. Debajo, la captura rápida ancha. Después, dos columnas: "Today" a la izquierda; "Areas" y "Recent activity" a la derecha. Toda la pantalla va en inglés (ver `DESIGN.md`, sección 9).
+
+Decisiones:
+
+- **Sin saludo ni tarjetas de métricas:** el saludo vive en la lista de proyectos.
+- **"Today" honesto:** muestra tareas vencidas y de hoy, que se marcan como hechas con un clic. Si no hay ninguna, lo dice y muestra "Up next". Se elimina el comportamiento de `DashboardStatsData::highlightedTasksCount()`, que mostraba todas las tareas abiertas bajo la etiqueta "para hoy".
+- **Áreas con progreso:** cada área muestra sus tareas `Done` sobre el total.
+- **Actividad reciente mezclada:** notebooks, decisiones, archivos y tareas completadas, con tiempo relativo.
+
+Diferencias de Stitch que se corrigen en el código:
+
+- [ ] El encabezado tiene una línea naranja superior: se quita (es un elemento de plantilla).
+- [ ] El progreso aparece tres veces (anillo de 60 %, "12 of 20 tasks done" y la barra): queda solo la barra con "12 of 20 tasks done".
+- [ ] "8 tasks remaining in active sprint": FunWork no tiene sprints; se quita.
+- [ ] La tarjeta "Design guidelines" con foto no existe en FunWork: se quita.
+- [ ] "FunWork Studio" al pie del sidebar: se quita, salvo lo que el sidebar ya tiene hoy (Change Log).
+- [ ] El ícono del selector de proyecto (cohete) no coincide con el del encabezado: se usa el ícono real del proyecto en los dos lugares.
+- [ ] "View all activity" no tiene una página destino: se quita, salvo que exista una.
+- [ ] Definir el modo oscuro, mobile (una columna: Today, Areas, Recent activity) y los estados vacíos de cada tarjeta.
+
+## Inbox: decisiones y ajustes para el código
+
+Diseño aprobado: "Capturá en un segundo, procesá en un minuto". Arriba, el título con el contador "N to process" y el botón "Process inbox". Debajo, una barra de captura que guarda con Enter. Después, los ítems agrupados por antigüedad (Today, This week, Older) en filas simples. El modo "Process" muestra un ítem por vez en un panel centrado.
+
+Decisiones:
+
+- **Captura con Enter:** sin botón "Add to Inbox" separado; un aviso de tecla Enter dentro de la barra.
+- **Acciones por fila:** "Make task", "Make note" y un ícono de borrar aparecen al pasar el mouse o al enfocar la fila con el teclado; en mobile se ven siempre. Borrar no usa rojo.
+- **Modo "Process":** contador y barra ("2 of 4"), el texto del ítem grande, "Captured N ago", tres acciones con atajos de teclado (T, N, D), "Skip" y cerrar. "Make task" y "Make note" reutilizan los modales de convertir que ya existen. Al terminar el último ítem, muestra el estado vacío.
+- **Estado vacío "Inbox zero":** un mensaje que explica para qué sirve el Inbox y el foco puesto en la barra de captura.
+- **Datos:** no se agregan columnas; los grupos salen de `created_at`.
+
+Diferencias de Stitch que se corrigen en el código:
+
+- [ ] En el sidebar, "Inbox" no aparece como ítem activo en ninguna de las dos pantallas: debe usar el resaltado activo.
+- [ ] "FunWork Studio" al pie del sidebar y el cohete del selector de proyecto: igual que en el Home, se quitan o se usa el ícono real.
+- [ ] Los atajos T, N y D deben funcionar solo dentro del modo "Process", con Escape para cerrar, y nunca mientras se escribe en un campo.
+- [ ] Definir el modo oscuro, mobile (el panel de "Process" ocupa casi toda la pantalla y los botones se apilan) y el estado vacío.
 
 ## Pendientes
 
