@@ -21,8 +21,8 @@ Herramienta: **Stitch** (proyecto `14584368472277721493`). Componentes de UI: Fl
 |---|---|---|
 | Login | "Login - Refined Board Preview" | Implementado |
 | Lista de proyectos | "Projects Dashboard - Luminous Editorial" | Implementado |
-| Home del proyecto | "Home - Website Relaunch" | Diseño aprobado; pendiente de implementar |
-| Tablero de tareas | | |
+| Home del proyecto | "Home - Website Relaunch" | Implementado |
+| Tablero de tareas | "Tasks - Website Relaunch" y "Tasks - Task Detail Side Panel" | Diseño aprobado; pendiente de implementar |
 | Inbox | "Inbox - Website Relaunch" y "Inbox - Process Mode Focus Panel" | Diseño aprobado; pendiente de implementar |
 | Notebooks / editor | | |
 | Archivos | | |
@@ -80,14 +80,14 @@ Decisiones:
 
 Diferencias de Stitch que se corrigen en el código:
 
-- [ ] El encabezado tiene una línea naranja superior: se quita (es un elemento de plantilla).
-- [ ] El progreso aparece tres veces (anillo de 60 %, "12 of 20 tasks done" y la barra): queda solo la barra con "12 of 20 tasks done".
-- [ ] "8 tasks remaining in active sprint": FunWork no tiene sprints; se quita.
-- [ ] La tarjeta "Design guidelines" con foto no existe en FunWork: se quita.
-- [ ] "FunWork Studio" al pie del sidebar: se quita, salvo lo que el sidebar ya tiene hoy (Change Log).
-- [ ] El ícono del selector de proyecto (cohete) no coincide con el del encabezado: se usa el ícono real del proyecto en los dos lugares.
-- [ ] "View all activity" no tiene una página destino: se quita, salvo que exista una.
-- [ ] Definir el modo oscuro, mobile (una columna: Today, Areas, Recent activity) y los estados vacíos de cada tarjeta.
+- [x] El encabezado tiene una línea naranja superior: se quita (es un elemento de plantilla).
+- [x] El progreso aparece tres veces (anillo de 60 %, "12 of 20 tasks done" y la barra): queda solo la barra con "12 of 20 tasks done".
+- [x] "8 tasks remaining in active sprint": FunWork no tiene sprints; se quita.
+- [x] La tarjeta "Design guidelines" con foto no existe en FunWork: se quita.
+- [x] "FunWork Studio" al pie del sidebar: se quita, salvo lo que el sidebar ya tiene hoy (Change Log).
+- [x] El ícono del selector de proyecto (cohete) no coincide con el del encabezado: se usa el ícono real del proyecto en los dos lugares.
+- [x] "View all activity" no tiene una página destino: se quita, salvo que exista una.
+- [x] Definir el modo oscuro, mobile (una columna: Today, Areas, Recent activity) y los estados vacíos de cada tarjeta.
 
 ## Inbox: decisiones y ajustes para el código
 
@@ -107,6 +107,30 @@ Diferencias de Stitch que se corrigen en el código:
 - [ ] "FunWork Studio" al pie del sidebar y el cohete del selector de proyecto: igual que en el Home, se quitan o se usa el ícono real.
 - [ ] Los atajos T, N y D deben funcionar solo dentro del modo "Process", con Escape para cerrar, y nunca mientras se escribe en un campo.
 - [ ] Definir el modo oscuro, mobile (el panel de "Process" ocupa casi toda la pantalla y los botones se apilan) y el estado vacío.
+
+## Tablero de tareas: decisiones y ajustes para el código
+
+Diseño aprobado: "Un tablero que se usa con las manos". Un encabezado compacto en una línea (título con total, filtros por área, selector Board/List y "New task"), columnas neutras con todas las tareas visibles, arrastrar y soltar, y el detalle en un panel lateral.
+
+Decisiones:
+
+- **Todas las tareas visibles:** se elimina el `limit(3)` de `⚡task-board.blade.php` y el botón "+N more tasks". Cada columna hace scroll por su cuenta.
+- **Arrastrar y soltar** con `wire:sort` de Livewire v4: entre columnas cambia el estado y dentro de una columna cambia el orden. Durante el arrastre, la tarjeta se levanta y la columna de destino muestra dónde va a caer.
+- **Columnas neutras** (`surface-low`): el color de estado queda solo en el punto del encabezado.
+- **Tarjetas:** título, etiqueta de área, prioridad solo cuando es High, y fecha solo si existe ("Overdue" en rojo). Sin avatar (hoy está fijo el de Caleb Porzio), sin ícono de expandir y sin "Due:" vacío.
+- **Panel lateral de detalle** al hacer clic en una tarjeta, sin cambiar de página: selector de estado, título editable, propiedades (área, prioridad, fecha, creada), descripción en markdown, "Delete task" en gris y "Save".
+- **Sin el título "Your Tasks, Organized."**
+
+Diferencias de Stitch que se corrigen en el código:
+
+- [ ] Los colores de los puntos de estado no coinciden entre el tablero y el panel (Doing es azul en el tablero y amarillo en el panel): usar siempre los colores de `TaskStatus`.
+- [ ] En el sidebar, el ícono de Decisions cambió a un gráfico de barras: mantener el ícono actual.
+- [ ] "Newtask" aparece sin espacio: el botón dice "New task".
+- [ ] En el panel, la fecha de entrega muestra solo "Overdue": debe mostrar la fecha y marcarla como vencida (por ejemplo "Nov 20, overdue").
+- [ ] La checklist de la descripción sale del markdown (`- [ ]` / `- [x]`); marcarla desde el panel es opcional y no debe romper el markdown guardado.
+- [ ] La zona "Drop here to complete" solo aparece mientras se arrastra.
+- [ ] Definir la vista de lista, el modo oscuro, mobile (columnas con scroll horizontal o una columna con selector de estado; el panel ocupa toda la pantalla) y los estados vacíos de cada columna.
+- [ ] Accesibilidad: mover tareas sin mouse (por ejemplo, el selector de estado del panel) y anunciar el cambio.
 
 ## Pendientes
 

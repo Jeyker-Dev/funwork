@@ -67,7 +67,11 @@ test('it counts open tasks, today tasks in user timezone, and inbox items via re
     expect($stats->openTasksCount)->toBe(3)
         ->and($stats->todayTasksCount)->toBe(1)
         ->and($stats->inboxCount)->toBe(2)
-        ->and($stats->highlightedTasksCount())->toBe(1);
+        ->and($stats->totalTasksCount)->toBe(4)
+        ->and($stats->todoTasksCount)->toBe(2)
+        ->and($stats->doingTasksCount)->toBe(1)
+        ->and($stats->doneTasksCount)->toBe(1)
+        ->and($stats->progressPercent)->toBe(25);
 });
 
 test('it respects UTC when user has UTC timezone', function () {
