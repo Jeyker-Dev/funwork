@@ -138,11 +138,11 @@ Referencia: el sidebar y la barra superior de "Home - Website Relaunch" en Stitc
 
 Cambios:
 
-- [ ] **Sidebar más legible** (afecta a todas las pantallas del proyecto): texto de unos 16 px, íconos de 20 px, filas más altas (al menos 44 px en mobile) y el logo con más peso. Se mantienen el resaltado activo, Change Log y el crédito del pie, en tamaño discreto.
-- [ ] **Barra superior sin repetir el proyecto:** el nombre aparece una sola vez, en un selector con forma de píldora a la izquierda con el ícono real del proyecto. A la derecha quedan "Areas", la campana, el nombre del usuario y el avatar. Se quita el título duplicado.
-- [ ] **Home más ancho:** el contenido pasa del ancho actual (unos 1000 px) a `max-w-7xl`, para que no queden franjas vacías en pantallas anchas.
-- [ ] **Columnas del Home de igual altura:** "Today" se estira a la altura de la columna derecha. Si sobra espacio, muestra las próximas tareas pendientes ("Upcoming"), nunca contenido inventado.
-- [ ] **Áreas sin tareas:** en lugar de "0 of 0 tasks done" y una barra vacía, dicen "No tasks yet".
+- [x] **Sidebar más legible** (afecta a todas las pantallas del proyecto): texto de unos 16 px, íconos de 20 px, filas más altas (al menos 44 px en mobile) y el logo con más peso. Se mantienen el resaltado activo, Change Log y el crédito del pie, en tamaño discreto.
+- [x] **Barra superior sin repetir el proyecto:** el nombre aparece una sola vez, en un selector con forma de píldora a la izquierda con el ícono real del proyecto. A la derecha quedan "Areas", la campana, el nombre del usuario y el avatar. Se quita el título duplicado.
+- [x] **Home más ancho:** el contenido pasa del ancho actual (unos 1000 px) a `max-w-7xl`, para que no queden franjas vacías en pantallas anchas.
+- [x] **Columnas del Home de igual altura:** "Today" se estira a la altura de la columna derecha. Si sobra espacio, muestra las próximas tareas pendientes ("Upcoming"), nunca contenido inventado.
+- [x] **Áreas sin tareas:** en lugar de "0 of 0 tasks done" y una barra vacía, dicen "No tasks yet".
 
 No se toma de Stitch: la tarjeta "Design guidelines", el anillo de progreso ni el texto del sprint.
 

@@ -17,6 +17,8 @@ class GetProjectHomeDataAction
 {
     private const int RECENT_ACTIVITY_LIMIT = 5;
 
+    private const int TODAY_SPARE_ROOM_TARGET = 5;
+
     public function __construct(
         private readonly GetDashboardStatsAction $getDashboardStats,
         private readonly ListRecentActivitiesAction $listRecentActivities,
@@ -31,12 +33,16 @@ class GetProjectHomeDataAction
         $localToday = DateHelper::userToday($user);
 
         $todayTasks = $this->loadTodayTasks($project, $localToday, $timezone);
-        $nextOpenTask = $todayTasks->isEmpty() ? $this->findNextOpenTask($project) : null;
+        $remainingSlots = max(0, self::TODAY_SPARE_ROOM_TARGET - $todayTasks->count());
+        $upcomingTasks = $remainingSlots > 0
+            ? $this->loadUpcomingTasks($project, $localToday, $remainingSlots)
+            : new Collection;
 
         return new ProjectHomeData(
             stats: ($this->getDashboardStats)($project, $user),
             todayTasks: $todayTasks,
-            nextOpenTask: $nextOpenTask,
+            upcomingTasks: $upcomingTasks,
+            nextOpenTask: $todayTasks->isEmpty() ? $upcomingTasks->first() : null,
             areas: $this->loadAreasWithProgress($project),
             recentActivities: ($this->listRecentActivities)($project, self::RECENT_ACTIVITY_LIMIT),
             localToday: $localToday,
@@ -66,15 +72,24 @@ class GetProjectHomeDataAction
             ->get();
     }
 
-    private function findNextOpenTask(Project $project): ?Task
+    /**
+     * @return Collection<int, Task>
+     */
+    private function loadUpcomingTasks(Project $project, string $localToday, int $limit): Collection
     {
         return $project->tasks()
+            ->with('area')
             ->open()
+            ->where(function (Builder $query) use ($localToday): void {
+                $query->whereNull('due_date')
+                    ->orWhereDate('due_date', '>', $localToday);
+            })
             ->orderByRaw('CASE WHEN due_date IS NULL THEN 1 ELSE 0 END ASC')
             ->orderBy('due_date')
-            ->orderBy('created_at')
+            ->orderBy('position')
             ->orderBy('id')
-            ->first();
+            ->limit($limit)
+            ->get();
     }
 
     /**

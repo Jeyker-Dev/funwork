@@ -62,6 +62,7 @@ class extends Component
             'home' => $home,
             'stats' => $home->stats,
             'todayTasks' => $home->todayTasks,
+            'upcomingTasks' => $home->upcomingTasks,
             'areas' => $home->areas,
             'recentActivities' => $home->recentActivities,
         ];
@@ -74,13 +75,14 @@ class extends Component
 
     <x-projects.dashboard.quick-capture :project="$project" />
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
-        <div class="lg:col-span-7">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-stretch">
+        <div class="lg:col-span-7 flex flex-col">
             <x-projects.dashboard.today-tasks
                 :tasks="$todayTasks"
+                :upcoming-tasks="$upcomingTasks"
                 :project="$project"
+                :home="$home"
                 :local-today="$home->localToday"
-                :up-next-text="$home->upNextText()"
             />
         </div>
 

@@ -27,15 +27,23 @@ new class extends Component {
 ?>
 
 <div>
-    <flux:dropdown position="bottom" align="end">
-        <flux:button variant="ghost" class="flex items-center! justify-center! max-md:min-h-11 max-md:px-2" icon:trailing="chevron-down">
-            <div class="flex items-center gap-2">
-                <x-projects.icon-project :project="$project" iconClass="size-4 text-ink-muted!"
-                                         containerClass="w-6! h-6! bg-transparent!"/>
+    <flux:dropdown position="bottom" align="start">
+        <flux:button
+            variant="ghost"
+            data-project-switcher
+            class="rounded-full! bg-surface-card! dark:bg-surface-high! border border-ghost shadow-xs px-2.5! sm:px-3.5! py-1! h-10! max-md:min-h-11! flex items-center! justify-center! gap-2 max-w-[12.5rem] sm:max-w-xs"
+            icon:trailing="chevron-down"
+        >
+            <div class="flex items-center gap-2 min-w-0">
+                <x-projects.icon-project
+                    :project="$project"
+                    iconClass="size-4"
+                    containerClass="w-6! h-6! rounded-full! shrink-0"
+                />
 
-                <flux:heading class="text-sm hidden md:block">
+                <span class="font-headline font-semibold text-sm text-ink truncate">
                     {{ $project->name }}
-                </flux:heading>
+                </span>
             </div>
         </flux:button>
 
