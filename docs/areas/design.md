@@ -24,7 +24,7 @@ Herramienta: **Stitch** (proyecto `14584368472277721493`). Componentes de UI: Fl
 | Home del proyecto | "Home - Website Relaunch" | Implementado |
 | Tablero de tareas | "Tasks - Website Relaunch" y "Tasks - Task Detail Side Panel" | Diseño aprobado; pendiente de implementar |
 | Inbox | "Inbox - Website Relaunch" y "Inbox - Process Mode Focus Panel" | Implementado |
-| Notebooks / editor | | |
+| Notebooks / editor | "Notebooks - Website Relaunch" y "Notebook Detail - Architecture" | Diseño aprobado; pendiente de implementar |
 | Archivos | | |
 
 ## Login: decisiones y ajustes para el código
@@ -145,6 +145,28 @@ Cambios:
 - [ ] **Áreas sin tareas:** en lugar de "0 of 0 tasks done" y una barra vacía, dicen "No tasks yet".
 
 No se toma de Stitch: la tarjeta "Design guidelines", el anillo de progreso ni el texto del sprint.
+
+## Notebooks: decisiones y ajustes para el código
+
+Diseño aprobado: "Una biblioteca de documentos del proyecto". La lista de notebooks es densa, en filas y con datos reales. Al abrir un notebook se ven dos paneles: a la izquierda el índice de páginas y a la derecha la página, con Write/Preview.
+
+Decisiones:
+
+- **Datos reales en cada fila:** nombre, descripción, área, cantidad de páginas, última edición real (`updated_at` del notebook o de su página más reciente) y estado: "From repo docs" cuando las páginas tienen `source_path`, y "Unsynced changes" cuando `hasUnsyncedChanges()` es verdadero. Se eliminan el "Modified at 2h" y el avatar de Caleb Porzio que están fijos en `⚡show-notebooks.blade.php`.
+- **Menú "⋯" en inglés:** Export as Markdown, Change area, Sync with Google Docs y Open in Google Docs (este último solo si hay `google_doc_id`). La fecha de la última sincronización se muestra en inglés.
+- **Notebook abierto en dos paneles:** se reutiliza el editor actual (markdown, Write/Preview, autoguardado con reintento, anterior/siguiente, "N of M", crear y borrar páginas). El modo de escritura enfocada (`layouts.focus`) se mantiene como opción.
+- **Estado vacío:** una línea que explica qué es un notebook, un botón "Create your first notebook" y la pista de importar los docs del repo con `funwork:sync-docs`. Sin el título de dos colores ni la tarjeta de tip.
+
+Diferencias de Stitch que se corrigen en el código:
+
+- [ ] El índice de páginas lleva números (01–06): se quitan; el orden ya lo da la lista.
+- [ ] La página actual del índice no usa el resaltado del sistema: fondo blanco y texto naranja, como el ítem activo del sidebar.
+- [ ] El contador dice "2 of 12", pero el índice muestra 6 páginas: el índice lista todas las páginas (con scroll) y el contador coincide con la posición real.
+- [ ] "History" al pie de la página: FunWork no tiene historial de versiones; se quita.
+- [ ] El bloque de código muestra un nombre de archivo y "PHP 8.2" inventados: el bloque renderiza solo lo que trae el markdown.
+- [ ] La lista con viñetas aparece sin viñetas: usar los estilos de `.markdown-content`.
+- [ ] La etiqueta "Backend" del notebook abierto perdió su punto de color.
+- [ ] Definir el modo oscuro y mobile: en mobile, el índice de páginas pasa a un selector o a un panel desplegable arriba de la página.
 
 ## Pendientes
 
