@@ -25,7 +25,7 @@ Herramienta: **Stitch** (proyecto `14584368472277721493`). Componentes de UI: Fl
 | Tablero de tareas | "Tasks - Website Relaunch" y "Tasks - Task Detail Side Panel" | Implementado |
 | Inbox | "Inbox - Website Relaunch" y "Inbox - Process Mode Focus Panel" | Implementado |
 | Notebooks / editor | "Notebooks - Website Relaunch" y "Notebook Detail - Architecture" | Diseño aprobado; pendiente de implementar |
-| Decisions | "Decisions - Website Relaunch" y "Decision Detail - Livewire Single-File Components" | Diseño aprobado; pendiente de implementar |
+| Decisions | "Decisions - Website Relaunch" y "Decision Detail - Livewire Single-File Components" | Implementado |
 | Archivos | "Files - Website Relaunch" y "Files - Drag and Drop Upload State" | Diseño aprobado; pendiente de implementar |
 | Settings de la cuenta | "Account Settings - FunWork" y "Account Settings - Integrations" | Diseño aprobado; pendiente de implementar |
 | Settings del proyecto (nueva) | "Project Settings - Website Relaunch" | Diseño aprobado; pendiente de implementar |
@@ -186,15 +186,15 @@ Decisiones:
 
 Diferencias de Stitch que se corrigen en el código:
 
-- [ ] En los chips, el contador se parte en una segunda línea ("Accepted / 8"): va en la misma línea.
-- [ ] Falta el chip "Rejected": los filtros cubren los cuatro estados de `DecisionStatus` y ocultan los que tienen cero.
-- [ ] "New decision" y el subtítulo se parten en dos líneas: el botón ocupa una línea y el subtítulo tiene ancho suficiente.
-- [ ] Las filas reemplazadas repiten "Superseded" y "Superseded by #N": queda solo el enlace.
-- [ ] "Edit" y "Supersede" en el panel parecen texto plano: se ven como botones secundarios.
-- [ ] "Supersede" hoy no es una acción propia: el reemplazo se elige en el formulario de edición (`form.supersededById`). El botón abre ese flujo con el campo preseleccionado, sin crear lógica nueva.
-- [ ] En el sidebar, el ícono de Inbox cambió a un sobre: mantener el ícono actual.
-- [ ] La sección "Preview" de la pantalla de detalle es solo una muestra de Stitch: en la app es el mismo detalle con el aviso de reemplazo.
-- [ ] Definir el modo oscuro y mobile (el panel lateral pasa debajo del título) y el estado vacío.
+- [x] En los chips, el contador se parte en una segunda línea ("Accepted / 8"): va en la misma línea.
+- [x] Falta el chip "Rejected": los filtros cubren los cuatro estados de `DecisionStatus` y ocultan los que tienen cero.
+- [x] "New decision" y el subtítulo se parten en dos líneas: el botón ocupa una línea y el subtítulo tiene ancho suficiente.
+- [x] Las filas reemplazadas repiten "Superseded" y "Superseded by #N": queda solo el enlace.
+- [x] "Edit" y "Supersede" en el panel parecen texto plano: se ven como botones secundarios.
+- [x] "Supersede" hoy no es una acción propia: el reemplazo se elige en el formulario de edición (`form.supersededById`). El botón abre ese flujo con el campo preseleccionado, sin crear lógica nueva.
+- [x] En el sidebar, el ícono de Inbox cambió a un sobre: mantener el ícono actual.
+- [x] La sección "Preview" de la pantalla de detalle es solo una muestra de Stitch: en la app es el mismo detalle con el aviso de reemplazo.
+- [x] Definir el modo oscuro y mobile (el panel lateral pasa debajo del título) y el estado vacío.
 
 ## Archivos: decisiones y ajustes para el código
 

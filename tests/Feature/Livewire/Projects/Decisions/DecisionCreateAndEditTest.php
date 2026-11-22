@@ -184,3 +184,27 @@ it('forbids another user from creating or editing someone elses project decision
 
     expect($decision->fresh()->title)->toBe('Protected Decision');
 });
+
+it('opens the edit flow with superseding field preselected when clicking Supersede', function () {
+    $owner = User::factory()->create();
+    $project = Project::factory()->create(['owner_id' => $owner->id]);
+    $decision = Decision::factory()->accepted()->create([
+        'project_id' => $project->id,
+        'created_by' => $owner->id,
+        'number' => 1,
+        'title' => 'Original Decision',
+    ]);
+    $candidate = Decision::factory()->accepted()->create([
+        'project_id' => $project->id,
+        'created_by' => $owner->id,
+        'number' => 2,
+        'title' => 'Replacement Candidate',
+    ]);
+
+    Livewire::actingAs($owner)
+        ->test('pages::projects.decisions.show', ['project' => $project, 'decision' => $decision])
+        ->call('openSupersede')
+        ->assertSet('form.status', DecisionStatus::Superseded->value)
+        ->assertSet('form.supersededById', $candidate->id)
+        ->assertSee('Superseded By');
+});
