@@ -183,7 +183,7 @@ small UI and up to 400 ms for sheets, ease-out on enter, ease-in on exit,
 
 ## 9. Open Decisions
 
-- **UI language.** The designs are in Spanish; the app mixes Spanish and
-  English. Pick one before copy changes.
+- **UI language (decided 2026-11-22).** The UI is in English. Redesigned
+  screens move their remaining Spanish copy to English.
 - **Dark mode fidelity.** Section 2 is a proposal, since Stitch has no dark
   theme.

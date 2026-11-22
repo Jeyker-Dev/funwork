@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\TaskPriority;
 use App\Enums\TaskStatus;
 use App\Support\Markdown;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -108,6 +109,21 @@ class Task extends Model
         return $query->open()
             ->whereDate('due_date', '>', $localToday)
             ->whereDate('due_date', '<=', $upcomingEnd);
+    }
+
+    /**
+     * @param  Builder<Task>  $query
+     * @return Builder<Task>
+     */
+    public function scopeDueThisWeek(Builder $query, string $localToday): Builder
+    {
+        $anchor = CarbonImmutable::parse($localToday);
+        $weekStart = $anchor->startOfWeek()->toDateString();
+        $weekEnd = $anchor->endOfWeek()->toDateString();
+
+        return $query->open()
+            ->whereDate('due_date', '>=', $weekStart)
+            ->whereDate('due_date', '<=', $weekEnd);
     }
 
     public const int MAX_DESCRIPTION_LENGTH = 65535;

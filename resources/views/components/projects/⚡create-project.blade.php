@@ -39,20 +39,9 @@ new class extends Component {
         </flux:modal.trigger>
     @else
         <flux:modal.trigger name="create-project">
-            <div
-                class="flex flex-col items-center justify-center gap-4 border-2 border-dashed border-ghost bg-surface-card rounded-2xl p-6 mt-6 max-w-96 cursor-pointer">
-                <div class="flex flex-col items-center justify-center bg-surface-high rounded-full w-10 h-10 md:w-12 md:h-12">
-                    <flux:icon.plus variant="solid" class="text-ink size-6 md:size-7"/>
-                </div>
-
-                <p class="text-ink font-bold md:text-lg">
-                    Create your first project
-                </p>
-
-                <p class="text-ink-muted font-normal text-center w-8/12 text-sm md:text-base">
-                    Start your first workspace and organize your tasks effortlessly.
-                </p>
-            </div>
+            <flux:button icon="plus" variant="primary" class="min-h-11">
+                Create your first project
+            </flux:button>
         </flux:modal.trigger>
     @endif
 
