@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Support\DateHelper;
 use Carbon\CarbonImmutable;
+use Carbon\CarbonInterface;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -28,6 +29,7 @@ use NotificationChannels\WebPush\HasPushSubscriptions;
     'digest_enabled',
     'digest_hour',
     'last_digest_sent_at',
+    'last_seen_changelog_at',
 ])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable
@@ -52,7 +54,28 @@ class User extends Authenticatable
             'digest_enabled' => 'boolean',
             'digest_hour' => 'integer',
             'last_digest_sent_at' => 'datetime',
+            'last_seen_changelog_at' => 'datetime',
         ];
+    }
+
+    public function markChangelogSeen(): void
+    {
+        $this->update([
+            'last_seen_changelog_at' => now(),
+        ]);
+    }
+
+    public function hasUnreadChangelog(?CarbonInterface $latestReleaseDate): bool
+    {
+        if ($latestReleaseDate === null) {
+            return false;
+        }
+
+        if ($this->last_seen_changelog_at === null) {
+            return true;
+        }
+
+        return $latestReleaseDate->gt($this->last_seen_changelog_at);
     }
 
     public function updateDigestSettings(bool $digestEnabled, int $digestHour): void

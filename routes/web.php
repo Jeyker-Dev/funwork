@@ -20,6 +20,7 @@ Route::view('/privacy', 'privacy')->name('privacy');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::livewire('/projects', 'pages::projects.index')->name('projects');
+    Route::livewire('/whats-new', 'pages::whats-new')->name('whats-new');
     Route::livewire('/notifications', 'pages::notifications.index')->name('notifications.index');
 
     Route::livewire('projects/{project}', 'pages::projects.show')

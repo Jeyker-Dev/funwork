@@ -60,7 +60,7 @@ test('all project screens render the updated sidebar and top bar without missing
         ->and(substr_count($header->textContent, 'Alpha Launch'))->toBe(1);
 
     $sidebarLinks = $xpath->query('//a[@data-flux-sidebar-item]');
-    expect($sidebarLinks->length)->toBe(7);
+    expect($sidebarLinks->length)->toBe(8);
 })->with([
     'home' => 'projects.show',
     'inbox' => 'project.inbox',

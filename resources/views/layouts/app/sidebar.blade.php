@@ -73,10 +73,33 @@
 
     <flux:spacer />
 
+    @php
+        $latestReleaseDate = app(\App\Services\ChangelogService::class)->latestReleaseDate();
+        $hasUnreadChangelog = auth()->user()?->hasUnreadChangelog($latestReleaseDate) ?? false;
+    @endphp
+
     <flux:sidebar.nav>
         <flux:separator class="mb-3"/>
 
-        <flux:button icon="bell" variant="ghost" class="w-full justify-start max-md:min-h-11">Change Log</flux:button>
+        <flux:sidebar.item
+            icon="sparkles"
+            :href="route('whats-new')"
+            :current="request()->routeIs('whats-new')"
+            :tooltip="__('What\'s new')"
+            wire:navigate
+        >
+            {{ __("What's new") }}
+
+            @if($hasUnreadChangelog)
+                <x-slot:iconTrailing>
+                    <span
+                        class="size-2 rounded-full bg-brand shrink-0"
+                        role="img"
+                        aria-label="{{ __('New updates') }}"
+                    ></span>
+                </x-slot:iconTrailing>
+            @endif
+        </flux:sidebar.item>
 
         <flux:text class="mt-2 text-center text-[11px] text-ink-subtle/75">
             Built with <span class="text-red-500/75 dark:text-red-400/75" aria-hidden="true">♥</span> by Jeyker-Dev

@@ -10,6 +10,8 @@
             <x-layouts::app.sidebar :project="$project" />
 
             <x-layouts::app.header :project="$project" />
+        @else
+            <x-layouts::app.standalone-header />
         @endif
 
         {{ $slot }}
