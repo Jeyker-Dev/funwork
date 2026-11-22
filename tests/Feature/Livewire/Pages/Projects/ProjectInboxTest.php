@@ -385,3 +385,60 @@ test('sidebar marks Inbox as the active item on the inbox route', function () {
 
     expect($activeInboxLinks->length)->toBe(1);
 });
+
+test('inbox items captured less than a minute ago display now instead of 0s', function () {
+    $this->travelTo(Carbon::parse('2026-11-22 14:00:30', 'UTC'));
+
+    $user = User::factory()->create(['timezone' => 'UTC']);
+    $project = Project::factory()->create(['owner_id' => $user->id]);
+
+    InboxItem::factory()->create([
+        'user_id' => $user->id,
+        'project_id' => $project->id,
+        'content' => 'Brand new thought',
+        'created_at' => Carbon::parse('2026-11-22 14:00:10', 'UTC'),
+    ]);
+
+    $html = Livewire::actingAs($user)
+        ->test('pages::projects.inbox', ['project' => $project])
+        ->assertSee('Brand new thought')
+        ->assertSee('now')
+        ->html();
+
+    $dom = new DOMDocument;
+    @$dom->loadHTML($html);
+    $xpath = new DOMXPath($dom);
+    $itemsSection = $xpath->query('//section[@aria-label="Inbox items"]')->item(0);
+    $ageText = trim($xpath->query('.//span[normalize-space(.)="now"]', $itemsSection)->item(0)?->textContent ?? '');
+
+    expect($itemsSection)->not->toBeNull()
+        ->and($itemsSection->textContent)->not->toContain('0s')
+        ->and($itemsSection->textContent)->not->toContain('20s')
+        ->and($ageText)->toBe('now');
+});
+
+test('process mode panel is rendered outside space-y layout flow with zero margin so its backdrop covers the full viewport', function () {
+    $user = User::factory()->create();
+    $project = Project::factory()->create(['owner_id' => $user->id]);
+
+    InboxItem::factory()->create([
+        'user_id' => $user->id,
+        'project_id' => $project->id,
+        'content' => 'Verify full viewport backdrop',
+    ]);
+
+    $html = Livewire::actingAs($user)
+        ->test('pages::projects.inbox', ['project' => $project])
+        ->call('openProcessMode')
+        ->html();
+
+    $dom = new DOMDocument;
+    @$dom->loadHTML($html);
+    $xpath = new DOMXPath($dom);
+    $dialog = $xpath->query('//*[@role="dialog" and @aria-labelledby="process-panel-item-text"]')->item(0);
+
+    expect($dialog)->not->toBeNull()
+        ->and($dialog->getAttribute('class'))->toContain('inset-0')
+        ->and($dialog->getAttribute('class'))->toContain('m-0!')
+        ->and($dialog->parentNode?->getAttribute('class') ?? '')->not->toContain('space-y-');
+});

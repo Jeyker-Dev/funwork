@@ -5,7 +5,7 @@
     </flux:sidebar.header>
 
     <flux:sidebar.nav>
-        <flux:sidebar.group class="flex flex-col gap-4">
+        <flux:sidebar.group class="flex flex-col gap-1.5">
             <flux:sidebar.item
                 icon="home"
                 :href="route('projects.show', ['project' => $project])"
@@ -65,12 +65,12 @@
     <flux:spacer />
 
     <flux:sidebar.nav>
-        <flux:separator class="mb-4"/>
+        <flux:separator class="mb-3"/>
 
-        <flux:button icon="bell" variant="ghost">Change Log</flux:button>
+        <flux:button icon="bell" variant="ghost" class="w-full justify-start max-md:min-h-11">Change Log</flux:button>
 
-        <flux:text class="mt-2 text-center text-xs">
-            Built with <span class="text-red-500 text-xl">♥</span> by Jeyker-Dev
+        <flux:text class="mt-2 text-center text-[11px] text-ink-subtle/75">
+            Built with <span class="text-red-500/75 dark:text-red-400/75" aria-hidden="true">♥</span> by Jeyker-Dev
         </flux:text>
     </flux:sidebar.nav>
 </flux:sidebar>

@@ -134,8 +134,9 @@ test('today card lists overdue and due-today open tasks plus tasks completed tod
         ->assertSee('Due today UI task')
         ->assertSee('Today')
         ->assertSee('Completed today task')
-        ->assertDontSee('Future task')
-        ->assertDontSee('Undated task')
+        ->assertSee('Upcoming')
+        ->assertSee('Future task')
+        ->assertSee('Undated task')
         ->assertSeeHtml(route('project.tasks', $project))
         ->assertSee('View all tasks')
         ->html();
@@ -148,9 +149,10 @@ test('today card lists overdue and due-today open tasks plus tasks completed tod
     expect($todaySectionText)->toContain('Overdue API task')
         ->and($todaySectionText)->toContain('Due today UI task')
         ->and($todaySectionText)->toContain('Completed today task')
+        ->and($todaySectionText)->toContain('Upcoming')
+        ->and($todaySectionText)->toContain('Future task')
+        ->and($todaySectionText)->toContain('Undated task')
         ->and($todaySectionText)->not->toContain('Completed yesterday task')
-        ->and($todaySectionText)->not->toContain('Future task')
-        ->and($todaySectionText)->not->toContain('Undated task')
         ->and($html)->toContain('line-through')
         ->and($html)->toContain('text-danger');
 });
@@ -254,7 +256,13 @@ test('empty today card says nothing is due today and shows up next for the earli
 
     $html = Livewire::test('pages::projects.show', ['project' => $project])
         ->assertSee('Nothing due today')
-        ->assertSee('Up next: Write onboarding notes, due Wednesday')
+        ->assertSee('Upcoming')
+        ->assertSeeInOrder([
+            'Write onboarding notes',
+            'Due Wednesday',
+            'Later task',
+            'Due Friday',
+        ])
         ->html();
 
     $dom = new DOMDocument;
@@ -354,7 +362,6 @@ test('recent activity card displays mixed feed of notebooks, decisions, files, a
             'Completed task',
             'Ship design tokens',
         ])
-        ->assertDontSee('Open task excluded from activity')
         ->assertDontSee('View all activity')
         ->html();
 
@@ -415,4 +422,128 @@ test('project home loads in constant queries without n+1 regardless of areas and
     DB::disableQueryLog();
 
     expect($queryCount)->toBeLessThanOrEqual(12);
+});
+
+test('areas without tasks show No tasks yet without an empty progress bar', function () {
+    $user = User::factory()->create();
+    $project = Project::factory()->create(['owner_id' => $user->id]);
+
+    $backend = Area::factory()->create([
+        'project_id' => $project->id,
+        'name' => 'Backend',
+        'slug' => 'backend',
+        'color' => 'blue',
+        'position' => 1,
+    ]);
+    $docs = Area::factory()->create([
+        'project_id' => $project->id,
+        'name' => 'Docs',
+        'slug' => 'docs',
+        'color' => 'green',
+        'position' => 2,
+    ]);
+
+    Task::factory()->create([
+        'project_id' => $project->id,
+        'area_id' => $backend->id,
+        'status' => TaskStatus::Done,
+    ]);
+
+    $this->actingAs($user);
+
+    $html = Livewire::test('pages::projects.show', ['project' => $project])
+        ->assertSee('Backend')
+        ->assertSee('1 of 1 tasks done')
+        ->assertSee('Docs')
+        ->assertSee('No tasks yet')
+        ->assertDontSee('0 of 0 tasks done')
+        ->html();
+
+    $dom = new DOMDocument;
+    @$dom->loadHTML($html);
+    $xpath = new DOMXPath($dom);
+
+    $areaProgressBars = $xpath->query('//*[@aria-labelledby="areas-heading"]//*[@data-area-progress]');
+    expect($areaProgressBars->length)->toBe(1);
+});
+
+test('today card shows upcoming open tasks under an Upcoming label when Today has spare room', function () {
+    $this->travelTo(Carbon::parse('2026-11-22 12:00:00'));
+
+    $user = User::factory()->create(['timezone' => 'UTC']);
+    $project = Project::factory()->create(['owner_id' => $user->id]);
+
+    Task::factory()->create([
+        'project_id' => $project->id,
+        'title' => 'Due today task',
+        'status' => TaskStatus::Todo,
+        'due_date' => '2026-11-22 00:00:00',
+    ]);
+
+    Task::factory()->create([
+        'project_id' => $project->id,
+        'title' => 'Upcoming dated task',
+        'status' => TaskStatus::Todo,
+        'due_date' => '2026-11-25 00:00:00',
+    ]);
+
+    Task::factory()->create([
+        'project_id' => $project->id,
+        'title' => 'Upcoming undated task',
+        'status' => TaskStatus::Doing,
+        'due_date' => null,
+    ]);
+
+    Task::factory()->create([
+        'project_id' => $project->id,
+        'title' => 'Completed earlier task',
+        'status' => TaskStatus::Done,
+        'due_date' => '2026-11-21 00:00:00',
+        'updated_at' => '2026-11-21 12:00:00',
+    ]);
+
+    $this->actingAs($user);
+
+    $html = Livewire::test('pages::projects.show', ['project' => $project])
+        ->assertSee('Today')
+        ->assertSee('Due today task')
+        ->assertSee('Upcoming')
+        ->assertSeeInOrder(['Due today task', 'Upcoming', 'Upcoming dated task', 'Upcoming undated task'])
+        ->html();
+
+    $dom = new DOMDocument;
+    @$dom->loadHTML($html);
+    $xpath = new DOMXPath($dom);
+    $todaySectionText = $xpath->query('//*[@aria-labelledby="today-heading"]')->item(0)?->textContent ?? '';
+
+    expect($todaySectionText)->toContain('Upcoming')
+        ->and($todaySectionText)->toContain('Upcoming dated task')
+        ->and($todaySectionText)->toContain('Upcoming undated task')
+        ->and($todaySectionText)->not->toContain('Completed earlier task');
+});
+
+test('today card omits Upcoming when Today already has enough tasks', function () {
+    $this->travelTo(Carbon::parse('2026-11-22 12:00:00'));
+
+    $user = User::factory()->create(['timezone' => 'UTC']);
+    $project = Project::factory()->create(['owner_id' => $user->id]);
+
+    Task::factory()->count(5)->create([
+        'project_id' => $project->id,
+        'status' => TaskStatus::Todo,
+        'due_date' => '2026-11-22 00:00:00',
+    ]);
+
+    Task::factory()->create([
+        'project_id' => $project->id,
+        'title' => 'Future task hidden when full',
+        'status' => TaskStatus::Todo,
+        'due_date' => '2026-11-25 00:00:00',
+    ]);
+
+    $this->actingAs($user);
+
+    Livewire::test('pages::projects.show', ['project' => $project])
+        ->assertDontSee('Upcoming')
+        ->assertDontSee('Future task hidden when full');
 });

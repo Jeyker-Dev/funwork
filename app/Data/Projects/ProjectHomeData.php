@@ -17,17 +17,34 @@ readonly class ProjectHomeData
 
     /**
      * @param  Collection<int, Task>  $todayTasks
+     * @param  Collection<int, Task>  $upcomingTasks
      * @param  Collection<int, Area>  $areas
      * @param  Collection<int, Notebook|ProjectFile|Decision|Task>  $recentActivities
      */
     public function __construct(
         public DashboardStatsData $stats,
         public Collection $todayTasks,
+        public Collection $upcomingTasks,
         public ?Task $nextOpenTask,
         public Collection $areas,
         public Collection $recentActivities,
         public string $localToday,
     ) {}
+
+    public function formatUpcomingDueLabel(Task $task): ?string
+    {
+        if ($task->due_date === null) {
+            return null;
+        }
+
+        $today = CarbonImmutable::parse($this->localToday);
+        $dueDate = CarbonImmutable::parse($task->due_date->toDateString());
+        $daysUntilDue = $today->diffInDays($dueDate, false);
+
+        return $daysUntilDue >= 1 && $daysUntilDue <= self::UPCOMING_WEEKDAY_WINDOW_DAYS
+            ? $dueDate->format('l')
+            : $dueDate->format('M j');
+    }
 
     public function upNextText(): ?string
     {
@@ -35,17 +52,11 @@ readonly class ProjectHomeData
             return null;
         }
 
-        if ($this->nextOpenTask->due_date === null) {
+        $dayLabel = $this->formatUpcomingDueLabel($this->nextOpenTask);
+
+        if ($dayLabel === null) {
             return "Up next: {$this->nextOpenTask->title}";
         }
-
-        $today = CarbonImmutable::parse($this->localToday);
-        $dueDate = CarbonImmutable::parse($this->nextOpenTask->due_date->toDateString());
-        $daysUntilDue = $today->diffInDays($dueDate, false);
-
-        $dayLabel = $daysUntilDue >= 1 && $daysUntilDue <= self::UPCOMING_WEEKDAY_WINDOW_DAYS
-            ? $dueDate->format('l')
-            : $dueDate->format('M j');
 
         return "Up next: {$this->nextOpenTask->title}, due {$dayLabel}";
     }

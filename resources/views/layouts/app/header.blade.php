@@ -6,15 +6,11 @@
     }
 @endphp
 
-<flux:header class="bg-surface-low flex items-center justify-between gap-2 sm:gap-4 px-4 lg:px-8 xl:px-16">
+<flux:header class="bg-surface-low/90 dark:bg-surface-low/90 backdrop-blur-md flex items-center justify-between gap-2 sm:gap-4 px-4 lg:px-8">
     <div class="flex gap-2 sm:gap-3 items-center min-w-0">
         <flux:sidebar.toggle class="lg:hidden shrink-0 min-h-11 min-w-11" icon="bars-2" inset="left"/>
 
-        <x-projects.icon-project :project="$project" containerClass="shrink-0 max-sm:w-9 max-sm:h-9"/>
-
-        <flux:heading class="text-lg sm:text-xl lg:text-2xl truncate min-w-0">
-            {{ $project->name }}
-        </flux:heading>
+        <livewire:projects.project-finder :project="$project"/>
     </div>
 
     @if(!request()->routeIs('projects.show'))
@@ -25,7 +21,7 @@
         />
     @endif
 
-    <div class="flex items-center gap-1 sm:gap-2 shrink-0">
+    <div data-header-right class="flex items-center gap-1 sm:gap-2 shrink-0">
         @if(!request()->routeIs('projects.show'))
             <flux:dropdown position="bottom" align="end" class="md:hidden">
                 <flux:button variant="ghost" icon="magnifying-glass" aria-label="Search" class="min-h-11 min-w-11" />
@@ -39,8 +35,6 @@
                 </flux:menu>
             </flux:dropdown>
         @endif
-
-        <livewire:projects.project-finder :project="$project"/>
 
         <livewire:projects.manage-areas :project="$project"/>
 

@@ -25,6 +25,7 @@ Herramienta: **Stitch** (proyecto `14584368472277721493`). Componentes de UI: Fl
 | Tablero de tareas | "Tasks - Website Relaunch" y "Tasks - Task Detail Side Panel" | Diseño aprobado; pendiente de implementar |
 | Inbox | "Inbox - Website Relaunch" y "Inbox - Process Mode Focus Panel" | Implementado |
 | Notebooks / editor | "Notebooks - Website Relaunch" y "Notebook Detail - Architecture" | Diseño aprobado; pendiente de implementar |
+| Decisions | "Decisions - Website Relaunch" y "Decision Detail - Livewire Single-File Components" | Diseño aprobado; pendiente de implementar |
 | Archivos | | |
 
 ## Login: decisiones y ajustes para el código
@@ -138,11 +139,11 @@ Referencia: el sidebar y la barra superior de "Home - Website Relaunch" en Stitc
 
 Cambios:
 
-- [ ] **Sidebar más legible** (afecta a todas las pantallas del proyecto): texto de unos 16 px, íconos de 20 px, filas más altas (al menos 44 px en mobile) y el logo con más peso. Se mantienen el resaltado activo, Change Log y el crédito del pie, en tamaño discreto.
-- [ ] **Barra superior sin repetir el proyecto:** el nombre aparece una sola vez, en un selector con forma de píldora a la izquierda con el ícono real del proyecto. A la derecha quedan "Areas", la campana, el nombre del usuario y el avatar. Se quita el título duplicado.
-- [ ] **Home más ancho:** el contenido pasa del ancho actual (unos 1000 px) a `max-w-7xl`, para que no queden franjas vacías en pantallas anchas.
-- [ ] **Columnas del Home de igual altura:** "Today" se estira a la altura de la columna derecha. Si sobra espacio, muestra las próximas tareas pendientes ("Upcoming"), nunca contenido inventado.
-- [ ] **Áreas sin tareas:** en lugar de "0 of 0 tasks done" y una barra vacía, dicen "No tasks yet".
+- [x] **Sidebar más legible** (afecta a todas las pantallas del proyecto): texto de unos 16 px, íconos de 20 px, filas más altas (al menos 44 px en mobile) y el logo con más peso. Se mantienen el resaltado activo, Change Log y el crédito del pie, en tamaño discreto.
+- [x] **Barra superior sin repetir el proyecto:** el nombre aparece una sola vez, en un selector con forma de píldora a la izquierda con el ícono real del proyecto. A la derecha quedan "Areas", la campana, el nombre del usuario y el avatar. Se quita el título duplicado.
+- [x] **Home más ancho:** el contenido pasa del ancho actual (unos 1000 px) a `max-w-7xl`, para que no queden franjas vacías en pantallas anchas.
+- [x] **Columnas del Home de igual altura:** "Today" se estira a la altura de la columna derecha. Si sobra espacio, muestra las próximas tareas pendientes ("Upcoming"), nunca contenido inventado.
+- [x] **Áreas sin tareas:** en lugar de "0 of 0 tasks done" y una barra vacía, dicen "No tasks yet".
 
 No se toma de Stitch: la tarjeta "Design guidelines", el anillo de progreso ni el texto del sprint.
 
@@ -167,6 +168,31 @@ Diferencias de Stitch que se corrigen en el código:
 - [ ] La lista con viñetas aparece sin viñetas: usar los estilos de `.markdown-content`.
 - [ ] La etiqueta "Backend" del notebook abierto perdió su punto de color.
 - [ ] Definir el modo oscuro y mobile: en mobile, el índice de páginas pasa a un selector o a un panel desplegable arriba de la página.
+
+## Decisions: decisiones y ajustes para el código
+
+Diseño aprobado (generado desde cero en Stitch): "El registro de por qué el proyecto es así". Pantallas: "Decisions - Website Relaunch" (lista) y "Decision Detail - Livewire Single-File Components" (detalle).
+
+Decisiones:
+
+- **Lista como registro:** filas con número, título, estado (punto y texto) y fecha. Las decisiones reemplazadas quedan atenuadas y muestran "Superseded by #N" como enlace.
+- **Filtros en chips con contador** en lugar del select actual, más una búsqueda por título y contenido.
+- **Detalle en dos columnas:** lectura (Context, Decision, Consequences) a ancho cómodo y un panel lateral fijo con estado, fecha, autor (`created_by`), la cadena de reemplazos en las dos direcciones ("Supersedes" y "Superseded by") y las acciones "Edit" y "Supersede".
+- **Decisión reemplazada:** aviso arriba de la lectura, "This decision was superseded by #N {title}", con enlace.
+- **Estado vacío:** "Record why the project is built this way", un botón y la pista de registrarla desde el agente con `log_decision`.
+- **Autor real:** se muestra `created_by`. No se muestra "Logged by MCP agent" porque hoy no se guarda el origen.
+
+Diferencias de Stitch que se corrigen en el código:
+
+- [ ] En los chips, el contador se parte en una segunda línea ("Accepted / 8"): va en la misma línea.
+- [ ] Falta el chip "Rejected": los filtros cubren los cuatro estados de `DecisionStatus` y ocultan los que tienen cero.
+- [ ] "New decision" y el subtítulo se parten en dos líneas: el botón ocupa una línea y el subtítulo tiene ancho suficiente.
+- [ ] Las filas reemplazadas repiten "Superseded" y "Superseded by #N": queda solo el enlace.
+- [ ] "Edit" y "Supersede" en el panel parecen texto plano: se ven como botones secundarios.
+- [ ] "Supersede" hoy no es una acción propia: el reemplazo se elige en el formulario de edición (`form.supersededById`). El botón abre ese flujo con el campo preseleccionado, sin crear lógica nueva.
+- [ ] En el sidebar, el ícono de Inbox cambió a un sobre: mantener el ícono actual.
+- [ ] La sección "Preview" de la pantalla de detalle es solo una muestra de Stitch: en la app es el mismo detalle con el aviso de reemplazo.
+- [ ] Definir el modo oscuro y mobile (el panel lateral pasa debajo del título) y el estado vacío.
 
 ## Pendientes
 

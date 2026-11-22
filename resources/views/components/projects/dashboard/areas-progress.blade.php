@@ -52,23 +52,31 @@
                     wire:navigate
                     class="block p-2.5 -mx-2.5 rounded-xl hover:bg-surface-low transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                 >
-                    <div class="flex items-center justify-between gap-3 text-sm mb-2">
+                    <div class="flex items-center justify-between gap-3 text-sm {{ $total > 0 ? 'mb-2' : '' }}">
                         <div class="flex items-center gap-2 min-w-0">
                             <span class="size-2.5 rounded-full shrink-0 {{ AreaColor::dotClassFor($area->color) }}" aria-hidden="true"></span>
                             <span class="font-medium text-ink truncate">{{ $area->name }}</span>
                         </div>
 
-                        <span class="text-xs font-medium shrink-0 {{ $isComplete ? 'text-emerald-700 dark:text-emerald-400' : 'text-ink-muted' }}">
-                            {{ $done }} of {{ $total }} tasks done
-                        </span>
+                        @if($total === 0)
+                            <span class="text-xs font-medium shrink-0 text-ink-subtle">
+                                No tasks yet
+                            </span>
+                        @else
+                            <span class="text-xs font-medium shrink-0 {{ $isComplete ? 'text-emerald-700 dark:text-emerald-400' : 'text-ink-muted' }}">
+                                {{ $done }} of {{ $total }} tasks done
+                            </span>
+                        @endif
                     </div>
 
-                    <div class="w-full h-1.5 bg-surface-highest rounded-full overflow-hidden">
-                        <div
-                            class="h-full rounded-full {{ AreaColor::progressBarClassFor($area->color) }}"
-                            style="width: {{ $percent }}%"
-                        ></div>
-                    </div>
+                    @if($total > 0)
+                        <div data-area-progress class="w-full h-1.5 bg-surface-highest rounded-full overflow-hidden">
+                            <div
+                                class="h-full rounded-full {{ AreaColor::progressBarClassFor($area->color) }}"
+                                style="width: {{ $percent }}%"
+                            ></div>
+                        </div>
+                    @endif
                 </a>
             @endforeach
         </div>

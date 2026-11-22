@@ -53,7 +53,7 @@
     role="dialog"
     aria-modal="true"
     aria-labelledby="process-panel-item-text"
-    class="fixed inset-0 lg:left-64 z-30 flex items-center justify-center bg-zinc-950/35 dark:bg-black/60 backdrop-blur-sm p-3 sm:p-6"
+    class="fixed inset-0 lg:left-64 z-30 m-0! overscroll-contain flex items-center justify-center bg-zinc-950/35 dark:bg-black/60 backdrop-blur-sm p-3 sm:p-6"
 >
     <div class="relative w-full max-sm:min-h-[calc(100dvh-1.5rem)] max-sm:justify-between sm:max-w-xl bg-surface-card rounded-2xl border border-ghost shadow-ambient p-6 sm:p-10 flex flex-col">
         <div class="space-y-3">
