@@ -33,10 +33,26 @@ class Task extends Model
 
     public const int DUE_SOON_DAYS = 3;
 
+    protected static function booted(): void
+    {
+        static::saving(function (Task $task): void {
+            if ($task->status !== TaskStatus::Done) {
+                $task->completed_at = null;
+
+                return;
+            }
+
+            if ((! $task->exists || $task->isDirty('status')) && ! $task->isDirty('completed_at')) {
+                $task->completed_at = now();
+            }
+        });
+    }
+
     protected function casts(): array
     {
         return [
             'due_date' => 'datetime',
+            'completed_at' => 'datetime',
             'status' => TaskStatus::class,
             'priority' => TaskPriority::class,
         ];

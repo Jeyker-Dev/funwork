@@ -29,8 +29,8 @@ Herramienta: **Stitch** (proyecto `14584368472277721493`). Componentes de UI: Fl
 | Archivos | "Files - Website Relaunch" y "Files - Drag and Drop Upload State" | Diseño aprobado; pendiente de implementar |
 | Settings de la cuenta | "Account Settings - FunWork" y "Account Settings - Integrations" | Diseño aprobado; pendiente de implementar |
 | Settings del proyecto (nueva) | "Project Settings - Website Relaunch" | Diseño aprobado; pendiente de implementar |
-| Historial del proyecto (nueva) | "History - Website Relaunch" | Diseño aprobado; pendiente de implementar |
-| What's new (nueva) | "What's new in FunWork" | Diseño aprobado; pendiente de implementar |
+| Historial del proyecto (nueva) | "History - Website Relaunch" | Implementado |
+| What's new (nueva) | "What's new in FunWork" | Implementado |
 
 ## Login: decisiones y ajustes para el código
 
@@ -277,10 +277,10 @@ Decisiones:
 
 Diferencias de Stitch que se corrigen en el código:
 
-- [ ] El chip seleccionado "All" es negro: usar el estilo de chip seleccionado del resto de la app.
-- [ ] La barra superior no es la real (sin búsqueda, "Areas" como texto, otro logo): usar el header actual del proyecto.
-- [ ] Estado vacío: "Nothing has happened yet" con una línea de ayuda, sin datos inventados.
-- [ ] Definir el modo oscuro y mobile.
+- [x] El chip seleccionado "All" es negro: usar el estilo de chip seleccionado del resto de la app.
+- [x] La barra superior no es la real (sin búsqueda, "Areas" como texto, otro logo): usar el header actual del proyecto.
+- [x] Estado vacío: "Nothing has happened yet" con una línea de ayuda, sin datos inventados.
+- [x] Definir el modo oscuro y mobile.
 
 ## What's new (pantalla nueva): decisiones y ajustes para el código
 
@@ -295,11 +295,11 @@ Decisiones:
 
 Diferencias de Stitch que se corrigen en el código:
 
-- [ ] Los pills "New" e "Improved" salieron grises: "New" verde tenue, "Improved" azul tenue, "Fixed" ámbar tenue, siempre con texto.
-- [ ] "Open Tasks" lleva una flecha: se quita.
-- [ ] El footer "FUNWORK CHANGELOG • CURATED CONTINUOUSLY" en mayúsculas es inventado: se quita.
-- [ ] La barra superior es blanca: usar la misma de Account Settings.
-- [ ] Definir el modo oscuro y mobile.
+- [x] Los pills "New" e "Improved" salieron grises: "New" verde tenue, "Improved" azul tenue, "Fixed" ámbar tenue, siempre con texto.
+- [x] "Open Tasks" lleva una flecha: se quita.
+- [x] El footer "FUNWORK CHANGELOG • CURATED CONTINUOUSLY" en mayúsculas es inventado: se quita.
+- [x] La barra superior es blanca: usar la misma de Account Settings.
+- [x] Definir el modo oscuro y mobile.
 
 ## Pendientes
 

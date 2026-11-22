@@ -20,6 +20,7 @@ Route::view('/privacy', 'privacy')->name('privacy');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::livewire('/projects', 'pages::projects.index')->name('projects');
+    Route::livewire('/whats-new', 'pages::whats-new')->name('whats-new');
     Route::livewire('/notifications', 'pages::notifications.index')->name('notifications.index');
 
     Route::livewire('projects/{project}', 'pages::projects.show')
@@ -60,6 +61,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->can('view', 'project')
         ->can('view', 'decision')
         ->name('project.decisions.show');
+    Route::livewire('/projects/{project}/history', 'pages::projects.history.index')
+        ->can('view', 'project')
+        ->name('project.history');
     Route::livewire('/projects/{project}/files', 'pages::projects.files.index')
         ->can('view', 'project')
         ->name('project.files');
