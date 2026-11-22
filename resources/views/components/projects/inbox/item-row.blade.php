@@ -71,7 +71,7 @@
         </div>
 
         <span class="text-xs text-ink-subtle tabular-nums shrink-0 sm:ml-1">
-            {{ $item->created_at->shortAbsoluteDiffForHumans() }}
+            {{ \App\Support\DateHelper::shortRelativeAge($item->created_at) }}
         </span>
     </div>
 </div>

@@ -45,3 +45,12 @@ test('user model provides localDate method delegating to the helper', function (
     expect($userNY->localDate())->toBe('2026-11-03')
         ->and($userUTC->localDate())->toBe('2026-11-04');
 });
+
+test('shortRelativeAge returns now under one minute and compact units from one minute onward', function () {
+    $this->travelTo(Carbon::parse('2026-11-22 14:00:00', 'UTC'));
+
+    expect(DateHelper::shortRelativeAge(now()))->toBe('now')
+        ->and(DateHelper::shortRelativeAge(now()->subSeconds(59)))->toBe('now')
+        ->and(DateHelper::shortRelativeAge(now()->subMinute()))->toBe('1m')
+        ->and(DateHelper::shortRelativeAge(now()->subHours(2)))->toBe('2h');
+});
