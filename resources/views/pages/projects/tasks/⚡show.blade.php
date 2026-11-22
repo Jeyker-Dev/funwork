@@ -127,7 +127,7 @@ class extends Component {
         <form wire:submit.prevent="save" class="space-y-6">
             <flux:input label="Title" placeholder="Task title" wire:model="form.title" required />
 
-            <flux:textarea label="Description" placeholder="Add task description..." wire:model="form.description" rows="5" required />
+            <flux:textarea label="Description" placeholder="Add task description..." wire:model="form.description" rows="5" />
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <flux:select variant="listbox" label="Status" placeholder="Choose status..." wire:model="form.status">

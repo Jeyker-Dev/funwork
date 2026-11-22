@@ -368,3 +368,41 @@ test('unauthorized user cannot mount or mutate a task through the detail panel',
 
     expect($task->refresh()->title)->toBe('Private Task');
 });
+
+test('detail panel and show page open tasks with null description and save keeping description empty', function () {
+    $user = User::factory()->create();
+    $project = Project::factory()->create(['owner_id' => $user->id]);
+    $task = Task::factory()->create([
+        'project_id' => $project->id,
+        'title' => 'Task Without Description',
+        'description' => null,
+        'due_date' => null,
+        'area_id' => null,
+        'position' => 0,
+    ]);
+
+    Livewire::actingAs($user)
+        ->test('projects.tasks.task-detail-panel', ['project' => $project, 'taskId' => $task->id])
+        ->assertOk()
+        ->assertSet('form.description', '')
+        ->assertSee('No description yet.')
+        ->set('form.title', 'Task Updated Without Description')
+        ->call('save')
+        ->assertHasNoErrors();
+
+    expect($task->refresh()->title)->toBe('Task Updated Without Description')
+        ->and($task->description)->toBe('');
+
+    $task->update(['description' => null]);
+
+    Livewire::actingAs($user)
+        ->test('pages::projects.tasks.show', ['project' => $project, 'task' => $task])
+        ->assertOk()
+        ->assertSet('form.description', '')
+        ->set('form.title', 'Show Page Updated Without Description')
+        ->call('save')
+        ->assertHasNoErrors();
+
+    expect($task->refresh()->title)->toBe('Show Page Updated Without Description')
+        ->and($task->description)->toBe('');
+});

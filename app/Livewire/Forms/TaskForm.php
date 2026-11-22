@@ -9,16 +9,19 @@ use App\Models\Task;
 use Flux\Flux;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
+use Livewire\Attributes\Locked;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 
 class TaskForm extends Form
 {
+    #[Locked]
+    public ?int $taskId = null;
+
     #[Validate('required')]
     public string $title = '';
 
-    #[Validate('required')]
-    public string $description = '';
+    public ?string $description = '';
 
     public string $status = '';
 
@@ -41,6 +44,7 @@ class TaskForm extends Form
     protected function rules(): array
     {
         return [
+            'description' => [$this->taskId !== null ? 'nullable' : 'required', 'string'],
             'status' => ['required', Rule::enum(TaskStatus::class)],
             'priority' => ['required', Rule::enum(TaskPriority::class)],
             'assignedUserIds.*' => ['integer', Rule::in([auth()->id()])],
@@ -57,7 +61,7 @@ class TaskForm extends Form
 
         $task = Task::create([
             'title' => $this->title,
-            'description' => $this->description,
+            'description' => $this->description ?? '',
             'status' => $this->status,
             'priority' => $this->priority,
             'due_date' => $this->dueDate ?: null,
@@ -84,10 +88,11 @@ class TaskForm extends Form
 
     public function setTask(Task $task): void
     {
-        $this->title = $task->title;
-        $this->description = $task->description;
-        $this->status = $task->status instanceof TaskStatus ? $task->status->value : (string) $task->status;
-        $this->priority = $task->priority instanceof TaskPriority ? $task->priority->value : (string) $task->priority;
+        $this->taskId = $task->id;
+        $this->title = $task->title ?? '';
+        $this->description = $task->description ?? '';
+        $this->status = $task->status instanceof TaskStatus ? $task->status->value : (string) ($task->status ?? TaskStatus::Todo->value);
+        $this->priority = $task->priority instanceof TaskPriority ? $task->priority->value : (string) ($task->priority ?? TaskPriority::Low->value);
         $this->dueDate = $task->due_date?->format('Y-m-d');
         $this->assignedUserIds = $task->users->pluck('id')->all();
         $this->projectId = $task->project_id;
@@ -103,7 +108,7 @@ class TaskForm extends Form
 
         $task->update([
             'title' => $this->title,
-            'description' => $this->description,
+            'description' => $this->description ?? '',
             'status' => $this->status,
             'priority' => $this->priority,
             'due_date' => $this->dueDate ?: null,

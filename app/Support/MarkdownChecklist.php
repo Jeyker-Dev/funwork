@@ -16,9 +16,9 @@ class MarkdownChecklist
      *
      * @throws ChecklistItemNotFound
      */
-    public static function toggle(string $markdown, int $targetIndex): string
+    public static function toggle(?string $markdown, int $targetIndex): string
     {
-        if ($targetIndex < 0) {
+        if ($markdown === null || $targetIndex < 0) {
             throw ChecklistItemNotFound::atIndex($targetIndex);
         }
 
