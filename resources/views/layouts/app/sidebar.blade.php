@@ -18,7 +18,7 @@
             <flux:sidebar.item
                 icon="inbox"
                 :href="route('project.inbox', ['project' => $project])"
-                :current="request()->routeIs('project.inbox', ['project' => $project])"
+                :current="request()->routeIs('project.inbox')"
                 wire:navigate
             >
                 {{ __('Inbox') }}

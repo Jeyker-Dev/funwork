@@ -23,6 +23,8 @@ new class extends Component {
 
     public function delete(): void
     {
+        $deletedId = $this->item?->id;
+
         if ($this->item) {
             $this->authorize('delete', $this->item);
 
@@ -39,7 +41,7 @@ new class extends Component {
 
         Flux::modal('delete-item-modal')->close();
 
-        $this->dispatch('item-deleted');
+        $this->dispatch('item-deleted', id: $deletedId);
     }
 };
 ?>

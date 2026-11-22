@@ -45,7 +45,7 @@ class ConvertInboxToTaskForm extends Form
         $this->item = $item;
         $this->title = $item->content;
         $this->description = '';
-        $this->projectId = null;
+        $this->projectId = $item->project_id;
         $this->areaId = null;
         $this->status = TaskStatus::Todo->value;
         $this->priority = TaskPriority::Low->value;
