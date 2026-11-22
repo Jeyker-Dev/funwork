@@ -82,12 +82,12 @@
                     </flux:button>
                 </div>
 
-                <div class="mt-5 space-x-0.5 text-sm leading-5 text-center">
-                    <span class="opacity-50">{{ __('or you can') }}</span>
-                    <div class="inline font-medium underline cursor-pointer opacity-80">
-                        <span x-show="!showRecoveryInput" @click="toggleInput()">{{ __('login using a recovery code') }}</span>
-                        <span x-show="showRecoveryInput" @click="toggleInput()">{{ __('login using an authentication code') }}</span>
-                    </div>
+                <div class="mt-5 space-x-1 text-sm leading-5">
+                    <span class="text-ink-muted">{{ __('or you can') }}</span>
+                    <button type="button" class="font-medium text-accent-content underline cursor-pointer" @click="toggleInput()">
+                        <span x-show="!showRecoveryInput">{{ __('login using a recovery code') }}</span>
+                        <span x-show="showRecoveryInput">{{ __('login using an authentication code') }}</span>
+                    </button>
                 </div>
             </x-auth.form>
         </div>
