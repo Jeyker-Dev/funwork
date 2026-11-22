@@ -8,7 +8,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Livewire\Livewire;
 
-test('rendering the task board with hidden tasks does not mount or query the slider components', function () {
+test('rendering the task board displays all tasks without mounting or querying slider components', function () {
     $user = User::factory()->create();
     $project = Project::factory()->create(['owner_id' => $user->id]);
 
@@ -33,20 +33,11 @@ test('rendering the task board with hidden tasks does not mount or query the sli
 
     $component->assertOk();
 
-    // The first 3 tasks are visible on the board column
-    $component->assertSee('Board-Todo-Task-1');
-    $component->assertSee('Board-Todo-Task-2');
-    $component->assertSee('Board-Todo-Task-3');
-    $component->assertSee('+ 2 more tasks ...');
-
-    // Hidden tasks from the slider must NOT be in the initial HTML
-    $component->assertDontSee('Board-Todo-Task-4');
-    $component->assertDontSee('Board-Todo-Task-5');
-
-    // The slider tasks container must not be rendered in the initial DOM
-    $html = $component->html();
-    expect($html)->not->toContain('<div class="grid grid-cols-2 gap-7 max-w-lg">')
-        ->and($html)->toContain('x-intersect');
+    // All 5 tasks are visible directly on the board without a 3-card cap or "+N more" trigger
+    for ($i = 1; $i <= 5; $i++) {
+        $component->assertSee("Board-Todo-Task-{$i}");
+    }
+    $component->assertDontSee('more tasks ...');
 
     // Ensure none of the queries originated from slider components (which paginate with limit 6)
     foreach ($queries as $query) {

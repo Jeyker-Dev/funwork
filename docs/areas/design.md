@@ -22,11 +22,13 @@ Herramienta: **Stitch** (proyecto `14584368472277721493`). Componentes de UI: Fl
 | Login | "Login - Refined Board Preview" | Implementado |
 | Lista de proyectos | "Projects Dashboard - Luminous Editorial" | Implementado |
 | Home del proyecto | "Home - Website Relaunch" | Implementado |
-| Tablero de tareas | "Tasks - Website Relaunch" y "Tasks - Task Detail Side Panel" | Diseño aprobado; pendiente de implementar |
+| Tablero de tareas | "Tasks - Website Relaunch" y "Tasks - Task Detail Side Panel" | Implementado |
 | Inbox | "Inbox - Website Relaunch" y "Inbox - Process Mode Focus Panel" | Implementado |
 | Notebooks / editor | "Notebooks - Website Relaunch" y "Notebook Detail - Architecture" | Diseño aprobado; pendiente de implementar |
 | Decisions | "Decisions - Website Relaunch" y "Decision Detail - Livewire Single-File Components" | Diseño aprobado; pendiente de implementar |
-| Archivos | | |
+| Archivos | "Files - Website Relaunch" y "Files - Drag and Drop Upload State" | Diseño aprobado; pendiente de implementar |
+| Settings de la cuenta | "Account Settings - FunWork" y "Account Settings - Integrations" | Diseño aprobado; pendiente de implementar |
+| Settings del proyecto (nueva) | "Project Settings - Website Relaunch" | Diseño aprobado; pendiente de implementar |
 
 ## Login: decisiones y ajustes para el código
 
@@ -124,14 +126,14 @@ Decisiones:
 
 Diferencias de Stitch que se corrigen en el código:
 
-- [ ] Los colores de los puntos de estado no coinciden entre el tablero y el panel (Doing es azul en el tablero y amarillo en el panel): usar siempre los colores de `TaskStatus`.
-- [ ] En el sidebar, el ícono de Decisions cambió a un gráfico de barras: mantener el ícono actual.
-- [ ] "Newtask" aparece sin espacio: el botón dice "New task".
-- [ ] En el panel, la fecha de entrega muestra solo "Overdue": debe mostrar la fecha y marcarla como vencida (por ejemplo "Nov 20, overdue").
-- [ ] La checklist de la descripción sale del markdown (`- [ ]` / `- [x]`); marcarla desde el panel es opcional y no debe romper el markdown guardado.
-- [ ] La zona "Drop here to complete" solo aparece mientras se arrastra.
-- [ ] Definir la vista de lista, el modo oscuro, mobile (columnas con scroll horizontal o una columna con selector de estado; el panel ocupa toda la pantalla) y los estados vacíos de cada columna.
-- [ ] Accesibilidad: mover tareas sin mouse (por ejemplo, el selector de estado del panel) y anunciar el cambio.
+- [x] Los colores de los puntos de estado no coinciden entre el tablero y el panel (Doing es azul en el tablero y amarillo en el panel): usar siempre los colores de `TaskStatus`.
+- [x] En el sidebar, el ícono de Decisions cambió a un gráfico de barras: mantener el ícono actual.
+- [x] "Newtask" aparece sin espacio: el botón dice "New task".
+- [x] En el panel, la fecha de entrega muestra solo "Overdue": debe mostrar la fecha y marcarla como vencida (por ejemplo "Nov 20, overdue").
+- [x] La checklist de la descripción sale del markdown (`- [ ]` / `- [x]`); marcarla desde el panel es opcional y no debe romper el markdown guardado.
+- [x] La zona "Drop here to complete" solo aparece mientras se arrastra.
+- [x] Definir la vista de lista, el modo oscuro, mobile (columnas con scroll horizontal o una columna con selector de estado; el panel ocupa toda la pantalla) y los estados vacíos de cada columna.
+- [x] Accesibilidad: mover tareas sin mouse (por ejemplo, el selector de estado del panel) y anunciar el cambio.
 
 ## Layout del proyecto y ajustes del Home (segunda pasada)
 
@@ -193,6 +195,71 @@ Diferencias de Stitch que se corrigen en el código:
 - [ ] En el sidebar, el ícono de Inbox cambió a un sobre: mantener el ícono actual.
 - [ ] La sección "Preview" de la pantalla de detalle es solo una muestra de Stitch: en la app es el mismo detalle con el aviso de reemplazo.
 - [ ] Definir el modo oscuro y mobile (el panel lateral pasa debajo del título) y el estado vacío.
+
+## Archivos: decisiones y ajustes para el código
+
+Diseño aprobado: "Los archivos del proyecto, a la vista". Arriba el encabezado con filtros por tipo, búsqueda, el selector grilla/lista, "New folder" y "Upload", con los breadcrumbs debajo. Luego las carpetas y, después, los archivos con miniaturas. Al arrastrar archivos sobre la página, aparece una capa para soltarlos y subirlos a la carpeta actual.
+
+Decisiones:
+
+- **El selector grilla/lista funciona:** la lista es una tabla con nombre, tipo, tamaño, fecha y carpeta.
+- **Filtros por tipo** con `FileCategory` (All, Images, PDFs, Documents).
+- **Miniaturas reales** para las imágenes; ícono por tipo con fondo suave para PDF (rojo) y documentos (azul).
+- **Arrastrar para subir:** la capa dice "Drop to upload to {carpeta}" y muestra el límite real que valida la subida (el "20 MB" de Stitch es un ejemplo). Reutiliza el flujo de subida existente.
+- **Se mantienen** la selección múltiple con barra flotante, mover, renombrar, borrar con confirmación y el lightbox.
+- **Sin el panel gris** que envuelve toda la página y sin el título en dos colores del estado vacío ("Upload" principal, "New folder" secundario y la pista "or drag files here").
+
+Diferencias de Stitch que se corrigen en el código:
+
+- [ ] "Upload" no usa el botón principal: va con el degradado de la marca.
+- [ ] El chip "All" casi no se ve seleccionado: usar el mismo estilo de chip seleccionado que Tasks y Notebooks.
+- [ ] La tarjeta seleccionada tiene borde azul y el checkbox no se ve: borde naranja (`brand`) y checkbox marcado visible.
+- [ ] Los PDF dicen "Document" y "Executive brief" debajo del ícono: la etiqueta dice el tipo real ("PDF", "Word document").
+- [ ] "Sorted by recent" no existe como opción: se quita, salvo que se agregue un orden real.
+- [ ] "1 selected" se parte en dos líneas en la barra flotante.
+- [ ] En el sidebar, el ícono de Inbox cambió a un sobre: mantener el ícono actual.
+- [ ] Las tarjetas de carpeta tienen muy poco contraste con el fondo.
+- [ ] Definir el modo oscuro, mobile (dos columnas de archivos, encabezado en dos filas) y el estado vacío.
+
+## Settings de la cuenta: decisiones y ajustes para el código
+
+Diseño aprobado: "Settings que se sienten parte de FunWork". Barra superior propia de la app (logo, campana, avatar), "Back to projects", contenido centrado, navegación lateral con íconos y estado activo, y cada sección en una tarjeta con su propio "Save".
+
+Decisiones:
+
+- **Profile:** avatar con iniciales de respaldo (hoy se ve roto cuando falla el avatar externo), "Upload photo" con vista previa y "Remove", campos en dos columnas y "Saved" junto a "Save".
+- **Danger zone separada:** "Delete account" va como botón secundario con texto rojo; el rojo sólido solo aparece en el modal de confirmación.
+- **Integrations como pieza central:** tarjeta "Connect your AI agent" con la URL real del servidor MCP (`Mcp::web('/mcp/funwork', ...)` en `routes/ai.php`, con el dominio de `APP_URL`), un bloque de configuración para copiar, la tabla de tokens (Name, Last used, Created, Revoke) y la tarjeta de Google Docs.
+- **Se mantienen** Security (contraseña y 2FA), Appearance y Notifications con el mismo formato de tarjetas.
+
+Diferencias de Stitch que se corrigen en el código:
+
+- [ ] La barra superior agrega enlaces "Account Settings, Security, Billing, Notifications": se quitan; la navegación vive solo en la columna izquierda y FunWork no tiene "Billing".
+- [ ] La URL del servidor MCP de Stitch (`https://funwork.test/mcp`) es un ejemplo: se usa la URL real, `/mcp/funwork`.
+- [ ] El bloque de configuración se titula "claude_desktop_config.json": usar un título genérico ("MCP client configuration") y verificar que el formato del snippet sea el que aceptan los clientes que usamos (Claude Code, Antigravity).
+- [ ] La columna "Action" de la tabla de tokens no necesita título.
+- [ ] Definir el modo oscuro y mobile (la navegación lateral pasa a pestañas o a un selector arriba).
+
+## Settings del proyecto (pantalla nueva): decisiones y ajustes para el código
+
+Diseño aprobado: una página de settings dentro del proyecto, con un ítem "Settings" (ícono de engranaje) al pie del sidebar del proyecto. Tarjetas "General", "Areas" y "Danger zone".
+
+Decisiones:
+
+- **General:** ícono del proyecto (el campo `icon` ya existe en `projects`), nombre, descripción, tipo (`ProjectType`), estado (`ProjectStatus`) y fecha de entrega, con "Saved" junto a "Save". Reutiliza las validaciones existentes de proyecto.
+- **Areas:** reemplaza o reutiliza el modal actual `⚡manage-areas`: lista con arrastrar para reordenar, punto de color, nombre, cantidad de tareas, "Edit", borrar y "Add area".
+- **Danger zone:** "Archive project" (usa `archived_at`, reversible) y "Delete project" con confirmación. Solo el dueño puede verla y usarla.
+- **Sin miembros ni invitaciones:** hoy cada proyecto tiene un solo dueño.
+
+Diferencias de Stitch que se corrigen en el código:
+
+- [ ] El eyebrow "PROJECT CONFIGURATION • Settings & taxonomies" en mayúsculas: se quita; queda solo el título "Project settings".
+- [ ] La píldora "Scoped to Website relaunch" repite lo que ya dice el selector de proyecto: se quita.
+- [ ] La tarjeta "General" tiene una línea naranja superior: se quita.
+- [ ] "ID: PRJ-RELAUNCH-01" es un identificador inventado: se quita.
+- [ ] "Change icon" abre un selector con los íconos que ya soporta `icon-project`; no se suben imágenes.
+- [ ] El acceso a Areas de la barra superior lleva a esta tarjeta en lugar de abrir el modal suelto, o se mantiene el modal y se enlaza desde acá: decidir uno solo para no duplicar.
+- [ ] Definir el modo oscuro y mobile.
 
 ## Pendientes
 

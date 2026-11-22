@@ -436,3 +436,95 @@ select:focus[data-flux-control] {
     }
 }
 
+.task-sort-fallback {
+    opacity: 1 !important;
+    transform: rotate(-2deg) scale(1.02);
+    box-shadow: 0 20px 35px -6px rgb(15 23 42 / 0.18), 0 8px 16px -4px rgb(15 23 42 / 0.08);
+    outline: 2px solid rgb(255 109 0 / 0.35);
+    border-radius: 0.75rem;
+    cursor: grabbing !important;
+    pointer-events: none;
+    z-index: 60;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .task-sort-fallback {
+        transform: none;
+    }
+}
+
+.task-sort-ghost {
+    position: relative;
+    min-height: 4.25rem;
+    border-radius: 0.75rem;
+    border: 2px dashed rgb(172 173 175 / 0.55);
+    background-color: rgb(225 226 229 / 0.35);
+
+    > * {
+        opacity: 0;
+    }
+
+    &:is(.dark, .dark *) {
+        border-color: rgb(255 255 255 / 0.18);
+        background-color: rgb(38 38 38 / 0.45);
+    }
+}
+
+[data-task-column][data-status="Done"] .task-sort-ghost {
+    border-color: rgb(255 109 0 / 0.55);
+    background-color: var(--color-brand-tint);
+
+    &::after {
+        content: "Drop here to complete";
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: var(--color-accent-content);
+        pointer-events: none;
+    }
+}
+
+body.sorting [data-task-column]:has(.task-sort-ghost) .column-empty-hint {
+    display: none;
+}
+
+.tasks-scroll::-webkit-scrollbar {
+    width: 4px;
+}
+
+.tasks-scroll::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.tasks-scroll::-webkit-scrollbar-thumb {
+    background-color: var(--color-surface-highest);
+    border-radius: 9999px;
+}
+
+.markdown-content li:has(> .task-checklist-checkbox) {
+    list-style-type: none;
+    margin-left: -1.25rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.625rem;
+}
+
+.task-checklist-checkbox {
+    margin-top: 0.2rem;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 0.25rem;
+    accent-color: var(--color-brand-strong);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.markdown-content li:has(> .task-checklist-checkbox:checked) {
+    color: var(--color-ink-subtle);
+    text-decoration: line-through;
+}
+

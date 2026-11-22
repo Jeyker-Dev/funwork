@@ -5,7 +5,7 @@ use App\Models\Task;
 use App\Models\User;
 use Livewire\Livewire;
 
-test('task board card renders plain text excerpt clamped to 2 lines without markdown or html tokens', function () {
+test('task board card renders title cleanly while detail panel renders formatted markdown', function () {
     $user = User::factory()->create();
     $project = Project::factory()->create(['owner_id' => $user->id]);
 
@@ -27,12 +27,17 @@ test('task board card renders plain text excerpt clamped to 2 lines without mark
         ->test('projects.tasks.⚡task-board', ['project' => $project])
         ->assertOk()
         ->assertSee('Card Markdown Task')
-        ->assertSee($task->description_excerpt)
-        ->assertSeeHtml('line-clamp-2')
         ->assertDontSeeHtml('<h1>Big Title</h1>')
         ->assertDontSeeHtml('<strong>bold</strong>')
         ->assertDontSeeHtml('<pre>')
         ->assertDontSeeHtml('<code>inline code</code>');
+
+    Livewire::actingAs($user)
+        ->test('projects.tasks.task-detail-panel', ['project' => $project, 'taskId' => $task->id])
+        ->assertOk()
+        ->assertSeeHtml('<h1>Big Title</h1>')
+        ->assertSeeHtml('<strong>bold</strong>')
+        ->assertSeeHtml('<code>inline code</code>');
 });
 
 test('task list card renders plain text excerpt clamped to 2 lines without markdown or html tokens', function () {
