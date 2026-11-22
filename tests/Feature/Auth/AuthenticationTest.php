@@ -9,6 +9,15 @@ test('login screen can be rendered', function () {
     $response->assertOk();
 });
 
+test('login screen shows the workspace board preview', function () {
+    $response = $this->get(route('login'));
+
+    $response->assertSeeText('Pick up where you left off.')
+        ->assertSeeText('Website relaunch')
+        ->assertDontSeeText('Create account')
+        ->assertDontSeeText('Realtime sync');
+});
+
 test('users can authenticate using the login screen', function () {
     $user = User::factory()->create();
 

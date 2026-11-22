@@ -27,6 +27,10 @@
     --color-ink-subtle: #757779;
 
     --color-brand: #ff6d00;
+    --color-brand-warm: #ff8a3d;
+    --color-brand-hover: #f45f00;
+    --color-brand-hover-warm: #ff7a24;
+    --color-brand-ink: #431407;
     --color-brand-strong: #c2410c;
     --color-brand-deep: #9b3f00;
     --color-brand-tint: #fff0ea;
@@ -124,13 +128,25 @@ select:focus[data-flux-control] {
 
 /* Flux renders primary buttons with no variant attribute, so they are matched by the accent background class it emits. */
 [data-flux-button][class*="bg-[var(--color-accent)]"] {
-    background-image: linear-gradient(90deg, var(--color-brand-strong), var(--color-brand-deep));
+    background-image: linear-gradient(90deg, var(--color-brand), var(--color-brand-warm));
     border-color: transparent;
+    color: var(--color-brand-ink);
     font-weight: 600;
 
     &:hover {
-        background-image: linear-gradient(90deg, var(--color-brand-deep), var(--color-brand-deep));
+        background-image: linear-gradient(90deg, var(--color-brand-hover), var(--color-brand-hover-warm));
+        color: var(--color-brand-ink);
     }
+
+    &:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 4px rgb(255 109 0 / 0.25);
+    }
+}
+
+[data-flux-brand] svg,
+[data-flux-sidebar-brand] svg {
+    --logo-pages: currentColor;
 }
 
 .form-line::before,
@@ -141,6 +157,79 @@ select:focus[data-flux-control] {
     height: 4px;
     background: linear-gradient(90deg, var(--color-brand), var(--color-brand-glow));
     border-radius: 100px;
+}
+
+.board-preview {
+    --board-card-h: 7.25rem;
+    --board-col-pad: 0.625rem;
+    --board-grid-gap: 0.75rem;
+    --board-card-gap: 0.625rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .board-preview__mover {
+        animation: board-advance 700ms 500ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    }
+
+    .board-preview__follower {
+        animation: board-close-gap 400ms 950ms ease-out both;
+    }
+
+    .board-preview__status-before {
+        animation: board-fade-out 250ms 850ms ease-out both;
+    }
+
+    .board-preview__status-after {
+        animation: board-fade-in 250ms 950ms ease-out both;
+    }
+}
+
+.board-preview__status-before {
+    opacity: 0;
+}
+
+.board-preview__status-after {
+    opacity: 1;
+}
+
+@keyframes board-advance {
+    from {
+        transform: translateX(calc((100% + (var(--board-col-pad) * 2) + var(--board-grid-gap)) * -1));
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes board-close-gap {
+    from {
+        transform: translateY(calc(var(--board-card-h) + var(--board-card-gap)));
+    }
+
+    to {
+        transform: translateY(0);
+    }
+}
+
+@keyframes board-fade-out {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes board-fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 .gray-search > [data-flux-control] {
@@ -155,7 +244,8 @@ select:focus[data-flux-control] {
     border-radius: 5px !important;
 }
 
-[data-current] {
+[data-flux-sidebar-item][data-current],
+[data-flux-navlist-item][data-current] {
     background-color: var(--color-surface-card);
     color: var(--color-accent-content);
     box-shadow: inset 3px 0 0 var(--color-brand);

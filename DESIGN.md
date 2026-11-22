@@ -38,16 +38,22 @@ Layers stack like sheets of paper. Lower layers are darker; cards are white.
 
 | Token | Hex | Use |
 |---|---|---|
-| `brand` | `#ff6d00` | Decorative accents only: gradient start, active bars, icons, focus glow |
-| `brand-strong` | `#c2410c` | Filled buttons, links, selected controls (white text 5.2:1) |
-| `brand-deep` | `#9b3f00` | Gradient end, text on light tints (6.3:1 on `surface`) |
+| `brand` | `#ff6d00` | Primary button gradient start, decorative accents, active bars, icons, focus glow |
+| `brand-warm` | `#ff8a3d` | Primary button gradient end |
+| `brand-hover` | `#f45f00` | Primary button hover gradient start |
+| `brand-hover-warm` | `#ff7a24` | Primary button hover gradient end |
+| `brand-ink` | `#431407` | Label text on bright orange primary buttons (5.2–7.1:1 across stops) |
+| `brand-strong` | `#c2410c` | `--color-accent` for filled small controls with white marks, links (white text 5.2:1) |
+| `brand-deep` | `#9b3f00` | Text on light tints (6.3:1 on `surface`) |
 | `brand-tint` | `#fff0ea` | Badge and selection backgrounds |
 | `brand-glow` | `#ffc96f` | Gradient end for top borders |
 
-**Accessibility correction.** The Stitch spec puts white text on `#ff7a2c`
-and `#ff6d00` (2.6–2.8:1). That fails the 4.5:1 floor, and so does the
-current `orange-500` accent (2.8:1). Rule: bright orange never carries text.
-Text sits on `brand-strong` or darker, and orange text on light surfaces
+**Accessibility correction.** White text on `#ff6d00`–`#ff8a3d` (2.3–2.8:1) fails
+the 4.5:1 floor, and so does the legacy `orange-500` accent (2.8:1). Rule:
+bright orange never carries white text. Primary buttons pair the luminous
+`brand` → `brand-warm` gradient with dark `brand-ink` (`#431407`, 5.2–7.1:1)
+semibold text; smaller controls with white marks (checkboxes, radios,
+switches) use `brand-strong` (`#c2410c`); and orange text on light surfaces
 uses `brand-strong` or `brand-deep`.
 
 ### Status
@@ -72,7 +78,7 @@ Stitch defines no dark theme, but the app supports one through
 | `surface-card` | `zinc-900` with a ghost border |
 | `surface-high` | `zinc-800` |
 | `ink` / `ink-muted` | `zinc-100` / `zinc-400` |
-| `brand-strong` | unchanged for fills (white text 5.2:1); text uses `accent-content` = `orange-400` |
+| `brand-strong` | unchanged for `--color-accent` fills (white text 5.2:1); primary buttons keep `brand` → `brand-warm` with `brand-ink` text; text uses `accent-content` = `orange-400` |
 
 The surface and ink tokens are redefined under `.dark`, so `bg-surface`,
 `text-ink`, and friends need no `dark:` variants.
@@ -82,7 +88,8 @@ The surface and ink tokens are redefined under `.dark`, so `bg-surface`,
 Tokens live in `resources/css/app.css` under `@theme`, so Tailwind exposes
 them as utilities: `bg-surface`, `bg-surface-low`, `bg-surface-card`,
 `bg-surface-high`, `text-ink`, `text-ink-muted`, `text-ink-subtle`,
-`bg-brand`, `bg-brand-strong`, `text-brand-deep`, `bg-brand-tint`,
+`bg-brand`, `bg-brand-warm`, `bg-brand-hover`, `bg-brand-hover-warm`,
+`text-brand-ink`, `bg-brand-strong`, `text-brand-deep`, `bg-brand-tint`,
 `border-ghost`, `shadow-ambient`. Flux's `--color-accent` points at
 `brand-strong`; `--color-accent-content` is the accessible orange for text.
 
@@ -91,8 +98,11 @@ them as utilities: `bg-surface`, `bg-surface-low`, `bg-surface-card`,
 - **Glow line:** a 4px top border on featured cards, auth cards, and modals,
   from `brand` to `brand-glow` at 90°. It replaces the current
   `#f59e42 → #facc15` gradient in `.form-line` and `.line-card`.
-- **Primary button fill:** `brand-strong` to `brand-deep` at 90°, white
-  semibold text. Both ends pass 4.5:1 with white.
+- **Primary button fill:** `brand` (`#ff6d00`) to `brand-warm` (`#ff8a3d`)
+  at 90° (hover: `brand-hover` `#f45f00` to `brand-hover-warm` `#ff7a24`),
+  with `brand-ink` (`#431407`) semibold text. White text on light orange
+  fails the 4.5:1 floor (2.3–2.8:1); `brand-ink` passes across every stop
+  (5.2–7.1:1 resting, 4.7–6.0:1 hover) in both light and dark themes.
 - Use the gradient only for focal points: one primary CTA per view, plus
   the glow line on the main card.
 
@@ -139,7 +149,7 @@ Flux is the component library. These rules restyle it through tokens and a
 small number of `data-flux-*` selectors in `app.css`; never fork the
 components.
 
-- **Button primary:** gradient fill (section 3), `rounded-lg`, semibold.
+- **Button primary:** gradient fill (`brand` → `brand-warm`, hover `brand-hover` → `brand-hover-warm`) with `brand-ink` semibold text (section 3), `rounded-lg`, applied globally via `[data-flux-button]` in `app.css`.
 - **Button secondary:** `surface-card` with ghost border.
 - **Button ghost / tertiary:** no fill, `brand-strong` text.
 - **Input:** `surface-card` fill, ghost border; on focus a solid
