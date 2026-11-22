@@ -69,7 +69,7 @@
 
     @if($upcomingTasks->isNotEmpty())
         <div class="flex flex-col gap-2.5 pt-1">
-            <h3 class="text-xs font-semibold uppercase tracking-wider text-ink-muted">Upcoming</h3>
+            <h3 class="text-sm font-semibold text-ink-muted">Upcoming</h3>
 
             @foreach($upcomingTasks as $task)
                 @php
