@@ -15,7 +15,7 @@ use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
 
-test('dashboard filters out done tasks from urgent tasks and stats counters', function () {
+test('dashboard filters out earlier done tasks from today tasks and stats counters', function () {
     $user = User::factory()->create();
     $project = Project::factory()->create([
         'owner_id' => $user->id,
@@ -25,6 +25,7 @@ test('dashboard filters out done tasks from urgent tasks and stats counters', fu
         'project_id' => $project->id,
         'status' => TaskStatus::Done,
         'due_date' => now()->subDay(),
+        'updated_at' => now()->subDay(),
     ]);
 
     $overdueTodoTask = Task::factory()->create([
@@ -42,9 +43,9 @@ test('dashboard filters out done tasks from urgent tasks and stats counters', fu
     $this->actingAs($user);
 
     Livewire::test('pages::projects.show', ['project' => $project])
-        ->assertViewHas('urgentTasks', function (Collection $urgentTasks) use ($overdueTodoTask, $overdueDoneTask): bool {
-            return $urgentTasks->contains($overdueTodoTask)
-                && ! $urgentTasks->contains($overdueDoneTask);
+        ->assertViewHas('todayTasks', function (Collection $todayTasks) use ($overdueTodoTask, $overdueDoneTask): bool {
+            return $todayTasks->contains($overdueTodoTask)
+                && ! $todayTasks->contains($overdueDoneTask);
         })
         ->assertViewHas('stats', function (DashboardStatsData $stats): bool {
             return $stats->openTasksCount === 2
@@ -52,7 +53,7 @@ test('dashboard filters out done tasks from urgent tasks and stats counters', fu
         });
 });
 
-test('America/New_York user sees task due on local day as Due today, not Overdue, and counts in today_tasks_count', function () {
+test('America/New_York user sees task due on local day as Today, not Overdue, and counts in today_tasks_count', function () {
     $this->travelTo(Carbon::parse('2026-11-04 02:00:00'));
 
     $user = User::factory()->create([
@@ -72,13 +73,13 @@ test('America/New_York user sees task due on local day as Due today, not Overdue
     $this->actingAs($user);
 
     Livewire::test('pages::projects.show', ['project' => $project])
-        ->assertViewHas('urgentTasks', function (Collection $urgentTasks) use ($task): bool {
-            return $urgentTasks->contains($task);
+        ->assertViewHas('todayTasks', function (Collection $todayTasks) use ($task): bool {
+            return $todayTasks->contains($task);
         })
         ->assertViewHas('stats', function (DashboardStatsData $stats): bool {
             return $stats->todayTasksCount === 1;
         })
-        ->assertSee('Due today')
+        ->assertSee('Today')
         ->assertDontSee('Overdue');
 });
 
@@ -102,14 +103,13 @@ test('America/New_York user sees task due on previous day as Overdue', function 
     $this->actingAs($user);
 
     Livewire::test('pages::projects.show', ['project' => $project])
-        ->assertViewHas('urgentTasks', function (Collection $urgentTasks) use ($task): bool {
-            return $urgentTasks->contains($task);
+        ->assertViewHas('todayTasks', function (Collection $todayTasks) use ($task): bool {
+            return $todayTasks->contains($task);
         })
-        ->assertSee('Overdue')
-        ->assertDontSee('Due today');
+        ->assertSee('Overdue');
 });
 
-test('regression: UTC user sees task due on current day as Due today, not Overdue', function () {
+test('regression: UTC user sees task due on current day as Today, not Overdue', function () {
     $this->travelTo(Carbon::parse('2026-11-04 02:00:00'));
 
     $user = User::factory()->create([
@@ -129,13 +129,13 @@ test('regression: UTC user sees task due on current day as Due today, not Overdu
     $this->actingAs($user);
 
     Livewire::test('pages::projects.show', ['project' => $project])
-        ->assertViewHas('urgentTasks', function (Collection $urgentTasks) use ($task): bool {
-            return $urgentTasks->contains($task);
+        ->assertViewHas('todayTasks', function (Collection $todayTasks) use ($task): bool {
+            return $todayTasks->contains($task);
         })
         ->assertViewHas('stats', function (DashboardStatsData $stats): bool {
             return $stats->todayTasksCount === 1;
         })
-        ->assertSee('Due today')
+        ->assertSee('Today')
         ->assertDontSee('Overdue');
 });
 
@@ -159,14 +159,13 @@ test('UTC user sees task due on previous day as Overdue', function () {
     $this->actingAs($user);
 
     Livewire::test('pages::projects.show', ['project' => $project])
-        ->assertViewHas('urgentTasks', function (Collection $urgentTasks) use ($task): bool {
-            return $urgentTasks->contains($task);
+        ->assertViewHas('todayTasks', function (Collection $todayTasks) use ($task): bool {
+            return $todayTasks->contains($task);
         })
-        ->assertSee('Overdue')
-        ->assertDontSee('Due today');
+        ->assertSee('Overdue');
 });
 
-test('urgent tasks widget displays the task title', function () {
+test('today widget displays the task title', function () {
     $this->travelTo(Carbon::parse('2026-11-04 02:00:00'));
 
     $user = User::factory()->create();
@@ -176,7 +175,7 @@ test('urgent tasks widget displays the task title', function () {
 
     $task = Task::factory()->create([
         'project_id' => $project->id,
-        'title' => 'Visible Task Title In Urgent Widget',
+        'title' => 'Visible Task Title In Today Widget',
         'due_date' => '2026-11-04 00:00:00',
         'status' => TaskStatus::Todo,
     ]);
@@ -184,10 +183,10 @@ test('urgent tasks widget displays the task title', function () {
     $this->actingAs($user);
 
     Livewire::test('pages::projects.show', ['project' => $project])
-        ->assertSee('Visible Task Title In Urgent Widget');
+        ->assertSee('Visible Task Title In Today Widget');
 });
 
-test('dashboard displays greeting, rendered stats, and falls back to total open tasks when today count is zero', function () {
+test('dashboard displays project header progress and omits greeting and legacy today fallback', function () {
     $this->travelTo(Carbon::parse('2026-11-04 12:00:00'));
 
     $user = User::factory()->create([
@@ -213,19 +212,20 @@ test('dashboard displays greeting, rendered stats, and falls back to total open 
 
     $this->actingAs($user);
 
-    // When today_tasks_count > 0, displays today_tasks_count (1) and inbox_count (4)
     Livewire::test('pages::projects.show', ['project' => $project])
-        ->assertSee('¡Buenos días, '.$user->display_name.'!')
-        ->assertViewHas('stats', fn (DashboardStatsData $stats): bool => $stats->highlightedTasksCount() === 1 && $stats->inboxCount === 4);
+        ->assertSee($project->name)
+        ->assertSee('0 of 3 tasks done')
+        ->assertDontSee('¡Buenos días, '.$user->display_name.'!')
+        ->assertViewHas('stats', fn (DashboardStatsData $stats): bool => $stats->todayTasksCount === 1 && $stats->inboxCount === 4);
 
-    // When today_tasks_count === 0, falls back to total open tasks_count (2)
     $project->tasks()->whereDate('due_date', '2026-11-04')->delete();
 
     Livewire::test('pages::projects.show', ['project' => $project])
-        ->assertViewHas('stats', fn (DashboardStatsData $stats): bool => $stats->highlightedTasksCount() === 2);
+        ->assertSee('Nothing due today')
+        ->assertViewHas('stats', fn (DashboardStatsData $stats): bool => $stats->todayTasksCount === 0 && $stats->openTasksCount === 2);
 });
 
-test('urgent tasks excludes future and undated tasks, orders by due date ascending, and limits to five', function () {
+test('today tasks excludes future and undated tasks and orders by due date ascending', function () {
     $this->travelTo(Carbon::parse('2026-11-04 12:00:00'));
 
     $user = User::factory()->create(['timezone' => 'UTC']);
@@ -247,7 +247,7 @@ test('urgent tasks excludes future and undated tasks, orders by due date ascendi
     foreach (range(1, 6) as $dayOffset) {
         Task::factory()->create([
             'project_id' => $project->id,
-            'title' => "Urgent Task {$dayOffset}",
+            'title' => "Today Task {$dayOffset}",
             'due_date' => Carbon::parse('2026-10-28')->addDays($dayOffset),
             'status' => TaskStatus::Todo,
         ]);
@@ -257,26 +257,27 @@ test('urgent tasks excludes future and undated tasks, orders by due date ascendi
 
     Livewire::test('pages::projects.show', ['project' => $project])
         ->assertSeeInOrder([
-            'Urgent Task 1',
-            'Urgent Task 2',
-            'Urgent Task 3',
-            'Urgent Task 4',
-            'Urgent Task 5',
+            'Today Task 1',
+            'Today Task 2',
+            'Today Task 3',
+            'Today Task 4',
+            'Today Task 5',
+            'Today Task 6',
         ])
-        ->assertDontSee('Urgent Task 6')
         ->assertDontSee('Future Task')
         ->assertDontSee('Undated Task')
         ->assertSeeHtml(route('project.tasks', $project));
 });
 
-test('dashboard shows empty states when there are no urgent tasks or recent activities', function () {
+test('dashboard shows empty states when there are no today tasks, areas, or recent activities', function () {
     $user = User::factory()->create();
     $project = Project::factory()->create(['owner_id' => $user->id]);
 
     $this->actingAs($user);
 
     Livewire::test('pages::projects.show', ['project' => $project])
-        ->assertSee('No urgent tasks!')
+        ->assertSee('Nothing due today')
+        ->assertSee('No areas yet')
         ->assertSee('No recent activity')
         ->assertSee('Upload File')
         ->assertSeeHtml(route('project.tasks', $project));

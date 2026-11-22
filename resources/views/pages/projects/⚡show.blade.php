@@ -1,31 +1,30 @@
 <?php
 
-use App\Actions\Projects\GetDashboardStatsAction;
-use App\Actions\Projects\ListRecentActivitiesAction;
+use App\Actions\Projects\GetProjectHomeDataAction;
+use App\Enums\TaskStatus;
 use App\Livewire\Forms\QuickCaptureForm;
 use App\Models\Project;
-use App\Support\DateHelper;
 use Flux\Flux;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 new #[Layout('layouts.app', ['title' => 'Home'])]
-class extends Component {
-    private const int DASHBOARD_LIST_LIMIT = 5;
-
+class extends Component
+{
     public Project $project;
-    
+
     public QuickCaptureForm $captureForm;
 
-    public function mount(Project $project)
+    public function mount(Project $project): void
     {
         $this->authorize('view', $project);
 
         $this->project = $project;
         $this->captureForm->setProject($project);
     }
-    
-    public function saveQuickCapture()
+
+    public function saveQuickCapture(): void
     {
         $this->authorize('view', $this->project);
 
@@ -33,64 +32,61 @@ class extends Component {
         Flux::toast('Item captured to Inbox');
     }
 
-    public function with(): array
+    public function toggleTaskCompletion(int $taskId): void
     {
-        $localToday = DateHelper::userToday();
+        $task = $this->project->tasks()->findOrFail($taskId);
+        $this->authorize('update', $task);
+
+        $nextStatus = $task->status === TaskStatus::Done
+            ? TaskStatus::Todo
+            : TaskStatus::Done;
+
+        $task->changeStatus($nextStatus);
+    }
+
+    #[On('areas-updated')]
+    #[On('task-created')]
+    #[On('file-uploaded')]
+    public function refreshHome(): void
+    {
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function with(GetProjectHomeDataAction $getProjectHomeData): array
+    {
+        $home = $getProjectHomeData($this->project);
 
         return [
-            'recentActivities' => app(ListRecentActivitiesAction::class)($this->project, self::DASHBOARD_LIST_LIMIT),
-            'urgentTasks' => $this->project->tasks()
-                ->urgent($localToday)
-                ->orderBy('due_date', 'asc')
-                ->take(self::DASHBOARD_LIST_LIMIT)
-                ->get(),
-            'stats' => app(GetDashboardStatsAction::class)($this->project),
+            'home' => $home,
+            'stats' => $home->stats,
+            'todayTasks' => $home->todayTasks,
+            'areas' => $home->areas,
+            'recentActivities' => $home->recentActivities,
         ];
     }
 };
 ?>
 
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-8">
-    
-    <!-- Greeting & Top Metrics -->
-    <div class="mb-8">
-        <h1 class="text-3xl font-bold text-accent-content break-words">¡Buenos días, {{ auth()->user()->display_name ?? 'Alex' }}!</h1>
-        <p class="text-ink-muted mt-1">Aquí tienes un resumen de tu espacio de trabajo.</p>
+<div class="max-w-7xl mx-auto w-full py-2 sm:py-4 space-y-6 sm:space-y-8">
+    <x-projects.dashboard.project-header :project="$project" :stats="$stats" />
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:max-w-md my-6">
-            <!-- Metric 1: Tareas -->
-            <div class="bg-surface-card rounded-2xl p-4 border border-ghost shadow-ambient flex items-center gap-4 min-w-0">
-                <div class="flex items-center justify-center bg-brand-tint text-brand rounded-full w-10 h-10 shrink-0">
-                    <flux:icon name="check-circle" variant="solid" class="w-6 h-6" />
-                </div>
-                <div class="flex flex-col min-w-0">
-                    <span class="text-2xl font-bold text-ink leading-none">{{ $stats->highlightedTasksCount() }}</span>
-                    <span class="text-sm text-ink-muted font-medium">Tareas para hoy</span>
-                </div>
-            </div>
+    <x-projects.dashboard.quick-capture :project="$project" />
 
-            <!-- Metric 2: Inbox -->
-            <div class="bg-surface-card rounded-2xl p-4 border border-ghost shadow-ambient flex items-center gap-4 min-w-0">
-                <div class="flex items-center justify-center bg-amber-50 dark:bg-amber-900/20 text-amber-500 rounded-full w-10 h-10 shrink-0">
-                    <flux:icon name="light-bulb" variant="solid" class="w-6 h-6" />
-                </div>
-                <div class="flex flex-col min-w-0">
-                    <span class="text-2xl font-bold text-ink leading-none">{{ $stats->inboxCount }}</span>
-                    <span class="text-sm text-ink-muted font-medium">Ideas en Inbox</span>
-                </div>
-            </div>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
+        <div class="lg:col-span-7">
+            <x-projects.dashboard.today-tasks
+                :tasks="$todayTasks"
+                :project="$project"
+                :local-today="$home->localToday"
+                :up-next-text="$home->upNextText()"
+            />
         </div>
-    </div>
 
-    <div class="grid grid-cols-12 gap-6">
-        <!-- Left Column -->
-        <div class="col-span-12 lg:col-span-7 flex flex-col gap-6">
-            <x-projects.dashboard.quick-capture :project="$project" />
-            <x-projects.dashboard.urgent-tasks :tasks="$urgentTasks" :project="$project" />
-        </div>
-        
-        <!-- Right Column -->
-        <div class="col-span-12 lg:col-span-5 flex flex-col gap-6 h-full">
+        <div class="lg:col-span-5 flex flex-col gap-6 sm:gap-8">
+            <x-projects.dashboard.areas-progress :areas="$areas" :project="$project" />
+
             <x-projects.dashboard.recent-activity :activities="$recentActivities" :project="$project" />
         </div>
     </div>
