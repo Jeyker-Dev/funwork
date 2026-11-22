@@ -244,7 +244,8 @@ select:focus[data-flux-control] {
     border-radius: 5px !important;
 }
 
-[data-current] {
+[data-flux-sidebar-item][data-current],
+[data-flux-navlist-item][data-current] {
     background-color: var(--color-surface-card);
     color: var(--color-accent-content);
     box-shadow: inset 3px 0 0 var(--color-brand);
