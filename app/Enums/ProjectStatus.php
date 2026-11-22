@@ -15,6 +15,26 @@ enum ProjectStatus: string
     case Done = 'done';
     case Completed = 'completed';
 
+    public function isOpen(): bool
+    {
+        return match ($this) {
+            self::Active, self::Planning, self::OnHold => true,
+            self::Done, self::Completed => false,
+        };
+    }
+
+    /**
+     * @return list<string>
+     */
+    public static function openValues(): array
+    {
+        return collect(self::cases())
+            ->filter(fn (self $status): bool => $status->isOpen())
+            ->map(fn (self $status): string => $status->value)
+            ->values()
+            ->all();
+    }
+
     public static function labelFor(?string $status): string
     {
         return match (self::resolve($status)) {

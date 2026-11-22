@@ -37,3 +37,21 @@ test('dotClassFor and progressBarClassFor map known statuses and fall back clean
         ->and(ProjectStatus::progressBarClassFor('completed'))->toBe('bg-emerald-500')
         ->and(ProjectStatus::progressBarClassFor(null))->toBe('bg-brand');
 });
+
+test('isOpen returns true for active, planning, and on-hold and false for done and completed', function (ProjectStatus $status, bool $expectedOpen) {
+    expect($status->isOpen())->toBe($expectedOpen);
+})->with([
+    'active' => [ProjectStatus::Active, true],
+    'planning' => [ProjectStatus::Planning, true],
+    'on-hold' => [ProjectStatus::OnHold, true],
+    'done' => [ProjectStatus::Done, false],
+    'completed' => [ProjectStatus::Completed, false],
+]);
+
+test('openValues returns the string values for all open statuses', function () {
+    expect(ProjectStatus::openValues())->toEqualCanonicalizing([
+        ProjectStatus::Active->value,
+        ProjectStatus::Planning->value,
+        ProjectStatus::OnHold->value,
+    ]);
+});

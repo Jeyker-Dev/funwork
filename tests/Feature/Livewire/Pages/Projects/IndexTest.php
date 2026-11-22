@@ -47,7 +47,27 @@ test('summary counts active projects and tasks due this week accurately', functi
     $this->actingAs($user);
 
     Livewire::test('pages::projects.index')
-        ->assertSee('2 active projects, 3 tasks due this week');
+        ->assertSee('3 active projects, 3 tasks due this week');
+});
+
+test('summary counts active, planning, and on-hold projects as active while excluding done, completed, and archived', function () {
+    $user = User::factory()->create(['timezone' => 'UTC']);
+
+    Project::factory()->create(['owner_id' => $user->id, 'status' => 'active']);
+    Project::factory()->create(['owner_id' => $user->id, 'status' => '  PLANNING ']);
+    Project::factory()->create(['owner_id' => $user->id, 'status' => 'on-hold']);
+    Project::factory()->create(['owner_id' => $user->id, 'status' => 'done']);
+    Project::factory()->create(['owner_id' => $user->id, 'status' => 'completed']);
+    Project::factory()->create([
+        'owner_id' => $user->id,
+        'status' => 'active',
+        'archived_at' => now()->subDay(),
+    ]);
+
+    $this->actingAs($user);
+
+    Livewire::test('pages::projects.index')
+        ->assertSee('3 active projects');
 });
 
 test('continue card shows the most recently active project, progress, next task, and open button without arrow', function () {

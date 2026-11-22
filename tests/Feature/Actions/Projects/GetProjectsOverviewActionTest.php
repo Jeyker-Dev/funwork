@@ -97,7 +97,7 @@ test('summary counts active projects and non-done tasks due within the current w
 
     $overview = app(GetProjectsOverviewAction::class)($user);
 
-    expect($overview->activeProjectsCount)->toBe(1)
+    expect($overview->activeProjectsCount)->toBe(2)
         ->and($overview->tasksDueThisWeekCount)->toBe(2);
 });
 

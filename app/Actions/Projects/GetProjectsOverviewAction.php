@@ -41,9 +41,12 @@ class GetProjectsOverviewAction
             ->orderByDesc('id')
             ->get();
 
+        $openStatuses = ProjectStatus::openValues();
+        $statusPlaceholders = implode(', ', array_fill(0, count($openStatuses), '?'));
+
         $activeProjectsCount = $user->projects()
             ->whereNull('archived_at')
-            ->whereRaw('LOWER(TRIM(status)) = ?', [ProjectStatus::Active->value])
+            ->whereRaw("LOWER(TRIM(status)) IN ({$statusPlaceholders})", $openStatuses)
             ->count();
 
         $tasksDueThisWeekCount = Task::query()
