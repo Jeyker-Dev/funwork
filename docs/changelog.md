@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-11-21
+
+- Rediseño del login y pantallas de autenticación (`layouts/auth/split.blade.php`, `pages/auth/login.blade.php`, `components/auth/board-preview.blade.php`, `components/app-logo-icon.blade.php`, `resources/css/app.css`, `DESIGN.md`, `docs/areas/design.md`):
+  - Nuevo layout dividido con el formulario alineado a la izquierda, logo vectorial adaptable a modo claro y oscuro sin fondo gris, y vista previa animada del tablero (`Projects / Website relaunch`) a la derecha en escritorio (oculta en `< lg` y respetando `prefers-reduced-motion`).
+  - Nuevo estilo global de botón primario (`[data-flux-button]`) con degradado `#ff6d00` → `#ff8a3d` (hover `#f45f00` → `#ff7a24`) y texto `#431407` semibold para cumplir contraste ≥4.5:1 en claro y oscuro, junto con alcance de `[data-current]` a ítems de barra lateral y listas de navegación para no resaltar el enlace del logo.
+
 ## 2026-11-18
 
 - Digest diario — Web Push en navegador y service worker (`laravel-notification-channels/webpush`, `public/sw.js`, `PushSubscriptionController`, `pages::settings.notifications`):
