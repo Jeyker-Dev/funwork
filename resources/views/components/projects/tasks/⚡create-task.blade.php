@@ -1,32 +1,66 @@
 <?php
 
-use Livewire\Component;
 use App\Enums\TaskPriority;
 use App\Enums\TaskStatus;
 use App\Livewire\Forms\TaskForm;
-use App\Models\Task;
 use App\Models\Project;
+use App\Models\Task;
+use Flux\Flux;
+use Livewire\Attributes\On;
+use Livewire\Component;
 
 new class extends Component
 {
     public TaskForm $form;
+
     public Project $project;
+
     public ?int $projectId = null;
+
     public ?string $status = null;
 
-    public function mount(Project $project, ?string $status = null): void
+    public bool $hideTrigger = false;
+
+    public function mount(Project $project, ?string $status = null, bool $hideTrigger = false): void
     {
         $this->authorize('view', $project);
 
         $this->project = $project;
         $this->projectId = $project->id;
         $this->status = $status;
+        $this->hideTrigger = $hideTrigger;
+
+        $this->form->status = $status ?? TaskStatus::Todo->value;
+        $this->form->priority = TaskPriority::Low->value;
+    }
+
+    #[On('open-create-task')]
+    public function openForStatus(string $status = TaskStatus::Todo->value): void
+    {
+        $this->authorize('create', [Task::class, $this->project]);
+
+        $resolvedStatus = TaskStatus::tryFrom($status)?->value ?? TaskStatus::Todo->value;
+
+        $this->resetValidation();
+        $this->status = $resolvedStatus;
+        $this->form->status = $resolvedStatus;
+        $this->form->priority = $this->form->priority ?: TaskPriority::Low->value;
+
+        Flux::modal($this->modalName())->show();
+    }
+
+    public function modalName(): string
+    {
+        $suffix = $this->hideTrigger ? 'board' : ($this->status ?? 'all');
+
+        return 'create-task-'.$this->projectId.'-'.$suffix;
     }
 
     public function with(): array
     {
         return [
             'user' => auth()->user(),
+            'modalName' => $this->modalName(),
         ];
     }
 
@@ -35,98 +69,110 @@ new class extends Component
         $this->authorize('create', [Task::class, $this->project]);
 
         $this->form->projectId = $this->projectId;
-        $this->form->status = $this->status ?? $this->form->status;
+        $this->form->status = $this->form->status ?: ($this->status ?? TaskStatus::Todo->value);
 
-        $this->form->position = Task::where('project_id', $this->projectId)
-            ->when($this->status, fn ($query) => $query->where('status', $this->status))
+        $maxPosition = Task::where('project_id', $this->projectId)
+            ->where('status', $this->form->status)
             ->max('position');
 
-        $this->form->position = $this->form->position ? $this->form->position + 1 : 1;
+        $this->form->position = $maxPosition ? ((int) $maxPosition) + 1 : 1;
 
         $this->form->store();
+
+        $this->form->status = $this->status ?? TaskStatus::Todo->value;
+        $this->form->priority = TaskPriority::Low->value;
 
         $this->dispatch('task-created');
     }
 };
 ?>
 
-@php
-    $modalName = 'create-task-'.$projectId.'-'.($status ?? 'all');
-
-    $taskStatus = $status ? TaskStatus::tryFrom($status) : null;
-    $buttonClasses = $taskStatus?->cardClasses() ?? 'border-gray-200 bg-gray-50 hover:bg-gray-100';
-    $iconClasses = $taskStatus?->text() ?? 'text-gray-500';
-@endphp
-
-<div class="w-full">
-    <flux:modal.trigger name="{{ $modalName }}">
-        <div class="border-2 border-dashed {{ $buttonClasses }} flex items-center justify-center p-10 cursor-pointer rounded-lg">
-            <flux:icon.plus-circle class="{{ $iconClasses }}"/>
-        </div>
-    </flux:modal.trigger>
+<div>
+    @if(! $hideTrigger)
+        <flux:modal.trigger name="{{ $modalName }}">
+            <flux:button size="sm" variant="ghost" icon="plus" class="w-full justify-start text-ink-muted hover:text-ink max-md:min-h-11">
+                Add task
+            </flux:button>
+        </flux:modal.trigger>
+    @endif
 
     <flux:modal name="{{ $modalName }}" class="w-[calc(100vw-2rem)] max-w-xl">
-        <form wire:submit.prevent="save">
-            <div class="space-y-6">
-                <div>
-                    <flux:heading size="lg">Create Task</flux:heading>
-                    <flux:text class="mt-2">
-                        Fill out the details below to create a new task for this project.
-                    </flux:text>
+        <form wire:submit.prevent="save" class="space-y-6">
+            <div>
+                <flux:heading size="lg">Create Task</flux:heading>
+                <flux:text class="mt-1.5 text-ink-muted">
+                    Add a new task to {{ $project->name }}.
+                </flux:text>
+            </div>
 
-                </div>
+            <flux:field>
+                <flux:label>Title</flux:label>
+                <flux:input placeholder="Write the onboarding notebook" wire:model="form.title" />
+                <flux:error name="form.title" />
+            </flux:field>
 
-                <flux:input label="Title" placeholder="Review Project Map" wire:model="form.title" />
+            <flux:field>
+                <flux:label>Description</flux:label>
+                <flux:textarea rows="4" placeholder="Add acceptance criteria or markdown checklist (- [ ] ...)" wire:model="form.description" />
+                <flux:error name="form.description" />
+            </flux:field>
 
-                <flux:textarea label="Description" placeholder="Add details..." wire:model="form.description" />
-
-                <div class="flex flex-col sm:flex-row justify-between sm:items-center w-full gap-4 my-6">
-                    <div class="w-full sm:w-1/2">
-                        <flux:select variant="listbox" label="Status" placeholder="Choose status..." wire:model="form.status">
-                            <flux:select.option>{{ TaskStatus::Todo->value }}</flux:select.option>
-                            <flux:select.option>{{ TaskStatus::Doing->value }}</flux:select.option>
-                            <flux:select.option>{{ TaskStatus::Done->value }}</flux:select.option>
-                        </flux:select>
-                    </div>
-
-                    <div class="w-full sm:w-1/2">
-                        <flux:select variant="listbox" label="Priority" placeholder="Choose priority..." wire:model="form.priority">
-                            <flux:select.option>{{ TaskPriority::Low->value }}</flux:select.option>
-                        </flux:select>
-                    </div>
-                </div>
-
-                <div class="flex flex-col sm:flex-row justify-between sm:items-center w-full gap-4 my-6">
-                    <div class="w-full sm:w-1/2">
-                        <flux:select variant="listbox" label="Area" placeholder="No area" wire:model="form.areaId">
-                            <flux:select.option :value="null">No area</flux:select.option>
-                            @foreach($project->areas as $area)
-                                <flux:select.option :value="$area->id">{{ $area->name }}</flux:select.option>
-                            @endforeach
-                        </flux:select>
-                    </div>
-
-                    <div class="w-full sm:w-1/2">
-                        <flux:input label="Due date" type="date" wire:model="form.dueDate"/>
-                    </div>
-                </div>
-
-                <div class="w-full my-6">
-                    <flux:select variant="listbox" multiple label="Assigned Users" placeholder="Choose users..." wire:model="form.assignedUserIds">
-                        <flux:select.option value="{{ $user->id }}">{{ $user->display_name }}</flux:select.option>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <flux:field>
+                    <flux:label>Status</flux:label>
+                    <flux:select variant="listbox" placeholder="Choose status..." wire:model="form.status">
+                        @foreach(TaskStatus::cases() as $taskStatus)
+                            <flux:select.option value="{{ $taskStatus->value }}">{{ $taskStatus->value }}</flux:select.option>
+                        @endforeach
                     </flux:select>
-                </div>
+                    <flux:error name="form.status" />
+                </flux:field>
 
-                <div class="flex">
-                    <flux:spacer />
+                <flux:field>
+                    <flux:label>Priority</flux:label>
+                    <flux:select variant="listbox" placeholder="Choose priority..." wire:model="form.priority">
+                        @foreach(TaskPriority::cases() as $taskPriority)
+                            <flux:select.option value="{{ $taskPriority->value }}">{{ $taskPriority->value }}</flux:select.option>
+                        @endforeach
+                    </flux:select>
+                    <flux:error name="form.priority" />
+                </flux:field>
+            </div>
 
-                    <flux:button type="submit" variant="primary">Save changes</flux:button>
-                </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <flux:field>
+                    <flux:label>Area</flux:label>
+                    <flux:select variant="listbox" placeholder="No area" wire:model="form.areaId">
+                        <flux:select.option :value="null">No area</flux:select.option>
+                        @foreach($project->areas as $area)
+                            <flux:select.option :value="$area->id">{{ $area->name }}</flux:select.option>
+                        @endforeach
+                    </flux:select>
+                    <flux:error name="form.areaId" />
+                </flux:field>
+
+                <flux:field>
+                    <flux:label>Due date</flux:label>
+                    <flux:input type="date" wire:model="form.dueDate" />
+                    <flux:error name="form.dueDate" />
+                </flux:field>
+            </div>
+
+            <flux:field>
+                <flux:label>Assigned Users</flux:label>
+                <flux:select variant="listbox" multiple placeholder="Choose users..." wire:model="form.assignedUserIds">
+                    <flux:select.option value="{{ $user->id }}">{{ $user->display_name }}</flux:select.option>
+                </flux:select>
+                <flux:error name="form.assignedUserIds" />
+            </flux:field>
+
+            <div class="flex items-center justify-end gap-2 pt-2">
+                <flux:modal.close>
+                    <flux:button type="button" variant="ghost" class="max-md:min-h-11">Cancel</flux:button>
+                </flux:modal.close>
+
+                <flux:button type="submit" variant="primary" class="max-md:min-h-11">Save changes</flux:button>
             </div>
         </form>
     </flux:modal>
-
-    @persist('toast')
-    <flux:toast />
-    @endpersist
 </div>

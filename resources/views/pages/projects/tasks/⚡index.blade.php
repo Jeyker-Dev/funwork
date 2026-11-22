@@ -19,12 +19,6 @@ class extends Component {
 };
 ?>
 
-<div class="flex h-full w-full flex-1 flex-col gap-4 rounded-xl">
-    <x-title-text 
-        title="Your Tasks," 
-        highlight="Organized."
-        description="Manage and track your project tasks with your team in one place." 
-    />
-
+<div class="flex h-full w-full flex-1 flex-col">
     <livewire:projects.tasks.task-board :project="$project" />
 </div>

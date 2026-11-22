@@ -126,7 +126,9 @@ test('tasks index page renders successfully via route and component with project
 
     $response = $this->actingAs($user)->get(route('project.tasks', $project));
     $response->assertOk()
-        ->assertSee('Your Tasks,')
+        ->assertSee('Tasks')
+        ->assertSee('New task')
+        ->assertDontSee('Your Tasks,')
         ->assertSee(route('projects.show', ['project' => $project]))
         ->assertSee(route('project.inbox', ['project' => $project]))
         ->assertSee(route('project.tasks', ['project' => $project]))
@@ -136,8 +138,10 @@ test('tasks index page renders successfully via route and component with project
     Livewire::actingAs($user)
         ->test('pages::projects.tasks.index', ['project' => $project])
         ->assertOk()
-        ->assertSee('Your Tasks,')
-        ->assertSee('Organized.');
+        ->assertSee('Tasks')
+        ->assertSee('Board')
+        ->assertSee('List')
+        ->assertDontSee('Organized.');
 });
 
 test('task detail HTTP route renders successfully with project sidebar', function () {
