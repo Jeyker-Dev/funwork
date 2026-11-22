@@ -74,7 +74,7 @@ new class extends Component
     <flux:dropdown position="bottom" align="end">
         <flux:button
             variant="subtle"
-            class="relative max-md:min-h-11 max-md:min-w-11"
+            class="relative max-md:min-h-11 max-md:min-w-11 max-md:px-2.5"
             aria-label="{{ __('Notifications') }}"
             data-test="notification-bell-button"
         >

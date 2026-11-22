@@ -26,13 +26,14 @@ new class extends Component {
 };
 ?>
 
-<div>
-    <flux:dropdown position="bottom" align="start">
+<div class="min-w-0 max-w-full">
+    <flux:dropdown position="bottom" align="start" class="block min-w-0 max-w-full">
         <flux:button
             variant="ghost"
             data-project-switcher
-            class="rounded-full! bg-surface-card! dark:bg-surface-high! border border-ghost shadow-xs px-2.5! sm:px-3.5! py-1! h-10! max-md:min-h-11! flex items-center! justify-center! gap-2 max-w-[12.5rem] sm:max-w-xs"
+            class="rounded-full! bg-surface-card! dark:bg-surface-high! border border-ghost shadow-xs px-2.5! sm:px-3.5! py-1! h-10! max-md:min-h-11! flex items-center! justify-between! gap-1.5 sm:gap-2 min-w-0 max-w-full sm:max-w-xs [&>span]:min-w-0 [&>span]:flex-1 [&>span]:overflow-hidden"
             icon:trailing="chevron-down"
+            icon-trailing:class="shrink-0"
         >
             <div class="flex items-center gap-2 min-w-0">
                 <x-projects.icon-project

@@ -80,3 +80,31 @@ test('top bar preserves search input on non-home project routes while hiding it 
     expect($homeHtml)->not->toContain('Search tasks')
         ->and($tasksHtml)->toContain('Search tasks');
 });
+
+test('project switcher allows truncation inside the flex header on narrow mobile viewports', function () {
+    $user = User::factory()->create();
+    $project = Project::factory()->create([
+        'owner_id' => $user->id,
+        'name' => 'Very Long Project Name That Should Truncate Cleanly On Mobile',
+    ]);
+
+    $response = $this->actingAs($user)
+        ->get(route('project.decisions', $project));
+
+    $response->assertSuccessful();
+
+    $dom = new DOMDocument;
+    @$dom->loadHTML($response->getContent());
+    $xpath = new DOMXPath($dom);
+
+    $header = $xpath->query('//header[@data-flux-header]')->item(0);
+    $leftGroup = $xpath->query('.//*[@data-header-left]', $header)->item(0);
+    $switcher = $xpath->query('.//*[@data-project-switcher]', $header)->item(0);
+
+    expect($leftGroup)->not->toBeNull()
+        ->and($leftGroup->getAttribute('class'))->toContain('flex-1')
+        ->and($leftGroup->getAttribute('class'))->toContain('min-w-0')
+        ->and($switcher)->not->toBeNull()
+        ->and($switcher->getAttribute('class'))->toContain('min-w-0')
+        ->and($switcher->getAttribute('class'))->toContain('max-w-full');
+});
