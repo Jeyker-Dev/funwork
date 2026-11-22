@@ -52,6 +52,15 @@
             </flux:sidebar.item>
 
             <flux:sidebar.item
+                icon="clock"
+                :href="route('project.history', ['project' => $project])"
+                :current="request()->routeIs('project.history')"
+                wire:navigate
+            >
+                {{ __('History') }}
+            </flux:sidebar.item>
+
+            <flux:sidebar.item
                 icon="folder"
                 :href="route('project.files', ['project' => $project])"
                 :current="request()->routeIs('project.files' , ['project' => $project])"

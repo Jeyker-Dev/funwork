@@ -29,7 +29,7 @@ Herramienta: **Stitch** (proyecto `14584368472277721493`). Componentes de UI: Fl
 | Archivos | "Files - Website Relaunch" y "Files - Drag and Drop Upload State" | Diseño aprobado; pendiente de implementar |
 | Settings de la cuenta | "Account Settings - FunWork" y "Account Settings - Integrations" | Diseño aprobado; pendiente de implementar |
 | Settings del proyecto (nueva) | "Project Settings - Website Relaunch" | Diseño aprobado; pendiente de implementar |
-| Historial del proyecto (nueva) | "History - Website Relaunch" | Diseño aprobado; pendiente de implementar |
+| Historial del proyecto (nueva) | "History - Website Relaunch" | Implementado |
 | What's new (nueva) | "What's new in FunWork" | Diseño aprobado; pendiente de implementar |
 
 ## Login: decisiones y ajustes para el código
@@ -277,10 +277,10 @@ Decisiones:
 
 Diferencias de Stitch que se corrigen en el código:
 
-- [ ] El chip seleccionado "All" es negro: usar el estilo de chip seleccionado del resto de la app.
-- [ ] La barra superior no es la real (sin búsqueda, "Areas" como texto, otro logo): usar el header actual del proyecto.
-- [ ] Estado vacío: "Nothing has happened yet" con una línea de ayuda, sin datos inventados.
-- [ ] Definir el modo oscuro y mobile.
+- [x] El chip seleccionado "All" es negro: usar el estilo de chip seleccionado del resto de la app.
+- [x] La barra superior no es la real (sin búsqueda, "Areas" como texto, otro logo): usar el header actual del proyecto.
+- [x] Estado vacío: "Nothing has happened yet" con una línea de ayuda, sin datos inventados.
+- [x] Definir el modo oscuro y mobile.
 
 ## What's new (pantalla nueva): decisiones y ajustes para el código
 

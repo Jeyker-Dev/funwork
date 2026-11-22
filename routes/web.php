@@ -60,6 +60,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->can('view', 'project')
         ->can('view', 'decision')
         ->name('project.decisions.show');
+    Route::livewire('/projects/{project}/history', 'pages::projects.history.index')
+        ->can('view', 'project')
+        ->name('project.history');
     Route::livewire('/projects/{project}/files', 'pages::projects.files.index')
         ->can('view', 'project')
         ->name('project.files');
