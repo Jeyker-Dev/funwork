@@ -729,52 +729,45 @@ new class extends Component
                     </div>
                 </div>
 
-                <footer class="pt-6 mt-8 border-t border-ghost flex flex-wrap items-center justify-between gap-4 text-xs text-ink-muted">
-                    <div class="flex items-center gap-4">
-                        @if ($this->previousPage)
-                            <a
-                                href="{{ route('project.notebooks.pages.edit', ['project' => $project, 'notebook' => $notebook, 'page' => $this->previousPage]) }}"
-                                wire:navigate
-                                class="text-sm font-medium text-ink-muted hover:text-ink transition-colors inline-flex items-center gap-1.5 max-md:min-h-11"
-                            >
-                                <flux:icon.chevron-left class="size-4 shrink-0" stroke-width="2" />
-                                <span>{{ __('Previous Page') }}</span>
-                            </a>
-                        @endif
+                @if ($this->previousPage || $this->nextPage || $notebook->google_doc_synced_at)
+                    <footer class="pt-6 mt-8 border-t border-ghost flex flex-wrap items-center justify-between gap-4 text-xs text-ink-muted">
+                        <div class="flex items-center gap-4">
+                            @if ($this->previousPage)
+                                <a
+                                    href="{{ route('project.notebooks.pages.edit', ['project' => $project, 'notebook' => $notebook, 'page' => $this->previousPage]) }}"
+                                    wire:navigate
+                                    class="text-sm font-medium text-ink-muted hover:text-ink transition-colors inline-flex items-center gap-1.5 max-md:min-h-11"
+                                >
+                                    <flux:icon.chevron-left class="size-4 shrink-0" stroke-width="2" />
+                                    <span>{{ __('Previous Page') }}</span>
+                                </a>
+                            @endif
 
-                        @if ($this->nextPage)
-                            <a
-                                href="{{ route('project.notebooks.pages.edit', ['project' => $project, 'notebook' => $notebook, 'page' => $this->nextPage]) }}"
-                                wire:navigate
-                                class="text-sm font-medium text-ink-muted hover:text-ink transition-colors inline-flex items-center gap-1.5 max-md:min-h-11"
-                            >
-                                <span>{{ __('Next Page') }}</span>
-                                <flux:icon.chevron-right class="size-4 shrink-0" stroke-width="2" />
-                            </a>
-                        @else
-                            <button
-                                type="button"
-                                wire:click="createNextPage"
-                                class="text-sm font-medium text-ink-muted hover:text-ink transition-colors inline-flex items-center gap-1.5 cursor-pointer max-md:min-h-11"
-                            >
-                                <span>{{ __('New Page') }}</span>
-                                <flux:icon.plus class="size-4 shrink-0" stroke-width="2" />
-                            </button>
-                        @endif
-                    </div>
-
-                    @if ($notebook->google_doc_synced_at)
-                        <div class="flex items-center gap-2 text-xs text-ink-subtle">
-                            <flux:icon.arrow-path class="size-3.5 shrink-0" />
-                            <span>
-                                {{ __('Synced with Google Docs') }} {{ $notebook->google_doc_synced_at->timezone($userTimezone)->locale('en')->diffForHumans() }}
-                            </span>
-                            @if ($notebook->hasUnsyncedChanges())
-                                <span class="text-amber-700 dark:text-amber-300 font-medium">· {{ __('Unsynced changes') }}</span>
+                            @if ($this->nextPage)
+                                <a
+                                    href="{{ route('project.notebooks.pages.edit', ['project' => $project, 'notebook' => $notebook, 'page' => $this->nextPage]) }}"
+                                    wire:navigate
+                                    class="text-sm font-medium text-ink-muted hover:text-ink transition-colors inline-flex items-center gap-1.5 max-md:min-h-11"
+                                >
+                                    <span>{{ __('Next Page') }}</span>
+                                    <flux:icon.chevron-right class="size-4 shrink-0" stroke-width="2" />
+                                </a>
                             @endif
                         </div>
-                    @endif
-                </footer>
+
+                        @if ($notebook->google_doc_synced_at)
+                            <div class="flex items-center gap-2 text-xs text-ink-subtle">
+                                <flux:icon.arrow-path class="size-3.5 shrink-0" />
+                                <span>
+                                    {{ __('Synced with Google Docs') }} {{ $notebook->google_doc_synced_at->timezone($userTimezone)->locale('en')->diffForHumans() }}
+                                </span>
+                                @if ($notebook->hasUnsyncedChanges())
+                                    <span class="text-amber-700 dark:text-amber-300 font-medium">· {{ __('Unsynced changes') }}</span>
+                                @endif
+                            </div>
+                        @endif
+                    </footer>
+                @endif
             </section>
         </div>
     @endif

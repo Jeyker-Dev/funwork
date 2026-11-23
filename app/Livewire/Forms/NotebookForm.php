@@ -18,8 +18,8 @@ class NotebookForm extends Form
     #[Validate('required')]
     public string $name = '';
 
-    #[Validate('required')]
-    public string $description = '';
+    #[Validate('nullable|string')]
+    public ?string $description = '';
 
     #[Validate('required|integer')]
     public ?int $createdBy = null;
@@ -44,7 +44,7 @@ class NotebookForm extends Form
             'project_id' => $this->projectId,
             'created_by' => $this->createdBy,
             'name' => $this->name,
-            'description' => $this->description,
+            'description' => filled($this->description) ? trim($this->description) : null,
             'area_id' => $this->areaId ?: null,
         ]);
 

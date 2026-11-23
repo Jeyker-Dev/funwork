@@ -19,7 +19,7 @@ class ConvertInboxToNotebookForm extends Form
     public string $name = '';
 
     #[Validate('nullable|string')]
-    public string $description = '';
+    public ?string $description = '';
 
     public ?InboxItem $item = null;
 
@@ -53,7 +53,7 @@ class ConvertInboxToNotebookForm extends Form
         $notebook = Notebook::create([
             'project_id' => $this->projectId,
             'name' => $this->name,
-            'description' => $this->description,
+            'description' => filled($this->description) ? trim($this->description) : null,
             'created_by' => auth()->id(),
             'is_archived' => false,
             'is_shared' => false,

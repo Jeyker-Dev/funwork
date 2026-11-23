@@ -7,6 +7,7 @@ use App\Models\Notebook;
 use App\Models\NotebookPage;
 use App\Models\Project;
 use App\Models\User;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Livewire\Livewire;
@@ -61,7 +62,9 @@ test('show notebooks component renders dense row with real data and no hardcoded
         ->assertDontSee('calebporzio');
 });
 
-test('show notebooks uses notebook updated_at when notebook has no pages or is newer', function () {
+test('show notebooks shows No pages, 1 page, N pages, and Edited just now for sub-minute edits', function () {
+    $this->travelTo(Carbon::parse('2026-11-23 12:00:00', 'UTC'));
+
     $user = User::factory()->create();
     $project = Project::factory()->create(['owner_id' => $user->id]);
 
@@ -69,16 +72,43 @@ test('show notebooks uses notebook updated_at when notebook has no pages or is n
         'project_id' => $project->id,
         'created_by' => $user->id,
         'name' => 'Empty Notes',
-        'description' => 'Freshly created',
+        'description' => null,
+        'updated_at' => now()->subSeconds(20),
+    ]);
+
+    $singlePageNotebook = Notebook::factory()->create([
+        'project_id' => $project->id,
+        'created_by' => $user->id,
+        'name' => 'Single Page Notes',
+        'description' => 'One page only',
         'updated_at' => now()->subHours(4),
     ]);
+    NotebookPage::factory()->create([
+        'notebook_id' => $singlePageNotebook->id,
+        'created_by' => $user->id,
+        'order' => 1,
+        'updated_at' => now()->subHours(4),
+    ]);
+    Notebook::withoutTimestamps(function () use ($singlePageNotebook): void {
+        $singlePageNotebook->forceFill(['updated_at' => now()->subHours(4)])->save();
+    });
 
     $this->actingAs($user);
 
-    Livewire::test('projects.notebooks.⚡show-notebooks', ['project' => $project])
-        ->assertSee('0 pages')
+    $component = Livewire::test('projects.notebooks.⚡show-notebooks', ['project' => $project])
+        ->assertSee('No pages')
+        ->assertDontSee('0 pages')
+        ->assertSee('1 page')
+        ->assertSee('Edited just now')
         ->assertSee('Edited 4 hours ago')
         ->assertDontSee('From repo docs');
+
+    $dom = new DOMDocument;
+    @$dom->loadHTML($component->html());
+    $xpath = new DOMXPath($dom);
+    $emptyButton = $xpath->query('//button[contains(., "Empty Notes")]')->item(0);
+    expect($emptyButton)->not->toBeNull()
+        ->and(trim($emptyButton->textContent))->toBe('Empty Notes');
 });
 
 test('show notebooks searches by name and description and filters by area', function () {

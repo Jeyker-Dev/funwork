@@ -6,13 +6,13 @@ use App\Models\Notebook;
 use App\Models\NotebookPage;
 use App\Models\Project;
 use App\Services\Google\GoogleAuthorizationException;
+use App\Support\DateHelper;
 use App\Support\QueryHelper;
 use Flux\Flux;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
@@ -56,13 +56,6 @@ new class extends Component
     {
         $this->area = 'all';
         $this->search = '';
-        $this->resetPage();
-    }
-
-    #[On('search-updated')]
-    public function updateSearch(string $search = ''): void
-    {
-        $this->search = trim($search);
         $this->resetPage();
     }
 
@@ -302,6 +295,12 @@ new class extends Component
                     $isFromRepoDocs = (int) $notebook->repo_docs_count > 0;
                     $hasUnsynced = $notebook->hasUnsyncedChanges();
                     $userTimezone = auth()->user()->timezone ?? config('app.timezone');
+                    $pageCount = (int) $notebook->pages_count;
+                    $pageCountLabel = match ($pageCount) {
+                        0 => __('No pages'),
+                        1 => __('1 page'),
+                        default => "{$pageCount} ".__('pages'),
+                    };
                 @endphp
                 <div
                     wire:key="notebook-row-{{ $notebook->id }}"
@@ -340,7 +339,7 @@ new class extends Component
                             @endif
 
                             <span class="text-ink-muted tabular-nums whitespace-nowrap">
-                                {{ $notebook->pages_count }} {{ Str::plural('page', $notebook->pages_count) }}
+                                {{ $pageCountLabel }}
                             </span>
 
                             @if ($isFromRepoDocs)
@@ -359,7 +358,7 @@ new class extends Component
 
                             @if ($lastEditedAt)
                                 <span class="text-ink-subtle tabular-nums whitespace-nowrap">
-                                    {{ __('Edited') }} {{ $lastEditedAt->locale('en')->diffForHumans() }}
+                                    {{ __('Edited') }} {{ DateHelper::relativeAge($lastEditedAt) }}
                                 </span>
                             @endif
                         </div>

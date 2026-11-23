@@ -58,3 +58,21 @@ test('it successfully persists notebook, dispatches event and resets form', func
         ->and($notebook->project_id)->toBe($project->id)
         ->and($notebook->created_by)->toBe($user->id);
 });
+
+test('it allows creating a notebook without a description', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    $project = Project::factory()->create(['owner_id' => $user->id]);
+
+    Livewire::test('projects.notebooks.⚡create-notebook', ['project' => $project])
+        ->set('form.name', 'Notes Without Description')
+        ->set('form.description', '')
+        ->call('save')
+        ->assertHasNoErrors()
+        ->assertDispatched('created-notebook');
+
+    $notebook = Notebook::where('name', 'Notes Without Description')->first();
+    expect($notebook)->not->toBeNull()
+        ->and($notebook->description)->toBeNull();
+});

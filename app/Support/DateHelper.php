@@ -23,14 +23,34 @@ class DateHelper
     }
 
     /**
+     * Determine whether a timestamp is less than a minute from now.
+     */
+    public static function isJustNow(CarbonInterface $timestamp): bool
+    {
+        return $timestamp->diffInSeconds(now(), absolute: true) < self::JUST_NOW_THRESHOLD_SECONDS;
+    }
+
+    /**
      * Format a compact relative age, returning "now" under one minute.
      */
     public static function shortRelativeAge(CarbonInterface $timestamp): string
     {
-        if ($timestamp->diffInSeconds(now(), absolute: true) < self::JUST_NOW_THRESHOLD_SECONDS) {
+        if (self::isJustNow($timestamp)) {
             return 'now';
         }
 
         return $timestamp->shortAbsoluteDiffForHumans();
+    }
+
+    /**
+     * Format a natural English relative age, returning "just now" under one minute.
+     */
+    public static function relativeAge(CarbonInterface $timestamp): string
+    {
+        if (self::isJustNow($timestamp)) {
+            return 'just now';
+        }
+
+        return $timestamp->locale('en')->diffForHumans();
     }
 }

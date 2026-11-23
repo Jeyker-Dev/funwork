@@ -61,7 +61,7 @@ new class extends Component
 
             <flux:input label="Name" placeholder="Architecture" wire:model="form.name"/>
 
-            <flux:textarea label="Description" placeholder="Add details..." wire:model="form.description"/>
+            <flux:textarea label="Description (optional)" placeholder="Optional details..." wire:model="form.description"/>
 
             <flux:select variant="listbox" label="Area" placeholder="No area" wire:model="form.areaId">
                 <flux:select.option :value="null">No area</flux:select.option>

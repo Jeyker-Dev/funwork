@@ -347,3 +347,19 @@ test('it renders only markdown content in code blocks without invented file head
         ->assertDontSee('WorkspaceAggregateRoot.php')
         ->assertDontSee('PHP 8.2');
 });
+
+test('it places New page creation in the desktop and mobile page indexes and omits it from the editor card footer', function (): void {
+    $component = mountNotebookPageEditor($this->user, $this->project, $this->notebook, $this->page);
+
+    $dom = new DOMDocument;
+    @$dom->loadHTML($component->html());
+    $xpath = new DOMXPath($dom);
+
+    $desktopCreateButtons = $xpath->query('//aside//button[contains(., "New page")]');
+    $mobileCreateButtons = $xpath->query('//*[@id="mobile-page-index"]//button[contains(., "New page")]');
+    $footerCreateButtons = $xpath->query('//section//footer//button[contains(., "New")]');
+
+    expect($desktopCreateButtons->length)->toBe(1)
+        ->and($mobileCreateButtons->length)->toBe(1)
+        ->and($footerCreateButtons->length)->toBe(0);
+});
