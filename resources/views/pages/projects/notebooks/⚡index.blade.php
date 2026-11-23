@@ -1,15 +1,17 @@
 <?php
 
-use Livewire\Component;
 use App\Models\Project;
 use Livewire\Attributes\Layout;
-use Livewire\Attributes\Title;
 use Livewire\Attributes\On;
+use Livewire\Attributes\Title;
+use Livewire\Component;
 
 new #[Layout('layouts.app')]
 #[Title('Notebooks')]
-class extends Component {
+class extends Component
+{
     public ?Project $project = null;
+
     public ?int $projectId = null;
 
     public function mount(Project $project): void
@@ -24,71 +26,60 @@ class extends Component {
     {
         return [
             'project' => $this->project,
-            'notebooks' => $this->project->notebooks,
+            'hasNotebooks' => $this->project->notebooks()->exists(),
         ];
     }
 
     #[On('created-notebook')]
     public function refreshNotebooks(): void
     {
-        $this->with();
+        // Livewire re-renders with updated notebook state
     }
 };
 ?>
 
-<div>
-    @if($notebooks->isEmpty())
-        <div class="flex h-full w-full flex-1 flex-col gap-4 rounded-xl">
-            <x-title-text
-                title="Notebooks"
-                description="Manage and track your project notebooks with your team in one place."
-                class="mb-0"
-            />
+<div class="max-w-7xl mx-auto w-full py-2 sm:py-4">
+    @if (! $hasNotebooks)
+        <div class="space-y-6">
+            <header class="min-w-0">
+                <div class="flex items-center gap-2.5">
+                    <h1 class="font-headline font-bold text-2xl sm:text-3xl tracking-tight text-ink">
+                        {{ __('Notebooks') }}
+                    </h1>
+                    <span class="inline-flex items-center px-2.5 py-0.5 text-xs font-semibold text-ink-muted bg-surface-high/70 rounded-full tabular-nums">
+                        0
+                    </span>
+                </div>
+                <p class="text-sm text-ink-muted mt-1">
+                    {{ __('Project documentation, architecture notes, and guides.') }}
+                </p>
+            </header>
 
-            <div class="flex items-center justify-center flex-col gap-4 mt-8">
-                <flux:icon.book-open class="w-32 h-32 text-gray-400"/>
+            <div class="bg-surface-card rounded-2xl border border-ghost shadow-ambient text-center px-6 py-16 space-y-4">
+                <div class="size-12 rounded-2xl bg-surface-low flex items-center justify-center mx-auto text-ink-subtle">
+                    <flux:icon.book-open class="size-6" />
+                </div>
 
-                <x-title-text
-                    title="No Notebooks,"
-                    highlight="Yet."
-                    description="Create your first notebook to start capturing your project’s ideas and information."
-                    class="text-center flex flex-col items-center mb-0"
-                />
+                <div class="space-y-1.5 max-w-md mx-auto">
+                    <h2 class="font-headline font-bold text-lg text-ink">
+                        {{ __('No notebooks yet') }}
+                    </h2>
+                    <p class="text-sm text-ink-muted">
+                        {{ __('Group project documentation, architecture notes, and guides in multi-page notebooks.') }}
+                    </p>
+                </div>
 
-                <livewire:projects.notebooks.create-notebook :project="$project"/>
+                <div class="pt-2 flex flex-col items-center gap-3">
+                    <livewire:projects.notebooks.create-notebook :project="$project" button-label="Create your first notebook" />
 
-                <div
-                    class="w-full max-w-md border border-ghost rounded-2xl p-4 mt-4 bg-surface-card shadow-ambient flex gap-3 items-center justify-center">
-                    <flux:icon.light-bulb variant="solid" class="size-5 text-brand shrink-0"/>
-
-                    <flux:text class="text-ink-muted text-xs font-semibold">
-                        Notebooks allow you to group and structure important information for your project.
-                    </flux:text>
+                    <p class="text-xs text-ink-subtle">
+                        {{ __('or import your repository docs with') }}
+                        <code class="px-1.5 py-0.5 rounded bg-surface-low text-ink-muted font-mono">funwork:sync-docs</code>
+                    </p>
                 </div>
             </div>
         </div>
     @else
-        <div class="mb-12">
-            <x-title-text
-                title="Your Digital"
-                highlight="Thoughts, Curated."
-                description="Organize your creative vision with precision and style. Every insight matters in your journey."
-            />
-
-
-            <livewire:projects.notebooks.create-notebook :project="$project"/>
-        </div>
-
-        <div>
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <flux:heading size="xl" class="mt-4 mb-2">All Notebook</flux:heading>
-
-                <livewire:projects.notebooks.filters/>
-            </div>
-
-            <flux:separator class="mt-6 mb-8"/>
-
-            <livewire:projects.notebooks.show-notebooks :project="$project"/>
-        </div>
+        <livewire:projects.notebooks.show-notebooks :project="$project" />
     @endif
 </div>

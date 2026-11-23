@@ -24,7 +24,7 @@ Herramienta: **Stitch** (proyecto `14584368472277721493`). Componentes de UI: Fl
 | Home del proyecto | "Home - Website Relaunch" | Implementado |
 | Tablero de tareas | "Tasks - Website Relaunch" y "Tasks - Task Detail Side Panel" | Implementado |
 | Inbox | "Inbox - Website Relaunch" y "Inbox - Process Mode Focus Panel" | Implementado |
-| Notebooks / editor | "Notebooks - Website Relaunch" y "Notebook Detail - Architecture" | Diseño aprobado; pendiente de implementar |
+| Notebooks / editor | "Notebooks - Website Relaunch" y "Notebook Detail - Architecture" | Implementado |
 | Decisions | "Decisions - Website Relaunch" y "Decision Detail - Livewire Single-File Components" | Implementado |
 | Archivos | "Files - Website Relaunch" y "Files - Drag and Drop Upload State" | Diseño aprobado; pendiente de implementar |
 | Settings de la cuenta | "Account Settings - FunWork" y "Account Settings - Integrations" | Diseño aprobado; pendiente de implementar |
@@ -164,14 +164,14 @@ Decisiones:
 
 Diferencias de Stitch que se corrigen en el código:
 
-- [ ] El índice de páginas lleva números (01–06): se quitan; el orden ya lo da la lista.
-- [ ] La página actual del índice no usa el resaltado del sistema: fondo blanco y texto naranja, como el ítem activo del sidebar.
-- [ ] El contador dice "2 of 12", pero el índice muestra 6 páginas: el índice lista todas las páginas (con scroll) y el contador coincide con la posición real.
-- [ ] "History" al pie de la página: FunWork no tiene historial de versiones; se quita.
-- [ ] El bloque de código muestra un nombre de archivo y "PHP 8.2" inventados: el bloque renderiza solo lo que trae el markdown.
-- [ ] La lista con viñetas aparece sin viñetas: usar los estilos de `.markdown-content`.
-- [ ] La etiqueta "Backend" del notebook abierto perdió su punto de color.
-- [ ] Definir el modo oscuro y mobile: en mobile, el índice de páginas pasa a un selector o a un panel desplegable arriba de la página.
+- [x] El índice de páginas lleva números (01–06): se quitan; el orden ya lo da la lista.
+- [x] La página actual del índice no usa el resaltado del sistema: fondo blanco y texto naranja, como el ítem activo del sidebar.
+- [x] El contador dice "2 of 12", pero el índice muestra 6 páginas: el índice lista todas las páginas (con scroll) y el contador coincide con la posición real.
+- [x] "History" al pie de la página: FunWork no tiene historial de versiones; se quita.
+- [x] El bloque de código muestra un nombre de archivo y "PHP 8.2" inventados: el bloque renderiza solo lo que trae el markdown.
+- [x] La lista con viñetas aparece sin viñetas: usar los estilos de `.markdown-content`.
+- [x] La etiqueta "Backend" del notebook abierto perdió su punto de color.
+- [x] Definir el modo oscuro y mobile: en mobile, el índice de páginas pasa a un selector o a un panel desplegable arriba de la página.
 
 ## Decisions: decisiones y ajustes para el código
 

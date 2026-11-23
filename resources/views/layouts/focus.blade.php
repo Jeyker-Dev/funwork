@@ -4,7 +4,7 @@
         @include('partials.head')
     </head>
 
-    <body class="min-h-screen bg-[#FAFAFA] dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans antialiased selection:bg-zinc-200 dark:selection:bg-zinc-700">
+    <body class="min-h-screen bg-surface text-ink font-sans antialiased selection:bg-surface-high">
         {{ $slot }}
 
         @fluxScripts

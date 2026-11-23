@@ -54,3 +54,12 @@ test('shortRelativeAge returns now under one minute and compact units from one m
         ->and(DateHelper::shortRelativeAge(now()->subMinute()))->toBe('1m')
         ->and(DateHelper::shortRelativeAge(now()->subHours(2)))->toBe('2h');
 });
+
+test('relativeAge returns just now under one minute and diffForHumans from one minute onward', function () {
+    $this->travelTo(Carbon::parse('2026-11-22 14:00:00', 'UTC'));
+
+    expect(DateHelper::relativeAge(now()))->toBe('just now')
+        ->and(DateHelper::relativeAge(now()->subSeconds(59)))->toBe('just now')
+        ->and(DateHelper::relativeAge(now()->subMinute()))->toBe('1 minute ago')
+        ->and(DateHelper::relativeAge(now()->subHours(2)))->toBe('2 hours ago');
+});

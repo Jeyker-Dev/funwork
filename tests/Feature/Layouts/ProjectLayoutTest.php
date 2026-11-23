@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Notebook;
+use App\Models\NotebookPage;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -108,4 +110,49 @@ test('project switcher allows truncation inside the flex header on narrow mobile
         ->and($switcher)->not->toBeNull()
         ->and($switcher->getAttribute('class'))->toContain('min-w-0')
         ->and($switcher->getAttribute('class'))->toContain('max-w-full');
+});
+
+test('top bar search renders on tasks and is hidden on notebooks, notebook editor, decisions, and history', function () {
+    $user = User::factory()->create();
+    $project = Project::factory()->create(['owner_id' => $user->id]);
+    $notebook = Notebook::factory()->create([
+        'project_id' => $project->id,
+        'created_by' => $user->id,
+    ]);
+    $page = NotebookPage::factory()->create([
+        'notebook_id' => $notebook->id,
+        'created_by' => $user->id,
+        'order' => 1,
+    ]);
+
+    $tasksHtml = $this->actingAs($user)->get(route('project.tasks', $project))->assertSuccessful()->getContent();
+    expect($tasksHtml)->toContain('Search tasks')
+        ->and($tasksHtml)->toContain('aria-label="Search"');
+
+    $urlsWithoutTopSearch = [
+        route('project.notebooks', $project),
+        route('project.notebooks.pages.edit', [$project, $notebook, $page]),
+        route('project.decisions', $project),
+        route('project.history', $project),
+        route('project.inbox', $project),
+        route('project.files', $project),
+        route('projects.show', $project),
+    ];
+
+    foreach ($urlsWithoutTopSearch as $url) {
+        $html = $this->actingAs($user)->get($url)->assertSuccessful()->getContent();
+        $dom = new DOMDocument;
+        @$dom->loadHTML($html);
+        $xpath = new DOMXPath($dom);
+
+        $header = $xpath->query('//header[@data-flux-header]')->item(0);
+        expect($header)->not->toBeNull();
+
+        $headerHtml = $dom->saveHTML($header);
+        $headerSearchButton = $xpath->query('.//button[@aria-label="Search"]', $header);
+        expect($headerSearchButton->length)->toBe(0)
+            ->and($headerHtml)->not->toContain('utilities.search-input')
+            ->and($headerHtml)->not->toContain('Search tasks')
+            ->and($headerHtml)->not->toContain('Search notebooks');
+    }
 });

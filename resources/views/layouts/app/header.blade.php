@@ -1,9 +1,6 @@
 @php
-    $placeholder = '';
-
-    if(request()->routeIs('project.tasks')) {
-        $placeholder = 'Search tasks';
-    }
+    $showSearch = request()->routeIs('project.tasks');
+    $placeholder = $showSearch ? 'Search tasks' : '';
 @endphp
 
 <flux:header class="bg-surface-low/90 dark:bg-surface-low/90 backdrop-blur-md flex items-center justify-between gap-2 sm:gap-4 px-3! sm:px-6! lg:px-8!">
@@ -13,7 +10,7 @@
         <livewire:projects.project-finder :project="$project"/>
     </div>
 
-    @if(!request()->routeIs('projects.show'))
+    @if($showSearch)
         <livewire:utilities.search-input
             :key="'header-search-desktop'"
             containerClass="hidden md:block min-w-0 flex-1 max-w-xs"
@@ -22,7 +19,7 @@
     @endif
 
     <div data-header-right class="flex items-center gap-0.5 sm:gap-2 shrink-0">
-        @if(!request()->routeIs('projects.show'))
+        @if($showSearch)
             <flux:dropdown position="bottom" align="end" class="md:hidden">
                 <flux:button variant="ghost" icon="magnifying-glass" aria-label="Search" class="min-h-11 min-w-11" />
 

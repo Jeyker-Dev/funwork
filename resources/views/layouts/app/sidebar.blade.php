@@ -36,7 +36,7 @@
             <flux:sidebar.item
                 icon="clipboard-document-list"
                 :href="route('project.notebooks', ['project' => $project])"
-                :current="request()->routeIs('project.notebooks' , ['project' => $project])"
+                :current="request()->routeIs('project.notebooks*')"
                 wire:navigate
             >
                 {{ __('Notebooks') }}
