@@ -1,5 +1,7 @@
 <?php
 
+use App\Actions\Projects\CreateDefaultAreasAction;
+use App\Enums\AreaColor;
 use App\Models\Notebook;
 use App\Models\NotebookPage;
 use App\Models\Project;
@@ -239,4 +241,109 @@ test('it shows muted empty state in preview when body is blank', function (): vo
     mountNotebookPageEditor($this->user, $this->project, $this->notebook, $emptyBodyPage)
         ->assertSee('Nothing to preview')
         ->assertDontSeeHtml('class="markdown-content');
+});
+
+test('it renders inside the project app layout with two panes by default and supports focus mode as an option', function (): void {
+    $response = $this->actingAs($this->user)
+        ->get(route('project.notebooks.pages.edit', [
+            'project' => $this->project,
+            'notebook' => $this->notebook,
+            'page' => $this->page,
+        ]));
+
+    $response->assertSuccessful()
+        ->assertSee('All notebooks')
+        ->assertSee('Focus mode')
+        ->assertSee('data-flux-sidebar', false);
+
+    $dom = new DOMDocument;
+    @$dom->loadHTML($response->getContent());
+    $xpath = new DOMXPath($dom);
+    $activeNotebooksLink = $xpath->query('//a[@data-flux-sidebar-item][@data-current][contains(., "Notebooks")]');
+    expect($activeNotebooksLink->length)->toBe(1);
+
+    $focusResponse = $this->actingAs($this->user)
+        ->get(route('project.notebooks.pages.edit', [
+            'project' => $this->project,
+            'notebook' => $this->notebook,
+            'page' => $this->page,
+            'focus' => 1,
+        ]));
+
+    $focusResponse->assertSuccessful()
+        ->assertSee('Exit focus mode')
+        ->assertDontSee('data-flux-sidebar', false);
+});
+
+test('it lists every page in the scrollable index without numbers, marks the active page, and matches N of M position', function (): void {
+    $pages = [$this->page];
+
+    for ($i = 2; $i <= 12; $i++) {
+        $pages[] = NotebookPage::factory()->create([
+            'notebook_id' => $this->notebook->id,
+            'created_by' => $this->user->id,
+            'order' => $i * 10,
+            'content' => ['title' => "Chapter {$i}", 'body' => "Body {$i}"],
+        ]);
+    }
+
+    // Add a page with duplicate order to verify N of M matches exact sorted index position
+    $duplicateOrderPage = NotebookPage::factory()->create([
+        'notebook_id' => $this->notebook->id,
+        'created_by' => $this->user->id,
+        'order' => 20,
+        'content' => ['title' => 'Extra Chapter', 'body' => 'Extra body'],
+    ]);
+
+    $targetPage = $pages[4]; // 5th created, order 50 -> 6th in (order, id) sorted list of 13 pages
+
+    $component = mountNotebookPageEditor($this->user, $this->project, $this->notebook, $targetPage);
+
+    $component->assertSee('Initial title')
+        ->assertSee('Chapter 12')
+        ->assertSee('Extra Chapter')
+        ->assertSee('6 of 13')
+        ->assertSeeHtml('aria-current="page"')
+        ->assertSeeHtml('shadow-[inset_3px_0_0_var(--color-brand)]')
+        ->assertSeeHtml('id="mobile-page-index"');
+
+    $dom = new DOMDocument;
+    @$dom->loadHTML($component->html());
+    $xpath = new DOMXPath($dom);
+    $desktopNavLinks = $xpath->query('//aside//nav[@aria-label="Notebook pages"]//a');
+    expect($desktopNavLinks->length)->toBe(13)
+        ->and(trim($desktopNavLinks->item(0)->textContent))->toBe('Initial title')
+        ->and(trim($desktopNavLinks->item(1)->textContent))->toBe('Chapter 2')
+        ->and(trim($desktopNavLinks->item(2)->textContent))->toBe('Extra Chapter');
+
+    expect($component->instance()->currentPageIndex())->toBe(6)
+        ->and($component->instance()->totalPages())->toBe(13)
+        ->and($duplicateOrderPage->id)->not->toBeNull();
+});
+
+test('it shows the notebook area tag with its color dot and omits history and orange top borders', function (): void {
+    app(CreateDefaultAreasAction::class)($this->project);
+    $backendArea = $this->project->areas()->where('slug', 'backend')->first();
+    $this->notebook->update(['area_id' => $backendArea->id]);
+
+    mountNotebookPageEditor($this->user, $this->project, $this->notebook, $this->page)
+        ->assertSee($backendArea->name)
+        ->assertSeeHtml(AreaColor::dotClassFor($backendArea->color))
+        ->assertDontSee('History')
+        ->assertDontSeeHtml('line-card')
+        ->assertDontSeeHtml('form-line');
+});
+
+test('it renders only markdown content in code blocks without invented file headers', function (): void {
+    $markdown = <<<'MD'
+    ```php
+    echo 'only markdown';
+    ```
+    MD;
+
+    mountNotebookPageEditor($this->user, $this->project, $this->notebook, $this->page)
+        ->set('content', $markdown)
+        ->assertSeeHtml('<pre><code class="language-php">')
+        ->assertDontSee('WorkspaceAggregateRoot.php')
+        ->assertDontSee('PHP 8.2');
 });

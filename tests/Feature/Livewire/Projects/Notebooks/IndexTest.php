@@ -13,8 +13,11 @@ test('index component mounts successfully and shows empty state', function () {
 
     $component = Livewire::test('pages::projects.notebooks.index', ['project' => $project]);
 
-    $component->assertSee('No Notebooks,')
-        ->assertSee('Yet.');
+    $component->assertSee('Notebooks')
+        ->assertSee('Create your first notebook')
+        ->assertSee('funwork:sync-docs')
+        ->assertDontSee('No Notebooks,')
+        ->assertDontSee('Yet.');
 });
 
 test('index component shows populated state when notebooks exist', function () {
@@ -31,6 +34,11 @@ test('index component shows populated state when notebooks exist', function () {
 
     $component = Livewire::test('pages::projects.notebooks.index', ['project' => $project]);
 
-    $component->assertSee('All Notebook')
+    $component->assertSee('Notebooks')
+        ->assertSee('New notebook')
+        ->assertSee('Existing Notebook')
+        ->assertDontSee('Your Digital')
+        ->assertDontSee('Thoughts, Curated.')
+        ->assertDontSee('All Notebook')
         ->assertSeeLivewire('projects.notebooks.show-notebooks');
 });

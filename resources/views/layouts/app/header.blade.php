@@ -3,6 +3,8 @@
 
     if(request()->routeIs('project.tasks')) {
         $placeholder = 'Search tasks';
+    } elseif(request()->routeIs('project.notebooks*')) {
+        $placeholder = 'Search notebooks';
     }
 @endphp
 
