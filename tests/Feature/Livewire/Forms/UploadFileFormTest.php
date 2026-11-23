@@ -111,3 +111,9 @@ test('it successfully uploads files to a specific folder', function () {
     expect($projectFile->name)->toBe('test.txt')
         ->and($projectFile->folder_id)->toBe($folder->id);
 });
+
+test('maxFileSizeLabel reflects the upload validation max rule', function () {
+    $expectedMb = (int) (UploadFileForm::MAX_FILE_SIZE_KB / 1024);
+
+    expect(UploadFileForm::maxFileSizeLabel())->toBe($expectedMb.' MB');
+});

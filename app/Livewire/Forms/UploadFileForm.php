@@ -9,20 +9,40 @@ use Flux\Flux;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
-use Livewire\Attributes\Validate;
 use Livewire\Form;
 
 class UploadFileForm extends Form
 {
+    public const int MAX_FILE_SIZE_KB = 102400;
+
+    private const int KILOBYTES_PER_MEGABYTE = 1024;
+
     public ?Project $project = null;
 
     public ?int $currentFolderId = null;
 
-    #[Validate([
-        'files' => 'required|array|min:1',
-        'files.*' => 'required|file|max:102400',
-    ])]
     public array $files = [];
+
+    public static function maxFileSizeLabel(): string
+    {
+        $megabytes = self::MAX_FILE_SIZE_KB / self::KILOBYTES_PER_MEGABYTE;
+        $formatted = (float) (int) $megabytes === (float) $megabytes
+            ? (string) (int) $megabytes
+            : number_format($megabytes, 1);
+
+        return "{$formatted} MB";
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected function rules(): array
+    {
+        return [
+            'files' => 'required|array|min:1',
+            'files.*' => 'required|file|max:'.self::MAX_FILE_SIZE_KB,
+        ];
+    }
 
     public function setContext(Project $project, ?int $currentFolderId = null): void
     {

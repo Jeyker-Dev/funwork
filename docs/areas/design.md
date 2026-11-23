@@ -26,7 +26,7 @@ Herramienta: **Stitch** (proyecto `14584368472277721493`). Componentes de UI: Fl
 | Inbox | "Inbox - Website Relaunch" y "Inbox - Process Mode Focus Panel" | Implementado |
 | Notebooks / editor | "Notebooks - Website Relaunch" y "Notebook Detail - Architecture" | Implementado |
 | Decisions | "Decisions - Website Relaunch" y "Decision Detail - Livewire Single-File Components" | Implementado |
-| Archivos | "Files - Website Relaunch" y "Files - Drag and Drop Upload State" | Diseño aprobado; pendiente de implementar |
+| Archivos | "Files - Website Relaunch" y "Files - Drag and Drop Upload State" | Implementado |
 | Settings de la cuenta | "Account Settings - FunWork" y "Account Settings - Integrations" | Diseño aprobado; pendiente de implementar |
 | Settings del proyecto (nueva) | "Project Settings - Website Relaunch" | Diseño aprobado; pendiente de implementar |
 | Historial del proyecto (nueva) | "History - Website Relaunch" | Implementado |
@@ -213,15 +213,15 @@ Decisiones:
 
 Diferencias de Stitch que se corrigen en el código:
 
-- [ ] "Upload" no usa el botón principal: va con el degradado de la marca.
-- [ ] El chip "All" casi no se ve seleccionado: usar el mismo estilo de chip seleccionado que Tasks y Notebooks.
-- [ ] La tarjeta seleccionada tiene borde azul y el checkbox no se ve: borde naranja (`brand`) y checkbox marcado visible.
-- [ ] Los PDF dicen "Document" y "Executive brief" debajo del ícono: la etiqueta dice el tipo real ("PDF", "Word document").
-- [ ] "Sorted by recent" no existe como opción: se quita, salvo que se agregue un orden real.
-- [ ] "1 selected" se parte en dos líneas en la barra flotante.
-- [ ] En el sidebar, el ícono de Inbox cambió a un sobre: mantener el ícono actual.
-- [ ] Las tarjetas de carpeta tienen muy poco contraste con el fondo.
-- [ ] Definir el modo oscuro, mobile (dos columnas de archivos, encabezado en dos filas) y el estado vacío.
+- [x] "Upload" no usa el botón principal: va con el degradado de la marca.
+- [x] El chip "All" casi no se ve seleccionado: usar el mismo estilo de chip seleccionado que Tasks y Notebooks.
+- [x] La tarjeta seleccionada tiene borde azul y el checkbox no se ve: borde naranja (`brand`) y checkbox marcado visible.
+- [x] Los PDF dicen "Document" y "Executive brief" debajo del ícono: la etiqueta dice el tipo real ("PDF", "Word document").
+- [x] "Sorted by recent" no existe como opción: se quita, salvo que se agregue un orden real.
+- [x] "1 selected" se parte en dos líneas en la barra flotante.
+- [x] En el sidebar, el ícono de Inbox cambió a un sobre: mantener el ícono actual.
+- [x] Las tarjetas de carpeta tienen muy poco contraste con el fondo.
+- [x] Definir el modo oscuro, mobile (dos columnas de archivos, encabezado en dos filas) y el estado vacío.
 
 ## Settings de la cuenta: decisiones y ajustes para el código
 

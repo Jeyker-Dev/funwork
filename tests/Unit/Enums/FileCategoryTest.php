@@ -29,3 +29,9 @@ test('previewClasses returns expected classes for each category', function () {
         ->and(FileCategory::Pdf->previewClasses())->toBe('text-red-500 bg-red-50 dark:bg-red-950/30 p-3 rounded-xl shadow-sm')
         ->and(FileCategory::Document->previewClasses())->toBe('text-blue-500 bg-blue-50 dark:bg-blue-950/30 p-3 rounded-xl shadow-sm');
 });
+
+test('filterLabel returns human readable plural labels for each category', function () {
+    expect(FileCategory::Image->filterLabel())->toBe('Images')
+        ->and(FileCategory::Pdf->filterLabel())->toBe('PDFs')
+        ->and(FileCategory::Document->filterLabel())->toBe('Documents');
+});

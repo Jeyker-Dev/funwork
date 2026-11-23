@@ -2,11 +2,13 @@
 
 use App\Livewire\Forms\FolderForm;
 use App\Models\Project;
+use Livewire\Attributes\Reactive;
 use Livewire\Component;
 
 new class extends Component {
     public Project $project;
 
+    #[Reactive]
     public ?int $currentFolderId = null;
 
     public FolderForm $form;

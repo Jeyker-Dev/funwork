@@ -2,6 +2,7 @@
 
 use App\Livewire\Forms\UploadFileForm;
 use App\Models\Project;
+use Livewire\Attributes\Reactive;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -10,6 +11,7 @@ new class extends Component {
 
     public Project $project;
 
+    #[Reactive]
     public ?int $currentFolderId = null;
 
     public UploadFileForm $form;
@@ -37,13 +39,14 @@ new class extends Component {
         <flux:heading size="lg" class="mb-4">Upload Files</flux:heading>
 
         <div class="mb-2">
-            <flux:label>Select files</flux:label>
-            <input type="file" multiple wire:model="form.files" class="block w-full text-sm text-ink-muted mt-2
+            <flux:label for="upload-modal-files">Select files</flux:label>
+            <input id="upload-modal-files" type="file" multiple wire:model="form.files" class="block w-full text-sm text-ink-muted mt-2
                 file:mr-4 file:py-2 file:px-4
-                file:rounded-md file:border-0
+                file:rounded-lg file:border-0
                 file:text-sm file:font-semibold
                 file:bg-brand-tint file:text-accent-content
                 hover:file:bg-surface-high" />
+            <p class="text-xs text-ink-subtle mt-1.5">Up to {{ UploadFileForm::maxFileSizeLabel() }} per file.</p>
         </div>
         <flux:error name="form.files" />
         <flux:error name="form.files.*" />

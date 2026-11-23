@@ -17,29 +17,29 @@ new class extends Component {
 }; ?>
 
 <flux:modal name="delete-confirmation" class="min-w-[22rem]">
-    <flux:heading size="lg" class="mb-4">Confirmar Eliminación</flux:heading>
-    
-    <div class="mb-6 text-gray-600 dark:text-gray-400">
-        ¿Estás seguro de que deseas eliminar 
+    <flux:heading size="lg" class="mb-4">Confirm deletion</flux:heading>
+
+    <div class="mb-6 text-ink-muted text-sm">
+        Are you sure you want to delete
         @if($selectedFoldersCount > 0)
-            <strong>{{ $selectedFoldersCount }} carpeta(s)</strong>
+            <strong class="text-ink">{{ $selectedFoldersCount }} {{ \Illuminate\Support\Str::plural('folder', $selectedFoldersCount) }}</strong>
         @endif
         @if($selectedFoldersCount > 0 && $selectedFilesCount > 0)
-            y 
+            and
         @endif
         @if($selectedFilesCount > 0)
-            <strong>{{ $selectedFilesCount }} archivo(s)</strong>
+            <strong class="text-ink">{{ $selectedFilesCount }} {{ \Illuminate\Support\Str::plural('file', $selectedFilesCount) }}</strong>
         @endif
-        ? Esta acción no se puede deshacer.
+        ? This action cannot be undone.
     </div>
 
     <div class="flex gap-2 justify-end mt-4">
         <flux:modal.close>
-            <flux:button variant="ghost" wire:loading.attr="disabled" wire:target="delete">Cancelar</flux:button>
+            <flux:button variant="ghost" wire:loading.attr="disabled" wire:target="delete" class="max-md:min-h-11">Cancel</flux:button>
         </flux:modal.close>
-        <flux:button variant="danger" wire:click="delete" wire:loading.attr="disabled" wire:target="delete">
-            <span wire:loading.remove wire:target="delete">Eliminar</span>
-            <span wire:loading wire:target="delete">Procesando...</span>
+        <flux:button variant="danger" wire:click="delete" wire:loading.attr="disabled" wire:target="delete" class="max-md:min-h-11">
+            <span wire:loading.remove wire:target="delete">Delete</span>
+            <span wire:loading wire:target="delete">Deleting...</span>
         </flux:button>
     </div>
 </flux:modal>

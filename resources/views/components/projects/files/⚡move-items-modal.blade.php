@@ -143,24 +143,24 @@ new class extends Component {
         </flux:breadcrumbs>
 
         <!-- Folder List -->
-        <div class="border rounded-lg max-h-60 overflow-y-auto p-2 border-gray-200 dark:border-gray-700">
+        <div class="border rounded-xl max-h-60 overflow-y-auto p-2 border-ghost bg-surface-card">
             @if($targetFolderId)
-                <div wire:click="navigateUp" class="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded cursor-pointer">
-                    <flux:icon.arrow-up-circle variant="outline" class="w-5 h-5 text-gray-500" />
+                <div wire:click="navigateUp" class="flex items-center gap-2 p-2 hover:bg-surface-low rounded-lg cursor-pointer text-ink">
+                    <flux:icon.arrow-up-circle variant="outline" class="w-5 h-5 text-ink-muted" />
                     <span>..</span>
                 </div>
             @endif
             
             @forelse($children as $child)
-                <div wire:click="navigateTo({{ $child->id }})" class="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded cursor-pointer">
-                    <flux:icon.folder variant="outline" class="w-5 h-5 text-blue-500" />
+                <div wire:click="navigateTo({{ $child->id }})" class="flex items-center gap-2 p-2 hover:bg-surface-low rounded-lg cursor-pointer text-ink">
+                    <flux:icon.folder variant="solid" class="w-5 h-5 text-brand" />
                     <span>{{ $child->name }}</span>
                 </div>
             @empty
                 @if(!$targetFolderId)
-                    <div class="p-2 text-sm text-gray-500">No folders available in root.</div>
+                    <div class="p-2 text-sm text-ink-muted">No folders available in root.</div>
                 @else
-                    <div class="p-2 text-sm text-gray-500">This folder is empty.</div>
+                    <div class="p-2 text-sm text-ink-muted">This folder is empty.</div>
                 @endif
             @endforelse
         </div>
