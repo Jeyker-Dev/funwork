@@ -2,4 +2,8 @@
     <flux:main>
         {{ $slot }}
     </flux:main>
+
+    @auth
+        <livewire:layout.quick-capture :project="$project ?? request()->route('project')" />
+    @endauth
 </x-layouts::app.body>

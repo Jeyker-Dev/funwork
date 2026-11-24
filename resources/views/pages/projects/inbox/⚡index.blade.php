@@ -73,6 +73,11 @@ class extends Component {
         $this->advanceProcessQueue();
     }
 
+    #[On('quick-capture-saved')]
+    public function refreshInbox(): void
+    {
+    }
+
     #[On('item-deleted')]
     #[On('item-converted')]
     public function handleItemProcessed(?int $id = null): void
