@@ -3,6 +3,7 @@
 use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\NotebookExportController;
 use App\Http\Controllers\ProjectFilePreviewController;
+use App\Http\Middleware\RememberLastVisitedProject;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -18,7 +19,7 @@ Route::get('/', static function (): RedirectResponse {
 // Public: Google's OAuth consent screen links here.
 Route::view('/privacy', 'privacy')->name('privacy');
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', RememberLastVisitedProject::class])->group(function () {
     Route::livewire('/projects', 'pages::projects.index')->name('projects');
     Route::livewire('/whats-new', 'pages::whats-new')->name('whats-new');
     Route::livewire('/notifications', 'pages::notifications.index')->name('notifications.index');
