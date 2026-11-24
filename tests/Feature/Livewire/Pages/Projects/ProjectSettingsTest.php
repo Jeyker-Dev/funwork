@@ -109,6 +109,76 @@ test('S2: non-owner cannot save general project settings', function () {
     expect($project->fresh()->name)->toBe('Original Name');
 });
 
+test('S2: project with legacy capitalized type and status loads normalized values and saves them', function () {
+    $owner = User::factory()->create();
+    $project = Project::factory()->create([
+        'owner_id' => $owner->id,
+        'name' => 'Legacy Project',
+        'description' => 'Created with legacy capitalized enum values.',
+        'icon' => 'wrench',
+        'type' => 'Programming',
+        'status' => 'Active',
+    ]);
+
+    Livewire::actingAs($owner)
+        ->test('pages::projects.settings', ['project' => $project])
+        ->assertSet('form.type', ProjectType::Programming->value)
+        ->assertSet('form.status', ProjectStatus::Active->value)
+        ->call('saveGeneral')
+        ->assertHasNoErrors();
+
+    $project->refresh();
+
+    expect($project->type)->toBe('programming')
+        ->and($project->status)->toBe('active');
+});
+
+test('S2: project with already-normalized type and status loads and saves unchanged', function () {
+    $owner = User::factory()->create();
+    $project = Project::factory()->create([
+        'owner_id' => $owner->id,
+        'name' => 'Normalized Project',
+        'description' => 'Already normalized values.',
+        'icon' => 'folder',
+        'type' => ProjectType::Design->value,
+        'status' => ProjectStatus::OnHold->value,
+    ]);
+
+    Livewire::actingAs($owner)
+        ->test('pages::projects.settings', ['project' => $project])
+        ->assertSet('form.type', 'design')
+        ->assertSet('form.status', 'on-hold')
+        ->call('saveGeneral')
+        ->assertHasNoErrors();
+
+    $project->refresh();
+
+    expect($project->type)->toBe('design')
+        ->and($project->status)->toBe('on-hold');
+});
+
+test('S2: project with unresolvable type or status loads empty values so validation asks for them', function () {
+    $owner = User::factory()->create();
+    $project = Project::factory()->create([
+        'owner_id' => $owner->id,
+        'name' => 'Unknown Enum Project',
+        'description' => 'Has unknown stored enum strings.',
+        'icon' => 'folder',
+        'type' => 'software',
+        'status' => 'archived',
+    ]);
+
+    Livewire::actingAs($owner)
+        ->test('pages::projects.settings', ['project' => $project])
+        ->assertSet('form.type', '')
+        ->assertSet('form.status', '')
+        ->call('saveGeneral')
+        ->assertHasErrors([
+            'form.type' => 'required',
+            'form.status' => 'required',
+        ]);
+});
+
 test('S3: areas card displays areas with color dot, name, task count, and supports adding, editing, reordering, and deleting areas', function () {
     $owner = User::factory()->create();
     $project = Project::factory()->create(['owner_id' => $owner->id]);
