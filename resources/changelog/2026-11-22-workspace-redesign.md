@@ -2,6 +2,14 @@
 date: 2026-11-22
 entries:
   - label: New
+    title: Project history
+    description: Follow a weekly timeline of completed tasks, accepted decisions, new notebooks, and uploaded files with type filters.
+    route: project.history
+    link_label: Open History
+  - label: New
+    title: What's new
+    description: Check recent product updates on this page, with an unread dot in the sidebar when there are updates you have not seen.
+  - label: New
     title: Decisions log and detail reader
     description: Browse architecture decisions with status filter chips, full-text search, and supersede chains.
     route: project.decisions
