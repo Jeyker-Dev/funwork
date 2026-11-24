@@ -1,22 +1,47 @@
-<div class="flex items-start max-md:flex-col">
-    <div class="me-10 w-full pb-4 md:w-[220px]">
-        <flux:navlist aria-label="{{ __('Settings') }}">
-            <flux:navlist.item :href="route('profile.edit')" wire:navigate>{{ __('Profile') }}</flux:navlist.item>
-            <flux:navlist.item :href="route('security.edit')" wire:navigate>{{ __('Security') }}</flux:navlist.item>
-            <flux:navlist.item :href="route('appearance.edit')" wire:navigate>{{ __('Appearance') }}</flux:navlist.item>
-            <flux:navlist.item :href="route('integrations.edit')" wire:navigate>{{ __('Integrations') }}</flux:navlist.item>
-            <flux:navlist.item :href="route('notifications.edit')" wire:navigate>{{ __('Notifications') }}</flux:navlist.item>
-        </flux:navlist>
-    </div>
+@props([
+    'heading' => null,
+    'subheading' => null,
+])
 
-    <flux:separator class="md:hidden" />
+@php
+    $navItems = [
+        ['label' => __('Profile'), 'route' => 'profile.edit', 'icon' => 'user-circle'],
+        ['label' => __('Security'), 'route' => 'security.edit', 'icon' => 'shield-check'],
+        ['label' => __('Appearance'), 'route' => 'appearance.edit', 'icon' => 'swatch'],
+        ['label' => __('Notifications'), 'route' => 'notifications.edit', 'icon' => 'bell'],
+        ['label' => __('Integrations'), 'route' => 'integrations.edit', 'icon' => 'puzzle-piece'],
+    ];
+@endphp
 
-    <div class="flex-1 self-stretch max-md:pt-6">
-        <flux:heading>{{ $heading ?? '' }}</flux:heading>
-        <flux:subheading>{{ $subheading ?? '' }}</flux:subheading>
+<div class="flex flex-col lg:flex-row gap-8 items-start">
+    <aside class="w-full lg:w-[240px] shrink-0">
+        <nav aria-label="{{ __('Settings') }}" class="grid grid-cols-2 sm:flex sm:flex-wrap lg:flex-col gap-1.5">
+            @foreach ($navItems as $item)
+                @php
+                    $isCurrent = request()->routeIs($item['route']);
+                @endphp
+                <a
+                    href="{{ route($item['route']) }}"
+                    wire:navigate
+                    @if ($isCurrent)
+                        aria-current="page"
+                        data-current="true"
+                    @endif
+                    data-flux-navlist-item
+                    @class([
+                        'flex items-center gap-3 px-4 py-3 min-h-11 rounded-xl text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand',
+                        'font-semibold' => $isCurrent,
+                        'text-ink-muted hover:text-ink hover:bg-surface-low font-medium' => ! $isCurrent,
+                    ])
+                >
+                    <flux:icon :name="$item['icon']" class="size-5 shrink-0" />
+                    <span class="truncate">{{ $item['label'] }}</span>
+                </a>
+            @endforeach
+        </nav>
+    </aside>
 
-        <div class="mt-5 w-full max-w-lg">
-            {{ $slot }}
-        </div>
+    <div class="flex-1 w-full min-w-0 flex flex-col gap-6">
+        {{ $slot }}
     </div>
 </div>

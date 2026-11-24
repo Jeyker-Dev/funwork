@@ -65,6 +65,46 @@ test('the integrations page lists only the current user tokens and revokes them'
         ->and(ApiToken::find($tokenB->id))->not->toBeNull();
 });
 
+test('the integrations page displays the Connect your AI agent card with the real MCP server URL, generic MCP client configuration snippet, and token table columns', function () {
+    config(['app.url' => 'https://funwork.example.com']);
+    url()->forceRootUrl('https://funwork.example.com');
+
+    $user = User::factory()->create();
+    ApiToken::factory()->for($user)->create([
+        'name' => 'Claude Code',
+        'last_used_at' => null,
+    ]);
+
+    $response = $this->actingAs($user)
+        ->get(route('integrations.edit'))
+        ->assertOk()
+        ->assertSee('Connect your AI agent')
+        ->assertSee('https://funwork.example.com/mcp/funwork')
+        ->assertSee('MCP client configuration')
+        ->assertDontSee('claude_desktop_config.json')
+        ->assertSee('API tokens')
+        ->assertSee('Claude Code')
+        ->assertSee('Google Docs');
+
+    $html = $response->getContent();
+    $dom = new DOMDocument;
+    @$dom->loadHTML($html);
+    $xpath = new DOMXPath($dom);
+
+    $headers = [];
+    foreach ($xpath->query('//table//thead//th') as $th) {
+        $headers[] = trim($th->textContent);
+    }
+
+    $codeText = $xpath->query('//pre//code')->item(0)?->textContent ?? '';
+
+    expect($headers)->toBe(['Name', 'Last used', 'Created', 'Actions'])
+        ->and($xpath->query('//table//thead//th[4]//span[contains(@class, "sr-only")]')->length)->toBe(1)
+        ->and($codeText)->toContain('"mcpServers"')
+        ->and($codeText)->toContain('"url": "https://funwork.example.com/mcp/funwork"')
+        ->and($codeText)->toContain('"Authorization": "Bearer YOUR_TOKEN"');
+});
+
 test('a user cannot revoke another user API token', function () {
     $userA = User::factory()->create();
     $userB = User::factory()->create();
