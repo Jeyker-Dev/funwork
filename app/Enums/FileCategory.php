@@ -2,6 +2,8 @@
 
 namespace App\Enums;
 
+use Illuminate\Contracts\Database\Eloquent\Builder;
+
 enum FileCategory: string
 {
     case Image = 'image';
@@ -18,6 +20,27 @@ enum FileCategory: string
             str_starts_with($mimeType, self::IMAGE_MIME_PREFIX) => self::Image,
             $mimeType === self::PDF_MIME_TYPE => self::Pdf,
             default => self::Document,
+        };
+    }
+
+    public function filterLabel(): string
+    {
+        return match ($this) {
+            self::Image => 'Images',
+            self::Pdf => 'PDFs',
+            self::Document => 'Documents',
+        };
+    }
+
+    public function applyFilter(Builder $query): Builder
+    {
+        return match ($this) {
+            self::Image => $query->where('mime_type', 'like', self::IMAGE_MIME_PREFIX.'%'),
+            self::Pdf => $query->where('mime_type', self::PDF_MIME_TYPE),
+            self::Document => $query->where(function (Builder $docQuery): void {
+                $docQuery->where('mime_type', 'not like', self::IMAGE_MIME_PREFIX.'%')
+                    ->where('mime_type', '!=', self::PDF_MIME_TYPE);
+            }),
         };
     }
 

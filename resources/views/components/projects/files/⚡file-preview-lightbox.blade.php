@@ -79,13 +79,13 @@ new class extends Component {
 x-on:open-lightbox.window="open($event.detail.id)"
 @keydown.window="if(Flux.modal('file-preview-lightbox')) handleKeydown($event)">
 
-    <flux:modal name="file-preview-lightbox" class="w-full max-w-7xl p-0 bg-white/60 backdrop-blur-xl">
+    <flux:modal name="file-preview-lightbox" class="w-full max-w-7xl p-0 bg-surface-card/90 dark:bg-zinc-900/90 backdrop-blur-xl">
         <template x-if="currentFile">
             <div class="flex flex-col h-[90vh] w-full overflow-hidden relative">
                 <!-- Header -->
-                <div class="flex items-center justify-between p-4 bg-black/10 backdrop-blur-sm shadow-sm z-50">
+                <div class="flex items-center justify-between p-4 bg-surface-low/80 backdrop-blur-sm border-b border-ghost z-50">
                     <div class="flex items-center gap-3 min-w-0">
-                        <div class="text-white p-2 bg-black/20 rounded-lg">
+                        <div class="text-brand p-2 bg-brand-tint rounded-lg">
                             <template x-if="currentFile.mime_type.startsWith('image/')">
                                 <flux:icon.photo class="w-6 h-6" />
                             </template>
@@ -97,21 +97,21 @@ x-on:open-lightbox.window="open($event.detail.id)"
                             </template>
                         </div>
                         <div class="min-w-0">
-                            <h3 class="text-lg font-medium text-gray-900 truncate" x-text="currentFile.name"></h3>
-                            <p class="text-sm text-gray-700" x-text="(currentFile.size / 1024 / 1024).toFixed(2) + ' MB'"></p>
+                            <h3 class="text-lg font-medium text-ink truncate" x-text="currentFile.name"></h3>
+                            <p class="text-sm text-ink-muted" x-text="(currentFile.size / 1024 / 1024).toFixed(2) + ' MB'"></p>
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <flux:button size="sm" variant="ghost" icon="arrow-down-tray" x-on:click="downloadCurrent">Download</flux:button>
+                        <flux:button size="sm" variant="ghost" icon="arrow-down-tray" x-on:click="downloadCurrent" class="max-md:min-h-11">Download</flux:button>
                     </div>
                 </div>
 
                 <!-- Main Content Area -->
-                <div class="flex-1 relative flex items-center justify-center bg-gray-100/50 backdrop-blur-md overflow-hidden">
+                <div class="flex-1 relative flex items-center justify-center bg-surface/60 backdrop-blur-md overflow-hidden">
                     
                     <!-- Navigation Previous -->
                     <button 
-                        class="absolute left-4 z-50 p-2 rounded-full bg-white/80 shadow-md text-gray-700 hover:bg-white hover:text-accent-content transition disabled:opacity-30 disabled:cursor-not-allowed"
+                        class="absolute left-4 z-50 p-2 max-md:min-h-11 max-md:min-w-11 flex items-center justify-center rounded-full bg-surface-card/90 border border-ghost shadow-ambient text-ink hover:text-accent-content transition disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                         x-on:click="prev()"
                         x-bind:disabled="currentIndex === 0"
                         title="Previous (Left Arrow)"
@@ -178,7 +178,7 @@ x-on:open-lightbox.window="open($event.detail.id)"
 
                     <!-- Navigation Next -->
                     <button 
-                        class="absolute right-4 z-50 p-2 rounded-full bg-white/80 shadow-md text-gray-700 hover:bg-white hover:text-accent-content transition disabled:opacity-30 disabled:cursor-not-allowed"
+                        class="absolute right-4 z-50 p-2 max-md:min-h-11 max-md:min-w-11 flex items-center justify-center rounded-full bg-surface-card/90 border border-ghost shadow-ambient text-ink hover:text-accent-content transition disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                         x-on:click="next()"
                         x-bind:disabled="currentIndex === files.length - 1"
                         title="Next (Right Arrow)"
