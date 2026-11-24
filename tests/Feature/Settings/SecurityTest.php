@@ -21,8 +21,11 @@ test('security settings page can be rendered', function () {
         ->withSession(['auth.password_confirmed_at' => time()])
         ->get(route('security.edit'))
         ->assertOk()
+        ->assertSee('Back to projects')
+        ->assertSee('Update password')
         ->assertSee('Two-factor authentication')
-        ->assertSee('Enable 2FA');
+        ->assertSee('Enable 2FA')
+        ->assertSee('bg-surface-card');
 });
 
 test('security settings page requires password confirmation when enabled', function () {

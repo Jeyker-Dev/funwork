@@ -27,7 +27,7 @@ Herramienta: **Stitch** (proyecto `14584368472277721493`). Componentes de UI: Fl
 | Notebooks / editor | "Notebooks - Website Relaunch" y "Notebook Detail - Architecture" | Implementado |
 | Decisions | "Decisions - Website Relaunch" y "Decision Detail - Livewire Single-File Components" | Implementado |
 | Archivos | "Files - Website Relaunch" y "Files - Drag and Drop Upload State" | Implementado |
-| Settings de la cuenta | "Account Settings - FunWork" y "Account Settings - Integrations" | Diseño aprobado; pendiente de implementar |
+| Settings de la cuenta | "Account Settings - FunWork" y "Account Settings - Integrations" | Implementado |
 | Settings del proyecto (nueva) | "Project Settings - Website Relaunch" | Diseño aprobado; pendiente de implementar |
 | Historial del proyecto (nueva) | "History - Website Relaunch" | Implementado |
 | What's new (nueva) | "What's new in FunWork" | Implementado |
@@ -236,11 +236,11 @@ Decisiones:
 
 Diferencias de Stitch que se corrigen en el código:
 
-- [ ] La barra superior agrega enlaces "Account Settings, Security, Billing, Notifications": se quitan; la navegación vive solo en la columna izquierda y FunWork no tiene "Billing".
-- [ ] La URL del servidor MCP de Stitch (`https://funwork.test/mcp`) es un ejemplo: se usa la URL real, `/mcp/funwork`.
-- [ ] El bloque de configuración se titula "claude_desktop_config.json": usar un título genérico ("MCP client configuration") y verificar que el formato del snippet sea el que aceptan los clientes que usamos (Claude Code, Antigravity).
-- [ ] La columna "Action" de la tabla de tokens no necesita título.
-- [ ] Definir el modo oscuro y mobile (la navegación lateral pasa a pestañas o a un selector arriba).
+- [x] La barra superior agrega enlaces "Account Settings, Security, Billing, Notifications": se quitan; la navegación vive solo en la columna izquierda y FunWork no tiene "Billing".
+- [x] La URL del servidor MCP de Stitch (`https://funwork.test/mcp`) es un ejemplo: se usa la URL real, `/mcp/funwork`.
+- [x] El bloque de configuración se titula "claude_desktop_config.json": usar un título genérico ("MCP client configuration") y verificar que el formato del snippet sea el que aceptan los clientes que usamos (Claude Code, Antigravity).
+- [x] La columna "Action" de la tabla de tokens no necesita título.
+- [x] Definir el modo oscuro y mobile (la navegación lateral pasa a pestañas o a un selector arriba).
 
 ## Settings del proyecto (pantalla nueva): decisiones y ajustes para el código
 

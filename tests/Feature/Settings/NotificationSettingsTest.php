@@ -32,7 +32,8 @@ test('user can update preferred delivery hour', function () {
         ->test('pages::settings.notifications')
         ->set('digestHour', 14)
         ->call('save')
-        ->assertHasNoErrors();
+        ->assertHasNoErrors()
+        ->assertDispatched('notifications-updated');
 
     $user->refresh();
     expect($user->digest_enabled)->toBeTrue()
