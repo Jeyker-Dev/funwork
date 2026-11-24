@@ -48,7 +48,7 @@ new class extends Component
 
         Flux::modal('global-quick-capture')->close();
 
-        $this->dispatch('inbox-item-captured');
+        $this->dispatch('quick-capture-saved');
     }
 };
 ?>

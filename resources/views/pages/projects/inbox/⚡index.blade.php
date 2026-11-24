@@ -73,7 +73,7 @@ class extends Component {
         $this->advanceProcessQueue();
     }
 
-    #[On('inbox-item-captured')]
+    #[On('quick-capture-saved')]
     public function refreshInbox(): void
     {
     }

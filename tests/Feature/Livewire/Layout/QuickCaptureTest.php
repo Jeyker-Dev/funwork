@@ -10,7 +10,7 @@ use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
 
-it('saves an idea to the current project inbox and dispatches inbox-item-captured', function () {
+it('saves an idea to the current project inbox and dispatches quick-capture-saved', function () {
     $user = User::factory()->create();
     $project = Project::factory()->create([
         'owner_id' => $user->id,
@@ -25,7 +25,7 @@ it('saves an idea to the current project inbox and dispatches inbox-item-capture
         ->call('save')
         ->assertHasNoErrors()
         ->assertSet('form.content', '')
-        ->assertDispatched('inbox-item-captured');
+        ->assertDispatched('quick-capture-saved');
 
     $item = InboxItem::query()->first();
 
@@ -62,7 +62,7 @@ it('remembers the last visited project in the session and saves to it outside a 
         ->set('form.content', 'Outside project idea')
         ->call('save')
         ->assertHasNoErrors()
-        ->assertDispatched('inbox-item-captured');
+        ->assertDispatched('quick-capture-saved');
 
     $item = InboxItem::query()->first();
 
@@ -98,7 +98,7 @@ it('falls back to the most recently active project when there is no session valu
         ->set('form.content', 'Fallback without session')
         ->call('save')
         ->assertHasNoErrors()
-        ->assertDispatched('inbox-item-captured');
+        ->assertDispatched('quick-capture-saved');
 
     expect(InboxItem::query()->latest('id')->first()?->project_id)->toBe($recentProject->id);
 
@@ -162,7 +162,7 @@ it('rejects empty content', function () {
     expect(InboxItem::query()->count())->toBe(0);
 });
 
-it('renders on non-project pages and refreshes an open inbox page on inbox-item-captured', function () {
+it('renders on non-project pages and refreshes an open inbox page on quick-capture-saved', function () {
     $user = User::factory()->create();
     $project = Project::factory()->create([
         'owner_id' => $user->id,
@@ -194,7 +194,7 @@ it('renders on non-project pages and refreshes an open inbox page on inbox-item-
         'content' => 'Captured via global shortcut',
     ]);
 
-    $inboxPage->dispatch('inbox-item-captured')
+    $inboxPage->dispatch('quick-capture-saved')
         ->assertSee('1 to process')
         ->assertSee('Captured via global shortcut');
 });
