@@ -206,3 +206,32 @@ test('appearance settings page renders with the shared layout and theme options'
         ->assertSee('System')
         ->assertSee('bg-surface-card');
 });
+
+test('mobile settings nav renders as a horizontally scrollable single row without truncating labels and scrolls active item into view', function () {
+    $user = User::factory()->create();
+
+    $html = $this->actingAs($user)
+        ->get(route('notifications.edit'))
+        ->assertOk()
+        ->getContent();
+
+    $dom = new DOMDocument;
+    @$dom->loadHTML($html);
+    $xpath = new DOMXPath($dom);
+
+    $nav = $xpath->query('//nav[@aria-label="Settings"]')->item(0);
+    expect($nav)->not->toBeNull()
+        ->and($nav->getAttribute('class'))->toContain('flex')
+        ->and($nav->getAttribute('class'))->toContain('overflow-x-auto')
+        ->and($nav->getAttribute('class'))->not->toContain('grid-cols-2');
+
+    $truncatedLabels = $xpath->query('//nav[@aria-label="Settings"]//*[contains(@class, "truncate")]');
+    expect($truncatedLabels->length)->toBe(0);
+
+    $activeLink = $xpath->query('//nav[@aria-label="Settings"]//a[@aria-current="page"]')->item(0);
+    expect($activeLink)->not->toBeNull()
+        ->and(trim($activeLink->textContent))->toBe('Notifications')
+        ->and($activeLink->getAttribute('data-current'))->toBe('true')
+        ->and($activeLink->getAttribute('class'))->toContain('min-h-11')
+        ->and($activeLink->getAttribute('class'))->toContain('shrink-0');
+});
