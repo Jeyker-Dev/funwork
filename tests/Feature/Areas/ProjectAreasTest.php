@@ -111,7 +111,7 @@ function createManageAreasFixture(): array
     app(CreateDefaultAreasAction::class)($project);
 
     $component = Livewire::actingAs($user)
-        ->test('projects.⚡manage-areas', ['project' => $project]);
+        ->test('pages::projects.settings', ['project' => $project]);
 
     return [$project, $component];
 }
@@ -215,14 +215,14 @@ test('duplicate slug in another project is allowed', function () {
     app(CreateDefaultAreasAction::class)($projectB);
 
     Livewire::actingAs($userA)
-        ->test('projects.⚡manage-areas', ['project' => $projectA])
+        ->test('pages::projects.settings', ['project' => $projectA])
         ->set('newName', 'QA')
         ->set('newColor', 'zinc')
         ->call('createArea')
         ->assertHasNoErrors();
 
     Livewire::actingAs($userB)
-        ->test('projects.⚡manage-areas', ['project' => $projectB])
+        ->test('pages::projects.settings', ['project' => $projectB])
         ->set('newName', 'QA')
         ->set('newColor', 'zinc')
         ->call('createArea')
@@ -238,7 +238,7 @@ test('another user is denied from managing areas', function () {
     $project = Project::factory()->create(['owner_id' => $owner->id]);
 
     Livewire::actingAs($other)
-        ->test('projects.⚡manage-areas', ['project' => $project])
+        ->test('pages::projects.settings', ['project' => $project])
         ->assertForbidden();
 });
 
@@ -263,7 +263,7 @@ test('deleting an area sets area_id to null on its tasks and notebooks without d
     ]);
 
     Livewire::actingAs($user)
-        ->test('projects.⚡manage-areas', ['project' => $project])
+        ->test('pages::projects.settings', ['project' => $project])
         ->call('confirmDelete', $area->id)
         ->call('deleteArea')
         ->assertHasNoErrors();

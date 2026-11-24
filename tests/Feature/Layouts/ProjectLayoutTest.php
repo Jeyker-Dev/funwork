@@ -62,7 +62,7 @@ test('all project screens render the updated sidebar and top bar without missing
         ->and(substr_count($header->textContent, 'Alpha Launch'))->toBe(1);
 
     $sidebarLinks = $xpath->query('//a[@data-flux-sidebar-item]');
-    expect($sidebarLinks->length)->toBe(8);
+    expect($sidebarLinks->length)->toBe(9);
 })->with([
     'home' => 'projects.show',
     'inbox' => 'project.inbox',
@@ -71,6 +71,7 @@ test('all project screens render the updated sidebar and top bar without missing
     'decisions' => 'project.decisions',
     'history' => 'project.history',
     'files' => 'project.files',
+    'settings' => 'project.settings',
 ]);
 
 test('top bar preserves search input on non-home project routes while hiding it on project home', function () {
@@ -136,6 +137,7 @@ test('top bar search renders on tasks and is hidden on notebooks, notebook edito
         route('project.history', $project),
         route('project.inbox', $project),
         route('project.files', $project),
+        route('project.settings', $project),
         route('projects.show', $project),
     ];
 

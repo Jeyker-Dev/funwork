@@ -31,6 +31,39 @@ class Project extends Model
 
     private const int FULL_PERCENT = 100;
 
+    /**
+     * @var list<string>
+     */
+    public const array SUPPORTED_ICONS = [
+        'wrench',
+        'pencil-square',
+        'eye',
+        'folder',
+        'document',
+        'home',
+        'cog',
+        'user',
+        'code-bracket',
+        'book-open',
+        'sparkles',
+        'cube',
+    ];
+
+    public function isArchived(): bool
+    {
+        return $this->archived_at !== null;
+    }
+
+    public function archive(): void
+    {
+        $this->update(['archived_at' => now()]);
+    }
+
+    public function unarchive(): void
+    {
+        $this->update(['archived_at' => null]);
+    }
+
     public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'owner_id');

@@ -67,6 +67,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::livewire('/projects/{project}/files', 'pages::projects.files.index')
         ->can('view', 'project')
         ->name('project.files');
+    Route::livewire('/projects/{project}/settings', 'pages::projects.settings')
+        ->can('view', 'project')
+        ->name('project.settings');
     Route::get('/projects/{project}/files/{projectFile}/preview', ProjectFilePreviewController::class)
         ->can('view', 'project')
         ->can('view', 'projectFile')

@@ -33,7 +33,16 @@
             </flux:dropdown>
         @endif
 
-        <livewire:projects.manage-areas :project="$project"/>
+        <flux:button
+            icon="tag"
+            variant="ghost"
+            :href="route('project.settings', ['project' => $project]).'#areas'"
+            wire:navigate
+            aria-label="Areas"
+            class="max-md:min-h-11 max-md:min-w-11 max-md:gap-0 max-md:px-2.5"
+        >
+            <span class="hidden md:inline">Areas</span>
+        </flux:button>
 
         <livewire:layout.notification-bell />
 
