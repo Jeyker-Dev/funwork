@@ -30,7 +30,8 @@
             <flux:button
                 size="sm"
                 variant="ghost"
-                x-on:click="Flux.modal('manage-areas-modal').show()"
+                :href="route('project.settings', ['project' => $project]).'#areas'"
+                wire:navigate
                 class="max-md:min-h-11"
             >
                 Manage areas

@@ -3,6 +3,8 @@
 namespace App\Livewire\Forms;
 
 use App\Actions\Projects\CreateDefaultAreasAction;
+use App\Enums\ProjectStatus;
+use App\Enums\ProjectType;
 use App\Models\Project;
 use Flux\Flux;
 use Illuminate\Support\Facades\Gate;
@@ -34,6 +36,35 @@ class ProjectForm extends Form
 
     #[Validate('required|integer')]
     public ?int $ownerId = null;
+
+    public function setProject(Project $project): void
+    {
+        $this->name = $project->name;
+        $this->description = (string) ($project->description ?? '');
+        $this->icon = $project->icon ?: 'folder';
+        $this->type = ProjectType::resolve($project->type)?->value ?? '';
+        $this->status = ProjectStatus::resolve($project->status)?->value ?? '';
+        $this->dueDate = $project->due_at ? substr((string) $project->due_at, 0, 10) : null;
+        $this->archiveDate = $project->archived_at ? substr((string) $project->archived_at, 0, 10) : null;
+        $this->ownerId = $project->owner_id;
+    }
+
+    public function update(Project $project): void
+    {
+        Gate::authorize('update', $project);
+
+        $this->ownerId = $project->owner_id;
+        $this->validate();
+
+        $project->update([
+            'name' => $this->name,
+            'description' => $this->description,
+            'icon' => $this->icon,
+            'type' => $this->type,
+            'status' => $this->status,
+            'due_at' => $this->dueDate ?: null,
+        ]);
+    }
 
     public function store(): void
     {

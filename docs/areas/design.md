@@ -28,7 +28,7 @@ Herramienta: **Stitch** (proyecto `14584368472277721493`). Componentes de UI: Fl
 | Decisions | "Decisions - Website Relaunch" y "Decision Detail - Livewire Single-File Components" | Implementado |
 | Archivos | "Files - Website Relaunch" y "Files - Drag and Drop Upload State" | Implementado |
 | Settings de la cuenta | "Account Settings - FunWork" y "Account Settings - Integrations" | Implementado |
-| Settings del proyecto (nueva) | "Project Settings - Website Relaunch" | Diseño aprobado; pendiente de implementar |
+| Settings del proyecto (nueva) | "Project Settings - Website Relaunch" | Implementado |
 | Historial del proyecto (nueva) | "History - Website Relaunch" | Implementado |
 | What's new (nueva) | "What's new in FunWork" | Implementado |
 
@@ -255,13 +255,13 @@ Decisiones:
 
 Diferencias de Stitch que se corrigen en el código:
 
-- [ ] El eyebrow "PROJECT CONFIGURATION • Settings & taxonomies" en mayúsculas: se quita; queda solo el título "Project settings".
-- [ ] La píldora "Scoped to Website relaunch" repite lo que ya dice el selector de proyecto: se quita.
-- [ ] La tarjeta "General" tiene una línea naranja superior: se quita.
-- [ ] "ID: PRJ-RELAUNCH-01" es un identificador inventado: se quita.
-- [ ] "Change icon" abre un selector con los íconos que ya soporta `icon-project`; no se suben imágenes.
-- [ ] El acceso a Areas de la barra superior lleva a esta tarjeta en lugar de abrir el modal suelto, o se mantiene el modal y se enlaza desde acá: decidir uno solo para no duplicar.
-- [ ] Definir el modo oscuro y mobile.
+- [x] El eyebrow "PROJECT CONFIGURATION • Settings & taxonomies" en mayúsculas: se quita; queda solo el título "Project settings".
+- [x] La píldora "Scoped to Website relaunch" repite lo que ya dice el selector de proyecto: se quita.
+- [x] La tarjeta "General" tiene una línea naranja superior: se quita.
+- [x] "ID: PRJ-RELAUNCH-01" es un identificador inventado: se quita.
+- [x] "Change icon" abre un selector con los íconos que ya soporta `icon-project`; no se suben imágenes.
+- [x] El acceso a Areas de la barra superior lleva a esta tarjeta en lugar de abrir el modal suelto, o se mantiene el modal y se enlaza desde acá: decidir uno solo para no duplicar.
+- [x] Definir el modo oscuro y mobile.
 
 ## Historial del proyecto (pantalla nueva): decisiones y ajustes para el código
 

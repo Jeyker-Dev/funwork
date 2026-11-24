@@ -82,6 +82,16 @@
         <flux:separator class="mb-3"/>
 
         <flux:sidebar.item
+            icon="cog"
+            :href="route('project.settings', ['project' => $project])"
+            :current="request()->routeIs('project.settings')"
+            :tooltip="__('Settings')"
+            wire:navigate
+        >
+            {{ __('Settings') }}
+        </flux:sidebar.item>
+
+        <flux:sidebar.item
             icon="sparkles"
             :href="route('whats-new')"
             :current="request()->routeIs('whats-new')"
