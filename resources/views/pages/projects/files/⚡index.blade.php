@@ -603,7 +603,7 @@ class extends Component
             @endif
         </header>
 
-        @if($hasAnyProjectItems || $currentFolderId !== null)
+        @if($currentFolderId !== null && !empty($breadcrumbs))
             <div wire:loading.remove.delay wire:target="navigateToFolder, navigateToRoot">
                 <x-projects.files.breadcrumbs :breadcrumbs="$breadcrumbs" />
             </div>

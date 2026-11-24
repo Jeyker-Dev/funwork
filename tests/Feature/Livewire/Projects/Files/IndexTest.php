@@ -615,3 +615,107 @@ test('S5: renders two-column mobile grid, 44px mobile touch targets, and preserv
     $sidebarHtml = view('layouts.app.sidebar', ['project' => $this->project])->render();
     expect($sidebarHtml)->toContain('Inbox');
 });
+
+test('list view image row renders preview thumbnail with soft-tinted fallback icon instead of an empty square', function () {
+    $this->actingAs($this->user);
+
+    $image = ProjectFile::factory()->create([
+        'project_id' => $this->project->id,
+        'created_by' => $this->user->id,
+        'name' => 'cover.png',
+        'mime_type' => 'image/png',
+    ]);
+    ProjectFile::factory()->create([
+        'project_id' => $this->project->id,
+        'created_by' => $this->user->id,
+        'name' => 'guide.pdf',
+        'mime_type' => 'application/pdf',
+    ]);
+    ProjectFile::factory()->create([
+        'project_id' => $this->project->id,
+        'created_by' => $this->user->id,
+        'name' => 'notes.docx',
+        'mime_type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    ]);
+
+    $html = Livewire::test('pages::projects.files.index', ['project' => $this->project])
+        ->call('setView', 'list')
+        ->html();
+
+    $dom = new DOMDocument;
+    @$dom->loadHTML($html);
+    $xpath = new DOMXPath($dom);
+
+    $imageRow = $xpath->query('//tr[contains(., "cover.png")]')->item(0);
+    expect($imageRow)->not->toBeNull();
+
+    $imageRowHtml = $dom->saveHTML($imageRow);
+    expect($imageRowHtml)->toContain(route('project.files.preview', [$this->project, $image]))
+        ->and($imageRowHtml)->toContain('bg-brand-tint')
+        ->and($xpath->query('.//svg', $xpath->query('.//td[2]', $imageRow)->item(0))->length)->toBeGreaterThan(0);
+
+    expect($html)->toContain('bg-red-50')
+        ->and($html)->toContain('bg-blue-50');
+});
+
+test('folder and file cards place selection checkbox next to the options menu in top-right without overlapping the icon and keep 44px touch targets', function () {
+    $this->actingAs($this->user);
+
+    Folder::factory()->create([
+        'project_id' => $this->project->id,
+        'created_by' => $this->user->id,
+        'name' => 'Brand assets',
+    ]);
+    ProjectFile::factory()->create([
+        'project_id' => $this->project->id,
+        'created_by' => $this->user->id,
+        'name' => 'logo.png',
+        'mime_type' => 'image/png',
+    ]);
+
+    $html = Livewire::test('pages::projects.files.index', ['project' => $this->project])->html();
+
+    $dom = new DOMDocument;
+    @$dom->loadHTML($html);
+    $xpath = new DOMXPath($dom);
+
+    $folderArticle = $xpath->query('//article[contains(., "Brand assets")]')->item(0);
+    expect($folderArticle)->not->toBeNull();
+    $folderControls = $xpath->query('.//*[@data-card-controls]', $folderArticle)->item(0);
+    expect($folderControls)->not->toBeNull()
+        ->and($xpath->query('.//input[@type="checkbox"]', $folderControls)->length)->toBe(1)
+        ->and($xpath->query('.//button', $folderControls)->length)->toBeGreaterThanOrEqual(1);
+
+    $folderLabel = $xpath->query('.//label', $folderControls)->item(0);
+    expect($folderLabel->getAttribute('class'))->toContain('max-md:min-h-11')
+        ->and($folderLabel->getAttribute('class'))->toContain('max-md:min-w-11');
+
+    $fileArticle = $xpath->query('//article[contains(., "logo.png")]')->item(0);
+    expect($fileArticle)->not->toBeNull();
+    $fileControls = $xpath->query('.//*[@data-card-controls]', $fileArticle)->item(0);
+    expect($fileControls)->not->toBeNull()
+        ->and($xpath->query('.//input[@type="checkbox"]', $fileControls)->length)->toBe(1)
+        ->and($xpath->query('.//button', $fileControls)->length)->toBeGreaterThanOrEqual(1);
+
+    $fileLabel = $xpath->query('.//label', $fileControls)->item(0);
+    expect($fileLabel->getAttribute('class'))->toContain('max-md:min-h-11')
+        ->and($fileLabel->getAttribute('class'))->toContain('max-md:min-w-11');
+});
+
+test('breadcrumbs are hidden at root and shown only when inside a folder', function () {
+    $this->actingAs($this->user);
+
+    $folder = Folder::factory()->create([
+        'project_id' => $this->project->id,
+        'created_by' => $this->user->id,
+        'name' => 'Brand assets',
+    ]);
+
+    $component = Livewire::test('pages::projects.files.index', ['project' => $this->project])
+        ->assertDontSeeHtml('data-files-breadcrumbs')
+        ->call('navigateToFolder', $folder->id)
+        ->assertSeeHtml('data-files-breadcrumbs')
+        ->assertSee('Brand assets')
+        ->call('navigateToRoot')
+        ->assertDontSeeHtml('data-files-breadcrumbs');
+});

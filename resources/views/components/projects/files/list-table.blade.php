@@ -161,13 +161,24 @@
                         <td class="py-3 px-4 min-w-48">
                             <div class="flex items-center gap-3 min-w-0">
                                 @if($category === FileCategory::Image)
-                                    <div class="size-8 rounded-lg bg-surface-low overflow-hidden shrink-0 border border-ghost">
+                                    <div
+                                        x-data="{ loaded: false, failed: false }"
+                                        x-init="if ($refs.thumb?.complete) { if ($refs.thumb.naturalWidth > 0) { loaded = true; } else { failed = true; } }"
+                                        class="relative size-8 rounded-lg bg-brand-tint text-brand overflow-hidden shrink-0 border border-ghost flex items-center justify-center"
+                                    >
+                                        <span x-show="!loaded || failed" class="flex items-center justify-center w-full h-full" aria-hidden="true">
+                                            <flux:icon :icon="$category->icon()" class="size-4" />
+                                        </span>
                                         <img
+                                            x-ref="thumb"
                                             src="{{ $previewUrl }}"
                                             alt="{{ $file->name }}"
                                             loading="lazy"
-                                            onerror="this.style.display='none'"
-                                            class="w-full h-full object-cover"
+                                            x-show="!failed"
+                                            x-on:load="loaded = true"
+                                            x-on:error="failed = true"
+                                            x-bind:class="loaded ? 'opacity-100' : 'opacity-0'"
+                                            class="absolute inset-0 z-10 w-full h-full object-cover transition-opacity duration-150"
                                         />
                                     </div>
                                 @else

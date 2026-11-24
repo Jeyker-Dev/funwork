@@ -21,36 +21,35 @@
         'border-ghost bg-surface-card hover:bg-surface-card' => ! $isSelected,
     ])
 >
-    <label
-        x-on:click.stop
-        @class([
-            'absolute top-1.5 left-1.5 z-30 inline-flex items-center justify-center p-1.5 max-md:min-h-11 max-md:min-w-11 cursor-pointer transition-opacity',
-            'opacity-100' => $isSelected,
-            'opacity-100 md:opacity-0 md:group-hover:opacity-100 md:focus-within:opacity-100' => ! $isSelected,
-        ])
-        aria-label="Select {{ $file->name }}"
-    >
-        <input
-            type="checkbox"
-            wire:model.live="selectedIds"
-            value="file_{{ $file->id }}"
-            @checked($isSelected)
-            class="peer sr-only"
-        />
-        <span
+    <div data-card-controls class="absolute top-1.5 right-1.5 z-30 flex items-center gap-0.5" x-on:click.stop>
+        <label
             @class([
-                'size-5 rounded-md border flex items-center justify-center transition-all duration-200 ease-out shadow-xs',
-                'bg-brand-strong border-brand-strong text-white' => $isSelected,
-                'bg-surface-card/90 backdrop-blur-sm border-ghost text-transparent peer-checked:bg-brand-strong peer-checked:border-brand-strong peer-checked:text-white' => ! $isSelected,
+                'inline-flex items-center justify-center p-1.5 max-md:min-h-11 max-md:min-w-11 cursor-pointer transition-opacity',
+                'opacity-100' => $isSelected,
+                'opacity-100 md:opacity-0 md:group-hover:opacity-100 md:focus-within:opacity-100' => ! $isSelected,
             ])
+            aria-label="Select {{ $file->name }}"
         >
-            <svg class="size-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-            </svg>
-        </span>
-    </label>
+            <input
+                type="checkbox"
+                wire:model.live="selectedIds"
+                value="file_{{ $file->id }}"
+                @checked($isSelected)
+                class="peer sr-only"
+            />
+            <span
+                @class([
+                    'size-5 rounded-md border flex items-center justify-center transition-all duration-200 ease-out shadow-xs',
+                    'bg-brand-strong border-brand-strong text-white' => $isSelected,
+                    'bg-surface-card/90 backdrop-blur-sm border-ghost text-transparent peer-checked:bg-brand-strong peer-checked:border-brand-strong peer-checked:text-white' => ! $isSelected,
+                ])
+            >
+                <svg class="size-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+            </span>
+        </label>
 
-    <div class="absolute top-1.5 right-1.5 z-20" x-on:click.stop>
         <flux:dropdown position="bottom" align="end">
             <flux:button
                 variant="ghost"
@@ -91,16 +90,26 @@
 
     <div class="h-28 sm:h-32 border-b border-ghost flex items-center justify-center relative overflow-hidden bg-surface-low">
         @if($category === FileCategory::Image)
-            <div class="absolute inset-0 flex items-center justify-center text-ink-subtle" aria-hidden="true">
-                <flux:icon.photo class="w-8 h-8" />
+            <div
+                x-data="{ loaded: false, failed: false }"
+                x-init="if ($refs.thumb?.complete) { if ($refs.thumb.naturalWidth > 0) { loaded = true; } else { failed = true; } }"
+                class="relative w-full h-full flex items-center justify-center bg-brand-tint text-brand"
+            >
+                <span x-show="!loaded || failed" class="flex items-center justify-center w-full h-full" aria-hidden="true">
+                    <flux:icon.photo class="w-8 h-8" />
+                </span>
+                <img
+                    x-ref="thumb"
+                    src="{{ $previewUrl }}"
+                    alt="{{ $file->name }}"
+                    loading="lazy"
+                    x-show="!failed"
+                    x-on:load="loaded = true"
+                    x-on:error="failed = true"
+                    x-bind:class="loaded ? 'opacity-100' : 'opacity-0'"
+                    class="absolute inset-0 z-10 w-full h-full object-cover transition-opacity duration-150"
+                />
             </div>
-            <img
-                src="{{ $previewUrl }}"
-                alt="{{ $file->name }}"
-                loading="lazy"
-                onerror="this.style.display='none'"
-                class="relative z-10 w-full h-full object-cover"
-            />
         @else
             <div class="relative z-10 {{ $category->previewClasses() }}">
                 <flux:icon :icon="$category->icon()" class="w-9 h-9 sm:w-10 sm:h-10" />
