@@ -33,6 +33,8 @@
             </flux:dropdown>
         @endif
 
+        <livewire:projects.copy-context-button :project="$project" />
+
         <flux:button
             icon="tag"
             variant="ghost"

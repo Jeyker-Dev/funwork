@@ -4,6 +4,7 @@ namespace App\Mcp\Servers;
 
 use App\Mcp\Tools\AddInboxItemTool;
 use App\Mcp\Tools\AddTaskTool;
+use App\Mcp\Tools\GetProjectBriefTool;
 use App\Mcp\Tools\GetTaskTool;
 use App\Mcp\Tools\ListDecisionsTool;
 use App\Mcp\Tools\ListInboxItemsTool;
@@ -29,6 +30,7 @@ class FunWorkServer extends Server
      */
     protected array $tools = [
         ListProjectsTool::class,
+        GetProjectBriefTool::class,
         ListTasksTool::class,
         GetTaskTool::class,
         UpdateTaskStatusTool::class,
