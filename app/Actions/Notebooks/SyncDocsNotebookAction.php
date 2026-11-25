@@ -8,11 +8,9 @@ use App\Models\Notebook;
 use App\Models\NotebookPage;
 use App\Models\Project;
 use Illuminate\Support\Facades\DB;
-use RuntimeException;
-use Symfony\Component\Finder\Finder;
 
 /**
- * Mirrors markdown documentation files from a directory into a project's Docs notebook.
+ * Mirrors markdown documentation files into a project's Docs notebook.
  */
 class SyncDocsNotebookAction
 {
@@ -20,20 +18,16 @@ class SyncDocsNotebookAction
 
     private const string AREA_NOTEBOOK_PREFIX = 'Docs · ';
 
-    private const string EXCLUDED_DIRECTORY = 'archive';
-
-    private const string SOURCE_PATH_PREFIX = 'docs/';
-
     private const int GOOGLE_DOC_SYNC_DELAY_MINUTES = 2;
 
     /**
+     * @param  array<string, string>  $files
      * @return array{created: int, updated: int, deleted: int}
      */
-    public function __invoke(Project $project, string $docsPath, ?Area $area = null): array
+    public function __invoke(Project $project, array $files, ?Area $area = null): array
     {
-        return DB::transaction(function () use ($project, $docsPath, $area): array {
+        return DB::transaction(function () use ($project, $files, $area): array {
             $notebook = $this->resolveNotebook($project, $area);
-            $files = $this->collectMarkdownFiles($docsPath);
             ['created' => $created, 'updated' => $updated] = $this->syncPages($notebook, $project, $files);
             $deleted = $this->pruneStalePages($notebook, array_keys($files));
 
@@ -76,32 +70,6 @@ class SyncDocsNotebookAction
         }
 
         return $notebook;
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    private function collectMarkdownFiles(string $docsPath): array
-    {
-        $finder = (new Finder)->files()->in($docsPath)->name('*.md')->exclude(self::EXCLUDED_DIRECTORY);
-        $files = [];
-
-        foreach ($finder as $file) {
-            $relativePath = str_replace('\\', '/', $file->getRelativePathname());
-            $sourcePath = self::SOURCE_PATH_PREFIX.ltrim($relativePath, '/');
-            $realPath = $file->getRealPath();
-            $body = $realPath !== false && is_readable($realPath) ? file_get_contents($realPath) : false;
-
-            if ($body === false) {
-                throw new RuntimeException("Could not read documentation file [{$file->getPathname()}].");
-            }
-
-            $files[$sourcePath] = $body;
-        }
-
-        ksort($files, SORT_NATURAL | SORT_FLAG_CASE);
-
-        return $files;
     }
 
     /**
