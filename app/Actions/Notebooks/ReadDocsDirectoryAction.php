@@ -35,8 +35,6 @@ class ReadDocsDirectoryAction
             $files[$sourcePath] = $body;
         }
 
-        ksort($files, SORT_NATURAL | SORT_FLAG_CASE);
-
         return $files;
     }
 }

@@ -26,6 +26,8 @@ class SyncDocsNotebookAction
      */
     public function __invoke(Project $project, array $files, ?Area $area = null): array
     {
+        ksort($files, SORT_NATURAL | SORT_FLAG_CASE);
+
         return DB::transaction(function () use ($project, $files, $area): array {
             $notebook = $this->resolveNotebook($project, $area);
             ['created' => $created, 'updated' => $updated] = $this->syncPages($notebook, $project, $files);

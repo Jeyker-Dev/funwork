@@ -225,3 +225,30 @@ it('syncs an area notebook from an in-memory files array', function (): void {
         ->and($notebook->name)->toBe('Docs · Backend')
         ->and($notebook->pages()->sole()->source_path)->toBe('docs/00-vision.md');
 });
+
+it('orders pages naturally and case-insensitively even when files arrive unsorted', function (): void {
+    $owner = User::factory()->create();
+    $project = Project::factory()->create(['owner_id' => $owner->id]);
+
+    $counts = app(SyncDocsNotebookAction::class)($project, [
+        'docs/sub/Guide.md' => '# Guide',
+        'docs/README.md' => '# Readme',
+        'docs/10-ten.md' => '# Ten',
+        'docs/areas/backend.md' => '# Backend',
+        'docs/2-two.md' => '# Two',
+        'docs/01-Alpha.md' => '# Alpha',
+    ]);
+
+    $notebook = Notebook::where('project_id', $project->id)->where('name', 'Docs')->sole();
+    $orderedPaths = $notebook->pages()->orderBy('order')->pluck('source_path', 'order')->all();
+
+    expect($counts)->toBe(['created' => 6, 'updated' => 0, 'deleted' => 0])
+        ->and($orderedPaths)->toBe([
+            1 => 'docs/01-Alpha.md',
+            2 => 'docs/2-two.md',
+            3 => 'docs/10-ten.md',
+            4 => 'docs/areas/backend.md',
+            5 => 'docs/README.md',
+            6 => 'docs/sub/Guide.md',
+        ]);
+});

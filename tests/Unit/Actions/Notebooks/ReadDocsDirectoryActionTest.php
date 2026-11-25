@@ -31,7 +31,7 @@ afterEach(function (): void {
     }
 });
 
-it('returns docs/ keys in natural case-insensitive order while excluding archive and non-markdown files', function (): void {
+it('returns docs/ keys while excluding archive and non-markdown files', function (): void {
     file_put_contents($this->tempDir.'/README.md', '# Project Docs');
     file_put_contents($this->tempDir.'/10-ten.md', '# Ten');
     file_put_contents($this->tempDir.'/2-two.md', '# Two');
@@ -51,7 +51,7 @@ it('returns docs/ keys in natural case-insensitive order while excluding archive
 
     $files = (new ReadDocsDirectoryAction)($this->tempDir);
 
-    expect(array_keys($files))->toBe([
+    expect(array_keys($files))->toEqualCanonicalizing([
         'docs/01-Alpha.md',
         'docs/2-two.md',
         'docs/10-ten.md',
@@ -59,6 +59,8 @@ it('returns docs/ keys in natural case-insensitive order while excluding archive
         'docs/README.md',
         'docs/sub/Guide.md',
     ])->and($files['docs/01-Alpha.md'])->toBe('# Alpha')
+        ->and($files['docs/2-two.md'])->toBe('# Two')
+        ->and($files['docs/10-ten.md'])->toBe('# Ten')
         ->and($files['docs/README.md'])->toBe('# Project Docs')
         ->and($files['docs/areas/backend.md'])->toBe('# Backend')
         ->and($files['docs/sub/Guide.md'])->toBe('# Guide');

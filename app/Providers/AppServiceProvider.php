@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Contracts\RepositoryDocsSource;
 use App\Models\RepositoryConnection;
 use App\Policies\RepositoryConnectionPolicy;
+use App\Services\GitHub\GitHubTokenDocsSource;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -18,7 +20,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(RepositoryDocsSource::class, GitHubTokenDocsSource::class);
     }
 
     /**
