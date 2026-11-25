@@ -11,6 +11,7 @@ use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;
 use Illuminate\Contracts\JsonSchema\JsonSchema;
+use Illuminate\JsonSchema\Types\Type;
 use Illuminate\Support\Facades\Gate;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
@@ -33,6 +34,16 @@ class AddTaskTool extends FunWorkTool
             'project_id' => $schema->integer()
                 ->required()
                 ->description('ID of the target project.'),
+            ...self::itemSchema($schema),
+        ];
+    }
+
+    /**
+     * @return array<string, Type>
+     */
+    public static function itemSchema(JsonSchema $schema): array
+    {
+        return [
             'title' => $schema->string()
                 ->required()
                 ->description('Task title (max 255 characters).'),

@@ -2,6 +2,8 @@
 
 namespace App\Livewire\Forms;
 
+use App\Actions\Notebooks\CreateNotebookAction;
+use App\Data\Notebooks\NotebookData;
 use App\Models\Notebook;
 use App\Models\Project;
 use Flux\Flux;
@@ -39,14 +41,21 @@ class NotebookForm extends Form
 
         $project = Project::findOrFail($this->projectId);
         Gate::authorize('create', [Notebook::class, $project]);
+        abort_if($this->createdBy !== auth()->id(), 403);
 
-        Notebook::create([
-            'project_id' => $this->projectId,
-            'created_by' => $this->createdBy,
-            'name' => $this->name,
-            'description' => filled($this->description) ? trim($this->description) : null,
-            'area_id' => $this->areaId ?: null,
-        ]);
+        $area = $this->areaId !== null
+            ? $project->areas()->find($this->areaId)
+            : null;
+
+        app(CreateNotebookAction::class)(
+            $project,
+            auth()->user(),
+            new NotebookData(
+                name: $this->name,
+                description: $this->description,
+            ),
+            $area,
+        );
 
         $this->reset();
 
