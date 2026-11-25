@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-24
+
+- Proxy de entrada compartido fuera de FunWork: el servicio `caddy` sale de `compose.prod.yml` y pasa a un stack propio en `~/proxy` del VPS, dueño de los puertos 80/443 y de los certificados (sigue usando el volumen `funwork_caddy_data`). La red `edge` ahora es externa: la crea el stack del proxy y FunWork solo se une. Cada dominio es un archivo en `~/proxy/sites/`, así que agregar o cambiar un sitio no requiere desplegar FunWork.
+
 ## 2026-11-21
 
 - Rediseño del login y pantallas de autenticación (`layouts/auth/split.blade.php`, `pages/auth/login.blade.php`, `components/auth/board-preview.blade.php`, `components/app-logo-icon.blade.php`, `resources/css/app.css`, `DESIGN.md`, `docs/areas/design.md`):
