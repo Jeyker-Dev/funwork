@@ -31,6 +31,11 @@ class UpdateRepositoryConnectionAction
                 'docs_path' => $input->docsPath,
             ];
 
+            if ($this->syncSourceChanges($connection, $attributes)) {
+                $attributes['last_synced_sha'] = null;
+                $attributes['last_synced_at'] = null;
+            }
+
             $token = $input->token !== null ? trim($input->token) : '';
 
             if ($token !== '') {
@@ -47,5 +52,19 @@ class UpdateRepositoryConnectionAction
 
             return $connection;
         });
+    }
+
+    /**
+     * Whether the update points the sync at a different repository, branch, folder or notebook,
+     * so the next sync must run even for an already synced commit.
+     *
+     * @param  array{area_id: ?int, repository: string, branch: string, docs_path: string}  $attributes
+     */
+    private function syncSourceChanges(RepositoryConnection $connection, array $attributes): bool
+    {
+        return $connection->repository !== $attributes['repository']
+            || $connection->branch !== $attributes['branch']
+            || $connection->docs_path !== $attributes['docs_path']
+            || $connection->area_id !== $attributes['area_id'];
     }
 }

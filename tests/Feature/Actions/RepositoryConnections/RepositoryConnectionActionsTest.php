@@ -364,3 +364,61 @@ it('forbids non-owners from invoking repository connection actions', function ()
         ->and(fn () => app(DeleteRepositoryConnectionAction::class)($connection, $otherUser))
         ->toThrow(AuthorizationException::class);
 });
+
+it('resets the last synced commit when the sync source changes', function (string $changedField) {
+    $owner = User::factory()->create();
+    $project = Project::factory()->create(['owner_id' => $owner->id]);
+    $area = Area::factory()->create(['project_id' => $project->id]);
+    $connection = RepositoryConnection::factory()->create([
+        'project_id' => $project->id,
+        'repository' => 'acme/app',
+        'branch' => 'main',
+        'docs_path' => 'docs',
+        'last_synced_sha' => 'abc123',
+        'last_synced_at' => now(),
+    ]);
+
+    $input = [
+        'repository' => 'acme/app',
+        'branch' => 'main',
+        'docsPath' => 'docs',
+        'token' => '',
+        'area' => null,
+    ];
+
+    $input = match ($changedField) {
+        'repository' => [...$input, 'repository' => 'acme/api'],
+        'branch' => [...$input, 'branch' => 'develop'],
+        'docs_path' => [...$input, 'docsPath' => 'documentation'],
+        'area' => [...$input, 'area' => $area],
+    };
+
+    $updated = app(UpdateRepositoryConnectionAction::class)($connection, $owner, new RepositoryConnectionData(...$input));
+
+    expect($updated->fresh()->last_synced_sha)->toBeNull()
+        ->and($updated->fresh()->last_synced_at)->toBeNull();
+})->with(['repository', 'branch', 'docs_path', 'area']);
+
+it('keeps the last synced commit when only the token changes', function () {
+    $owner = User::factory()->create();
+    $project = Project::factory()->create(['owner_id' => $owner->id]);
+    $connection = RepositoryConnection::factory()->create([
+        'project_id' => $project->id,
+        'repository' => 'acme/app',
+        'branch' => 'main',
+        'docs_path' => 'docs',
+        'last_synced_sha' => 'abc123',
+        'last_synced_at' => now(),
+    ]);
+
+    $updated = app(UpdateRepositoryConnectionAction::class)($connection, $owner, new RepositoryConnectionData(
+        repository: 'acme/app',
+        branch: 'main',
+        docsPath: 'docs',
+        token: 'ghp_rotated_9999',
+        area: null,
+    ));
+
+    expect($updated->fresh()->last_synced_sha)->toBe('abc123')
+        ->and($updated->fresh()->last_synced_at)->not->toBeNull();
+});
