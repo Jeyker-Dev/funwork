@@ -119,6 +119,11 @@ class Project extends Model
         return $this->hasMany(Decision::class, 'project_id');
     }
 
+    public function repositoryConnections(): HasMany
+    {
+        return $this->hasMany(RepositoryConnection::class, 'project_id');
+    }
+
     /**
      * @param  Builder<Project>  $query
      * @return Builder<Project>
