@@ -29,6 +29,7 @@ class UserFactory extends Factory
             'email' => fake()->unique()->safeEmail(),
             'timezone' => 'UTC',
             'digest_enabled' => true,
+            'digest_email_enabled' => false,
             'digest_hour' => User::DEFAULT_DIGEST_HOUR,
             'last_digest_sent_at' => null,
             'email_verified_at' => now(),

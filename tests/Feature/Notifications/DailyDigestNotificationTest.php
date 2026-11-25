@@ -216,3 +216,123 @@ it('includes task and project inbox deep links in database payload sections', fu
         ->and($payload['sections']['inbox_items'][0]['url'])->toBe(route('project.inbox', ['project' => $project->id]))
         ->and($payload['sections']['inbox_items'][0]['id'])->toBe($inboxItem->id);
 });
+
+it('excludes mail channel by default when dispatching digest job', function () {
+    Notification::fake();
+    $this->travelTo(Carbon::parse('2026-11-17 08:00:00', 'UTC'));
+
+    $user = User::factory()->create(['timezone' => 'UTC']);
+    $project = Project::factory()->create(['owner_id' => $user->id]);
+
+    Task::factory()->create([
+        'project_id' => $project->id,
+        'status' => TaskStatus::Todo,
+        'due_date' => '2026-11-17 00:00:00',
+    ]);
+
+    (new SendUserDailyDigestJob($user))->handle(app(BuildDailyDigestAction::class));
+
+    Notification::assertSentTo(
+        $user,
+        DailyDigestNotification::class,
+        fn (DailyDigestNotification $notification, array $channels): bool => $channels === ['database'],
+    );
+});
+
+it('includes mail channel in via() and dispatch when digest_email_enabled is true', function () {
+    Notification::fake();
+    $this->travelTo(Carbon::parse('2026-11-17 08:00:00', 'UTC'));
+
+    $user = User::factory()->create([
+        'timezone' => 'UTC',
+        'digest_email_enabled' => true,
+    ]);
+    $project = Project::factory()->create(['owner_id' => $user->id]);
+
+    Task::factory()->create([
+        'project_id' => $project->id,
+        'status' => TaskStatus::Todo,
+        'due_date' => '2026-11-17 00:00:00',
+    ]);
+
+    $digest = app(BuildDailyDigestAction::class)($user);
+    expect((new DailyDigestNotification($digest))->via($user))->toBe(['database', 'mail']);
+
+    $user->updatePushSubscription('https://fcm.googleapis.com/fcm/send/sub-mail', 'key', 'auth');
+    expect((new DailyDigestNotification($digest))->via($user))->toBe(['database', WebPushChannel::class, 'mail']);
+
+    (new SendUserDailyDigestJob($user))->handle(app(BuildDailyDigestAction::class));
+
+    Notification::assertSentTo(
+        $user,
+        DailyDigestNotification::class,
+        fn (DailyDigestNotification $notification, array $channels): bool => $channels === ['database', WebPushChannel::class, 'mail'],
+    );
+});
+
+it('suppresses notification when digest is empty even if digest_email_enabled is true', function () {
+    Notification::fake();
+
+    $user = User::factory()->create([
+        'timezone' => 'UTC',
+        'digest_email_enabled' => true,
+    ]);
+
+    (new SendUserDailyDigestJob($user))->handle(app(BuildDailyDigestAction::class));
+
+    Notification::assertNothingSent();
+});
+
+it('formats mail message with summary, sections, deep links, and notifications button', function () {
+    $this->travelTo(Carbon::parse('2026-11-17 08:00:00', 'UTC'));
+
+    $user = User::factory()->create([
+        'timezone' => 'UTC',
+        'digest_email_enabled' => true,
+    ]);
+    $project = Project::factory()->create(['owner_id' => $user->id, 'name' => 'Alpha']);
+
+    $overdueTask = Task::factory()->create([
+        'project_id' => $project->id,
+        'title' => '[Backend] Fix overdue sync',
+        'status' => TaskStatus::Todo,
+        'due_date' => '2026-11-16 00:00:00',
+    ]);
+
+    $todayTask = Task::factory()->create([
+        'project_id' => $project->id,
+        'title' => 'Ship daily digest email',
+        'status' => TaskStatus::Doing,
+        'due_date' => '2026-11-17 00:00:00',
+    ]);
+
+    $upcomingTask = Task::factory()->create([
+        'project_id' => $project->id,
+        'title' => 'Review Brevo quota',
+        'status' => TaskStatus::Todo,
+        'due_date' => '2026-11-19 00:00:00',
+    ]);
+
+    InboxItem::factory()->create([
+        'project_id' => $project->id,
+        'user_id' => $user->id,
+        'content' => 'Follow up on sender domain',
+    ]);
+
+    $digest = app(BuildDailyDigestAction::class)($user);
+    $mail = (new DailyDigestNotification($digest))->toMail($user);
+    $html = (string) $mail->render();
+
+    expect($mail->subject)->toBe('FunWork Daily Digest for 2026-11-17')
+        ->and($mail->actionUrl)->toBe(route('notifications.index'))
+        ->and($html)->toContain('You have 1 overdue task, 1 task due today, 1 upcoming task and 1 inbox item.')
+        ->and($html)->toContain('[Backend] Fix overdue sync')
+        ->and($html)->toContain(route('show.task', ['project' => $project->id, 'task' => $overdueTask->id]))
+        ->and($html)->toContain('Ship daily digest email')
+        ->and($html)->toContain(route('show.task', ['project' => $project->id, 'task' => $todayTask->id]))
+        ->and($html)->toContain('Review Brevo quota')
+        ->and($html)->toContain(route('show.task', ['project' => $project->id, 'task' => $upcomingTask->id]))
+        ->and($html)->toContain('Follow up on sender domain')
+        ->and($html)->toContain(route('project.inbox', ['project' => $project->id]))
+        ->and($html)->toContain(route('notifications.index'));
+});

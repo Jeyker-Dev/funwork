@@ -13,6 +13,9 @@ new #[Title('Notifications settings')] class extends Component
     #[Validate(['boolean'])]
     public bool $digestEnabled = true;
 
+    #[Validate(['boolean'])]
+    public bool $digestEmailEnabled = false;
+
     #[Validate(['required', 'integer', 'min:0', 'max:23'])]
     public int $digestHour = User::DEFAULT_DIGEST_HOUR;
 
@@ -21,6 +24,7 @@ new #[Title('Notifications settings')] class extends Component
         $user = Auth::user();
 
         $this->digestEnabled = (bool) $user->digest_enabled;
+        $this->digestEmailEnabled = (bool) $user->digest_email_enabled;
         $this->digestHour = (int) $user->digest_hour;
     }
 
@@ -35,6 +39,11 @@ new #[Title('Notifications settings')] class extends Component
         $this->save();
     }
 
+    public function updatedDigestEmailEnabled(): void
+    {
+        $this->save();
+    }
+
     public function save(): void
     {
         $validated = $this->validate();
@@ -42,6 +51,7 @@ new #[Title('Notifications settings')] class extends Component
         Auth::user()->updateDigestSettings(
             digestEnabled: (bool) $validated['digestEnabled'],
             digestHour: (int) $validated['digestHour'],
+            digestEmailEnabled: (bool) $validated['digestEmailEnabled'],
         );
 
         $this->dispatch('notifications-updated');
@@ -70,6 +80,13 @@ new #[Title('Notifications settings')] class extends Component
                 wire:model.live="digestEnabled"
                 :label="__('Enable morning digest')"
                 :description="__('Delivered at your preferred hour in your profile timezone (:timezone).', ['timezone' => auth()->user()->timezone ?? config('app.timezone')])"
+            />
+
+            <flux:switch
+                wire:model.live="digestEmailEnabled"
+                :disabled="! $digestEnabled"
+                :label="__('Email me the daily digest')"
+                :description="__('Also send the daily digest summary and links to :email.', ['email' => auth()->user()->email])"
             />
 
             <form wire:submit="save" class="space-y-6">
