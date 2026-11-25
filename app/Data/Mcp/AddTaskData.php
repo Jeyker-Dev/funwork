@@ -19,30 +19,48 @@ readonly class AddTaskData
         public ?string $dueDate,
     ) {}
 
+    /**
+     * @return array<string, array<int, mixed>>
+     */
+    public static function itemRules(string $prefix = ''): array
+    {
+        return [
+            "{$prefix}title" => ['required', 'string', 'max:255'],
+            "{$prefix}description" => ['required', 'string'],
+            "{$prefix}area" => ['nullable', 'string'],
+            "{$prefix}status" => ['nullable', 'string', Rule::enum(TaskStatus::class)],
+            "{$prefix}priority" => ['nullable', 'string', Rule::enum(TaskPriority::class)],
+            "{$prefix}due_date" => ['nullable', 'date_format:Y-m-d'],
+        ];
+    }
+
     public static function fromRequest(Request $request): self
     {
         $validated = $request->validate([
             'project_id' => ['required', 'integer'],
-            'title' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string'],
-            'area' => ['nullable', 'string'],
-            'status' => ['nullable', 'string', Rule::enum(TaskStatus::class)],
-            'priority' => ['nullable', 'string', Rule::enum(TaskPriority::class)],
-            'due_date' => ['nullable', 'date_format:Y-m-d'],
+            ...self::itemRules(),
         ]);
 
-        $areaKey = isset($validated['area']) && trim($validated['area']) !== ''
-            ? trim($validated['area'])
+        return self::fromValidated((int) $validated['project_id'], $validated);
+    }
+
+    /**
+     * @param  array<string, mixed>  $attributes
+     */
+    public static function fromValidated(int $projectId, array $attributes): self
+    {
+        $areaKey = isset($attributes['area']) && trim($attributes['area']) !== ''
+            ? trim($attributes['area'])
             : null;
 
         return new self(
-            projectId: (int) $validated['project_id'],
-            title: $validated['title'],
-            description: $validated['description'],
+            projectId: $projectId,
+            title: $attributes['title'],
+            description: $attributes['description'],
             areaKey: $areaKey,
-            status: isset($validated['status']) ? TaskStatus::from($validated['status']) : TaskStatus::Todo,
-            priority: isset($validated['priority']) ? TaskPriority::from($validated['priority']) : TaskPriority::Low,
-            dueDate: $validated['due_date'] ?? null,
+            status: filled($attributes['status'] ?? null) ? TaskStatus::from($attributes['status']) : TaskStatus::Todo,
+            priority: filled($attributes['priority'] ?? null) ? TaskPriority::from($attributes['priority']) : TaskPriority::Low,
+            dueDate: filled($attributes['due_date'] ?? null) ? $attributes['due_date'] : null,
         );
     }
 }

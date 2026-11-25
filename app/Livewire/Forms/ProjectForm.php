@@ -2,7 +2,8 @@
 
 namespace App\Livewire\Forms;
 
-use App\Actions\Projects\CreateDefaultAreasAction;
+use App\Actions\Projects\CreateProjectAction;
+use App\Data\Projects\ProjectData;
 use App\Enums\ProjectStatus;
 use App\Enums\ProjectType;
 use App\Models\Project;
@@ -73,18 +74,15 @@ class ProjectForm extends Form
         Gate::authorize('create', Project::class);
         abort_if($this->ownerId !== auth()->id(), 403);
 
-        $project = Project::create([
-            'name' => $this->name,
-            'description' => $this->description,
-            'icon' => $this->icon,
-            'type' => $this->type,
-            'archived_at' => $this->archiveDate ?: null,
-            'status' => $this->status,
-            'due_at' => $this->dueDate ?: null,
-            'owner_id' => $this->ownerId,
-        ]);
-
-        app(CreateDefaultAreasAction::class)($project);
+        app(CreateProjectAction::class)(auth()->user(), new ProjectData(
+            name: $this->name,
+            description: $this->description,
+            icon: $this->icon,
+            type: $this->type,
+            status: $this->status,
+            dueAt: $this->dueDate ?: null,
+            archivedAt: $this->archiveDate ?: null,
+        ));
 
         $this->reset();
 

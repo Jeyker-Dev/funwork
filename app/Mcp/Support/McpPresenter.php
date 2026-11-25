@@ -5,6 +5,8 @@ namespace App\Mcp\Support;
 use App\Models\Area;
 use App\Models\Decision;
 use App\Models\InboxItem;
+use App\Models\Notebook;
+use App\Models\NotebookPage;
 use App\Models\Project;
 use App\Models\Task;
 
@@ -35,6 +37,7 @@ class McpPresenter
             'id' => $project->id,
             'name' => $project->name,
             'description' => $project->description,
+            'type' => $project->type,
             'status' => $project->status,
             'archived_at' => $project->archived_at,
             'areas' => $project->areas->map(fn (Area $area): array => [
@@ -43,6 +46,40 @@ class McpPresenter
                 'slug' => $area->slug,
                 'color' => $area->color,
             ])->values()->all(),
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function notebook(Notebook $notebook): array
+    {
+        return [
+            'id' => $notebook->id,
+            'project_id' => $notebook->project_id,
+            'name' => $notebook->name,
+            'description' => $notebook->description,
+            'area' => self::area($notebook->area),
+            'created_at' => $notebook->created_at?->toISOString(),
+            'updated_at' => $notebook->updated_at?->toISOString(),
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function notebookPage(NotebookPage $page): array
+    {
+        $content = is_array($page->content) ? $page->content : [];
+
+        return [
+            'id' => $page->id,
+            'notebook_id' => $page->notebook_id,
+            'order' => $page->order,
+            'title' => (string) ($content['title'] ?? ''),
+            'body' => (string) ($content['body'] ?? ''),
+            'created_at' => $page->created_at?->toISOString(),
+            'updated_at' => $page->updated_at?->toISOString(),
         ];
     }
 
