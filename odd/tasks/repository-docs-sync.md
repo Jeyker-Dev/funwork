@@ -28,7 +28,7 @@ Branch: `feat/repository-docs-sync` · Delivery: `ask-on-risk`, one commit per t
 
 | ID | Specs | Route | Risk | Status | Commit |
 |----|-------|-------|------|--------|--------|
-| T1 | S1, S2 | Antigravity, inline | item 1 (prune deletes pages) | done | — |
+| T1 | S1, S2 | Antigravity, inline | item 1 (prune deletes pages) | done | `ece1fe1` |
 | T2 | S4, S5 | Antigravity, inline | item 2 (secrets), item 1 (migration) | pending | — |
 | T3 | S3, S6 | Antigravity, inline | item 2 (token use) | pending | — |
 | T4 | S7, S8 | Antigravity, inline | item 2 (public endpoint), item 4 (job concurrency) | pending | — |
