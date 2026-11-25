@@ -27,6 +27,7 @@ use NotificationChannels\WebPush\HasPushSubscriptions;
     'timezone',
     'profile_photo_path',
     'digest_enabled',
+    'digest_email_enabled',
     'digest_hour',
     'last_digest_sent_at',
     'last_seen_changelog_at',
@@ -52,6 +53,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'digest_enabled' => 'boolean',
+            'digest_email_enabled' => 'boolean',
             'digest_hour' => 'integer',
             'last_digest_sent_at' => 'datetime',
             'last_seen_changelog_at' => 'datetime',
@@ -78,11 +80,12 @@ class User extends Authenticatable
         return $latestReleaseDate->gt($this->last_seen_changelog_at);
     }
 
-    public function updateDigestSettings(bool $digestEnabled, int $digestHour): void
+    public function updateDigestSettings(bool $digestEnabled, int $digestHour, bool $digestEmailEnabled): void
     {
         $this->update([
             'digest_enabled' => $digestEnabled,
             'digest_hour' => $digestHour,
+            'digest_email_enabled' => $digestEmailEnabled,
         ]);
     }
 

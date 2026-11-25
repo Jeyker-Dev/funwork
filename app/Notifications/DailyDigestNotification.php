@@ -6,13 +6,28 @@ use App\Data\DailyDigestData;
 use App\Models\InboxItem;
 use App\Models\Task;
 use App\Models\User;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Collection;
+use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
 use NotificationChannels\WebPush\WebPushChannel;
 use NotificationChannels\WebPush\WebPushMessage;
 
 class DailyDigestNotification extends Notification
 {
+    private const int INBOX_PREVIEW_LIMIT = 120;
+
+    /**
+     * @var array<string, string>
+     */
+    private const array SECTION_LABELS = [
+        'overdue_tasks' => 'Overdue',
+        'today_tasks' => 'Due today',
+        'upcoming_tasks' => 'Upcoming',
+        'inbox_items' => 'Inbox',
+    ];
+
     public string $date;
 
     public string $summary;
@@ -62,7 +77,35 @@ class DailyDigestNotification extends Notification
             $channels[] = WebPushChannel::class;
         }
 
+        if ($notifiable instanceof User && $notifiable->digest_email_enabled) {
+            $channels[] = 'mail';
+        }
+
         return $channels;
+    }
+
+    public function toMail(object $notifiable): MailMessage
+    {
+        $mail = (new MailMessage)
+            ->subject('FunWork Daily Digest for '.$this->date)
+            ->greeting('Daily Digest for '.$this->date)
+            ->line($this->summary);
+
+        foreach (self::SECTION_LABELS as $sectionKey => $heading) {
+            $items = $this->sections[$sectionKey] ?? [];
+
+            if ($items === []) {
+                continue;
+            }
+
+            $mail->line(new HtmlString('<strong>'.e($heading).' ('.count($items).')</strong>'));
+
+            foreach ($items as $entry) {
+                $mail->line($this->formatMailSectionItem($sectionKey, $entry));
+            }
+        }
+
+        return $mail->action('View notifications', route('notifications.index'));
     }
 
     public function toWebPush(object $notifiable, Notification $notification): WebPushMessage
@@ -109,6 +152,29 @@ class DailyDigestNotification extends Notification
                 'task' => $task->id,
             ]),
         ])->values()->all();
+    }
+
+    /**
+     * @param  array<string, mixed>  $entry
+     */
+    private function formatMailSectionItem(string $sectionKey, array $entry): HtmlString
+    {
+        $label = $sectionKey === 'inbox_items'
+            ? Str::limit((string) $entry['content'], self::INBOX_PREVIEW_LIMIT)
+            : (string) $entry['title'];
+
+        $meta = (string) $entry['project_name'];
+
+        if ($sectionKey !== 'inbox_items' && ! empty($entry['due_date'])) {
+            $meta .= ' · '.$entry['due_date'];
+        }
+
+        return new HtmlString(sprintf(
+            '• <a href="%s">%s</a> (%s)',
+            e((string) $entry['url']),
+            e($label),
+            e($meta),
+        ));
     }
 
     /**
