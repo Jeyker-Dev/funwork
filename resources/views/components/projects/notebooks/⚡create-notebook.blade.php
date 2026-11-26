@@ -15,12 +15,22 @@ new class extends Component
 
     public string $buttonLabel = 'New notebook';
 
-    public function mount(Project $project, string $buttonLabel = 'New notebook'): void
-    {
+    public string $buttonVariant = 'primary';
+
+    public string $buttonClass = '';
+
+    public function mount(
+        Project $project,
+        string $buttonLabel = 'New notebook',
+        string $buttonVariant = 'primary',
+        string $buttonClass = '',
+    ): void {
         $this->authorize('view', $project);
 
         $this->project = $project;
         $this->buttonLabel = $buttonLabel;
+        $this->buttonVariant = $buttonVariant;
+        $this->buttonClass = $buttonClass;
         $this->form->projectId = $project->id;
 
         if (auth()->check()) {
@@ -45,7 +55,11 @@ new class extends Component
 
 <div>
     <flux:modal.trigger name="create-notebook">
-        <flux:button icon="plus" variant="primary" class="whitespace-nowrap shrink-0 max-md:min-h-11">
+        <flux:button
+            :icon="$buttonVariant === 'primary' ? 'plus' : null"
+            :variant="$buttonVariant"
+            class="whitespace-nowrap shrink-0 max-md:min-h-11 {{ $buttonClass }}"
+        >
             {{ $buttonLabel }}
         </flux:button>
     </flux:modal.trigger>

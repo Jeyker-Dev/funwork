@@ -202,8 +202,9 @@ test('asserts empty state rendering when the project has zero notebooks on index
     $this->actingAs($user);
 
     Livewire::test('pages::projects.notebooks.index', ['project' => $project])
-        ->assertSee('Create your first notebook')
-        ->assertSee('funwork:sync-docs')
+        ->assertSee('No notebooks yet')
+        ->assertSee('Write in FunWork')
+        ->assertSee('Connect a repository')
         ->assertDontSee('No Notebooks,')
         ->assertDontSee('Yet.');
 });
