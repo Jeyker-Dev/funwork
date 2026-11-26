@@ -15,6 +15,7 @@ class CreateRepositoryConnectionAction
 {
     public function __construct(
         private readonly ValidateRepositoryConnectionAction $validateConnection,
+        private readonly RequestRepositoryDocsSyncAction $requestSync,
     ) {}
 
     public function __invoke(Project $project, User $user, RepositoryConnectionData $input): RepositoryConnection
@@ -27,7 +28,7 @@ class CreateRepositoryConnectionAction
             throw EmptyRepositoryTokenException::make();
         }
 
-        return DB::transaction(function () use ($project, $input, $token): RepositoryConnection {
+        $connection = DB::transaction(function () use ($project, $input, $token): RepositoryConnection {
             ($this->validateConnection)($project, $input);
 
             $connection = RepositoryConnection::create([
@@ -47,5 +48,9 @@ class CreateRepositoryConnectionAction
 
             return $connection;
         });
+
+        ($this->requestSync)($connection);
+
+        return $connection;
     }
 }

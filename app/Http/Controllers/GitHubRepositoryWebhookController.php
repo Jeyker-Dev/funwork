@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\SyncRepositoryDocsJob;
+use App\Actions\RepositoryConnections\RequestRepositoryDocsSyncAction;
 use App\Models\RepositoryConnection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -17,7 +17,7 @@ class GitHubRepositoryWebhookController extends Controller
 
     private const string SIGNATURE_PREFIX = 'sha256=';
 
-    public function __invoke(Request $request, RepositoryConnection $connection): JsonResponse
+    public function __invoke(Request $request, RepositoryConnection $connection, RequestRepositoryDocsSyncAction $requestSync): JsonResponse
     {
         if (! $this->hasValidSignature($request, $connection)) {
             return response()->json(['status' => 'unauthorized'], Response::HTTP_UNAUTHORIZED);
@@ -43,7 +43,7 @@ class GitHubRepositoryWebhookController extends Controller
             return response()->json(['status' => 'ignored'], Response::HTTP_ACCEPTED);
         }
 
-        SyncRepositoryDocsJob::dispatch($connection);
+        $requestSync($connection);
 
         return response()->json(['status' => 'queued'], Response::HTTP_ACCEPTED);
     }

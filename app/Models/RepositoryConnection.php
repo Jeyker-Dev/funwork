@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'webhook_secret',
     'last_synced_sha',
     'last_synced_at',
+    'sync_requested_at',
     'status',
     'last_error',
 ])]
@@ -34,6 +35,10 @@ class RepositoryConnection extends Model
 
     public const int WEBHOOK_SECRET_LENGTH = 64;
 
+    public const int SYNC_PENDING_MINUTES = 10;
+
+    public const int SYNC_POLL_SECONDS = 3;
+
     private const int MASKED_TOKEN_VISIBLE_CHARS = 4;
 
     private const string MASKED_TOKEN_PREFIX = '••••';
@@ -44,6 +49,7 @@ class RepositoryConnection extends Model
             'token' => 'encrypted',
             'webhook_secret' => 'encrypted',
             'last_synced_at' => 'datetime',
+            'sync_requested_at' => 'datetime',
             'status' => RepositoryConnectionStatus::class,
         ];
     }
@@ -83,6 +89,36 @@ class RepositoryConnection extends Model
     }
 
     /**
+     * Records that a sync was queued, so the UI can show progress until the job finishes.
+     */
+    public function markSyncRequested(): void
+    {
+        $this->update([
+            'sync_requested_at' => now(),
+        ]);
+    }
+
+    /**
+     * Whether a queued sync is still pending. Requests older than the pending window are
+     * ignored so a stopped queue worker never leaves the UI polling forever.
+     */
+    public function isSyncing(): bool
+    {
+        return $this->sync_requested_at !== null
+            && $this->sync_requested_at->gt(now()->subMinutes(self::SYNC_PENDING_MINUTES));
+    }
+
+    /**
+     * Clears the pending sync request when the job finished without changes.
+     */
+    public function markSyncFinished(): void
+    {
+        $this->update([
+            'sync_requested_at' => null,
+        ]);
+    }
+
+    /**
      * Records a successful docs sync at the given commit SHA, restores Active status, and clears any prior error.
      */
     public function markSynced(string $commitSha): void
@@ -90,6 +126,7 @@ class RepositoryConnection extends Model
         $this->update([
             'last_synced_sha' => $commitSha,
             'last_synced_at' => now(),
+            'sync_requested_at' => null,
             'status' => RepositoryConnectionStatus::Active,
             'last_error' => null,
         ]);
@@ -102,6 +139,7 @@ class RepositoryConnection extends Model
     {
         $this->update([
             'status' => RepositoryConnectionStatus::Broken,
+            'sync_requested_at' => null,
             'last_error' => $error,
         ]);
     }
@@ -112,6 +150,7 @@ class RepositoryConnection extends Model
     public function recordError(string $error): void
     {
         $this->update([
+            'sync_requested_at' => null,
             'last_error' => $error,
         ]);
     }

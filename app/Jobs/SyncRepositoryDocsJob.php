@@ -69,6 +69,8 @@ class SyncRepositoryDocsJob implements ShouldBeUniqueUntilProcessing, ShouldQueu
             $headSha = $docsSource->headCommit($connection);
 
             if ($connection->isActive() && $connection->last_error === null && $connection->last_synced_sha === $headSha) {
+                $connection->markSyncFinished();
+
                 return;
             }
 
