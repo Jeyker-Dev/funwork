@@ -252,3 +252,73 @@ it('orders pages naturally and case-insensitively even when files arrive unsorte
             6 => 'docs/sub/Guide.md',
         ]);
 });
+
+it('preserves skipped source paths during prune without creating missing ones', function (): void {
+    $owner = User::factory()->create();
+    $project = Project::factory()->create(['owner_id' => $owner->id]);
+    $notebook = Notebook::factory()->for($project)->create([
+        'name' => 'Docs',
+        'created_by' => $owner->id,
+    ]);
+
+    $preservedPage = NotebookPage::factory()->create([
+        'notebook_id' => $notebook->id,
+        'source_path' => 'docs/huge.md',
+        'content' => ['title' => 'docs/huge.md', 'body' => 'Previous body'],
+        'order' => 1,
+        'created_by' => $owner->id,
+    ]);
+
+    NotebookPage::factory()->create([
+        'notebook_id' => $notebook->id,
+        'source_path' => 'docs/removed.md',
+        'content' => ['title' => 'docs/removed.md', 'body' => 'Removed body'],
+        'order' => 2,
+        'created_by' => $owner->id,
+    ]);
+
+    $counts = app(SyncDocsNotebookAction::class)(
+        $project,
+        ['docs/active.md' => '# Active'],
+        null,
+        ['docs/huge.md', 'docs/never-existed.md'],
+    );
+
+    expect($counts)->toBe(['created' => 1, 'updated' => 0, 'deleted' => 1])
+        ->and($preservedPage->fresh())->not->toBeNull()
+        ->and($preservedPage->fresh()->content)->toBe(['title' => 'docs/huge.md', 'body' => 'Previous body'])
+        ->and($notebook->pages()->where('source_path', 'docs/removed.md')->exists())->toBeFalse()
+        ->and($notebook->pages()->where('source_path', 'docs/never-existed.md')->exists())->toBeFalse()
+        ->and($notebook->pages()->pluck('source_path')->all())->toEqualCanonicalizing(['docs/huge.md', 'docs/active.md']);
+});
+
+it('preserves skipped source paths even when the synced files array is empty', function (): void {
+    $owner = User::factory()->create();
+    $project = Project::factory()->create(['owner_id' => $owner->id]);
+    $notebook = Notebook::factory()->for($project)->create([
+        'name' => 'Docs',
+        'created_by' => $owner->id,
+    ]);
+
+    $preservedPage = NotebookPage::factory()->create([
+        'notebook_id' => $notebook->id,
+        'source_path' => 'docs/huge.md',
+        'content' => ['title' => 'docs/huge.md', 'body' => 'Still here'],
+        'order' => 1,
+        'created_by' => $owner->id,
+    ]);
+
+    NotebookPage::factory()->create([
+        'notebook_id' => $notebook->id,
+        'source_path' => 'docs/deleted.md',
+        'content' => ['title' => 'docs/deleted.md', 'body' => 'Gone'],
+        'order' => 2,
+        'created_by' => $owner->id,
+    ]);
+
+    $counts = app(SyncDocsNotebookAction::class)($project, [], null, ['docs/huge.md']);
+
+    expect($counts)->toBe(['created' => 0, 'updated' => 0, 'deleted' => 1])
+        ->and($preservedPage->fresh())->not->toBeNull()
+        ->and($notebook->pages()->pluck('source_path')->all())->toBe(['docs/huge.md']);
+});

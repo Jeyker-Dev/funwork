@@ -22,16 +22,18 @@ class SyncDocsNotebookAction
 
     /**
      * @param  array<string, string>  $files
+     * @param  list<string>  $preservedSourcePaths
      * @return array{created: int, updated: int, deleted: int}
      */
-    public function __invoke(Project $project, array $files, ?Area $area = null): array
+    public function __invoke(Project $project, array $files, ?Area $area = null, array $preservedSourcePaths = []): array
     {
         ksort($files, SORT_NATURAL | SORT_FLAG_CASE);
 
-        return DB::transaction(function () use ($project, $files, $area): array {
+        return DB::transaction(function () use ($project, $files, $area, $preservedSourcePaths): array {
             $notebook = $this->resolveNotebook($project, $area);
             ['created' => $created, 'updated' => $updated] = $this->syncPages($notebook, $project, $files);
-            $deleted = $this->pruneStalePages($notebook, array_keys($files));
+            $retainedSourcePaths = array_values(array_unique([...array_keys($files), ...$preservedSourcePaths]));
+            $deleted = $this->pruneStalePages($notebook, $retainedSourcePaths);
 
             if ($created + $updated + $deleted > 0) {
                 $this->recordNotebookChanged($notebook);
@@ -127,14 +129,14 @@ class SyncDocsNotebookAction
     }
 
     /**
-     * @param  list<string>  $syncedSourcePaths
+     * @param  list<string>  $retainedSourcePaths
      */
-    private function pruneStalePages(Notebook $notebook, array $syncedSourcePaths): int
+    private function pruneStalePages(Notebook $notebook, array $retainedSourcePaths): int
     {
         $deleteQuery = $notebook->pages()->whereNotNull('source_path');
 
-        if ($syncedSourcePaths !== []) {
-            $deleteQuery->whereNotIn('source_path', $syncedSourcePaths);
+        if ($retainedSourcePaths !== []) {
+            $deleteQuery->whereNotIn('source_path', $retainedSourcePaths);
         }
 
         return $deleteQuery->delete();

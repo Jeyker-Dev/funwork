@@ -67,6 +67,18 @@ class RepositoryConnection extends Model
     }
 
     /**
+     * Records a successful docs sync at the given commit SHA and clears any prior error.
+     */
+    public function markSynced(string $commitSha): void
+    {
+        $this->update([
+            'last_synced_sha' => $commitSha,
+            'last_synced_at' => now(),
+            'last_error' => null,
+        ]);
+    }
+
+    /**
      * Generates a cryptographically secure random webhook secret.
      */
     public static function generateWebhookSecret(): string

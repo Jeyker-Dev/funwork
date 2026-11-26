@@ -3,6 +3,7 @@
 use App\Actions\RepositoryConnections\CreateRepositoryConnectionAction;
 use App\Actions\RepositoryConnections\DeleteRepositoryConnectionAction;
 use App\Actions\RepositoryConnections\RegenerateWebhookSecretAction;
+use App\Actions\RepositoryConnections\SyncRepositoryConnectionNowAction;
 use App\Actions\RepositoryConnections\UpdateRepositoryConnectionAction;
 use App\Data\RepositoryConnections\RepositoryConnectionData;
 use App\Enums\RepositoryConnectionStatus;
@@ -12,6 +13,7 @@ use App\Exceptions\RepositoryConnections\EmptyRepositoryTokenException;
 use App\Exceptions\RepositoryConnections\InvalidBranchException;
 use App\Exceptions\RepositoryConnections\InvalidDocsPathException;
 use App\Exceptions\RepositoryConnections\InvalidRepositoryException;
+use App\Jobs\SyncRepositoryDocsJob;
 use App\Models\Area;
 use App\Models\Notebook;
 use App\Models\NotebookPage;
@@ -19,6 +21,7 @@ use App\Models\Project;
 use App\Models\RepositoryConnection;
 use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Support\Facades\Queue;
 
 it('creates a repository connection with encrypted token and generated webhook secret', function () {
     $owner = User::factory()->create();
@@ -421,4 +424,33 @@ it('keeps the last synced commit when only the token changes', function () {
 
     expect($updated->fresh()->last_synced_sha)->toBe('abc123')
         ->and($updated->fresh()->last_synced_at)->not->toBeNull();
+});
+
+it('dispatches SyncRepositoryDocsJob when the owner triggers SyncRepositoryConnectionNowAction', function () {
+    Queue::fake();
+
+    $owner = User::factory()->create();
+    $project = Project::factory()->create(['owner_id' => $owner->id]);
+    $connection = RepositoryConnection::factory()->create(['project_id' => $project->id]);
+
+    app(SyncRepositoryConnectionNowAction::class)($connection, $owner);
+
+    Queue::assertPushed(
+        SyncRepositoryDocsJob::class,
+        fn (SyncRepositoryDocsJob $job): bool => $job->repositoryConnection->is($connection),
+    );
+});
+
+it('forbids another user from triggering SyncRepositoryConnectionNowAction', function () {
+    Queue::fake();
+
+    $owner = User::factory()->create();
+    $otherUser = User::factory()->create();
+    $project = Project::factory()->create(['owner_id' => $owner->id]);
+    $connection = RepositoryConnection::factory()->create(['project_id' => $project->id]);
+
+    expect(fn () => app(SyncRepositoryConnectionNowAction::class)($connection, $otherUser))
+        ->toThrow(AuthorizationException::class);
+
+    Queue::assertNothingPushed();
 });

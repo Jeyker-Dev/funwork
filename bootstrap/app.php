@@ -15,6 +15,9 @@ return Application::configure(basePath: dirname(__DIR__))
         // The app is only reachable through the Caddy proxy on the internal network,
         // so its X-Forwarded-* headers are trusted to detect HTTPS and the client IP.
         $middleware->trustProxies(at: '*');
+        $middleware->preventRequestForgery(except: [
+            'webhooks/github/repository-connections/*',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->dontReport(BusinessRuleException::class);
