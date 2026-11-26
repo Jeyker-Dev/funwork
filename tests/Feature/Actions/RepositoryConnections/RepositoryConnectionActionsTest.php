@@ -218,6 +218,8 @@ it('rejects creating a connection with an empty token', function () {
 });
 
 it('keeps the previous token when updating with an empty token and replaces it when provided', function () {
+    Queue::fake();
+
     $owner = User::factory()->create();
     $project = Project::factory()->create(['owner_id' => $owner->id]);
     $area = Area::factory()->create(['project_id' => $project->id]);
@@ -369,6 +371,8 @@ it('forbids non-owners from invoking repository connection actions', function ()
 });
 
 it('resets the last synced commit when the sync source changes', function (string $changedField) {
+    Queue::fake();
+
     $owner = User::factory()->create();
     $project = Project::factory()->create(['owner_id' => $owner->id]);
     $area = Area::factory()->create(['project_id' => $project->id]);
@@ -403,6 +407,8 @@ it('resets the last synced commit when the sync source changes', function (strin
 })->with(['repository', 'branch', 'docs_path', 'area']);
 
 it('keeps the last synced commit when only the token changes', function () {
+    Queue::fake();
+
     $owner = User::factory()->create();
     $project = Project::factory()->create(['owner_id' => $owner->id]);
     $connection = RepositoryConnection::factory()->create([
@@ -426,12 +432,47 @@ it('keeps the last synced commit when only the token changes', function () {
         ->and($updated->fresh()->last_synced_at)->not->toBeNull();
 });
 
-it('dispatches SyncRepositoryDocsJob when the owner triggers SyncRepositoryConnectionNowAction', function () {
+it('dispatches SyncRepositoryDocsJob when UpdateRepositoryConnectionAction saves an active or broken connection', function (RepositoryConnectionStatus $status) {
     Queue::fake();
 
     $owner = User::factory()->create();
     $project = Project::factory()->create(['owner_id' => $owner->id]);
-    $connection = RepositoryConnection::factory()->create(['project_id' => $project->id]);
+    $connection = RepositoryConnection::factory()->create([
+        'project_id' => $project->id,
+        'repository' => 'acme/app',
+        'branch' => 'main',
+        'docs_path' => 'docs',
+        'status' => $status,
+        'last_error' => $status === RepositoryConnectionStatus::Broken ? 'HTTP 401' : null,
+    ]);
+
+    app(UpdateRepositoryConnectionAction::class)($connection, $owner, new RepositoryConnectionData(
+        repository: 'acme/app',
+        branch: 'main',
+        docsPath: 'docs',
+        token: 'ghp_rotated_9999',
+        area: null,
+    ));
+
+    Queue::assertPushed(
+        SyncRepositoryDocsJob::class,
+        fn (SyncRepositoryDocsJob $job): bool => $job->repositoryConnection->is($connection),
+    );
+})->with([
+    'active connection' => RepositoryConnectionStatus::Active,
+    'broken connection' => RepositoryConnectionStatus::Broken,
+]);
+
+it('dispatches SyncRepositoryDocsJob when the owner triggers SyncRepositoryConnectionNowAction even if broken', function (RepositoryConnectionStatus $status) {
+    Queue::fake();
+
+    $owner = User::factory()->create();
+    $project = Project::factory()->create(['owner_id' => $owner->id]);
+    $connection = RepositoryConnection::factory()->create([
+        'project_id' => $project->id,
+        'status' => $status,
+        'last_error' => $status === RepositoryConnectionStatus::Broken ? 'HTTP 401' : null,
+    ]);
 
     app(SyncRepositoryConnectionNowAction::class)($connection, $owner);
 
@@ -439,7 +480,10 @@ it('dispatches SyncRepositoryDocsJob when the owner triggers SyncRepositoryConne
         SyncRepositoryDocsJob::class,
         fn (SyncRepositoryDocsJob $job): bool => $job->repositoryConnection->is($connection),
     );
-});
+})->with([
+    'active connection' => RepositoryConnectionStatus::Active,
+    'broken connection' => RepositoryConnectionStatus::Broken,
+]);
 
 it('forbids another user from triggering SyncRepositoryConnectionNowAction', function () {
     Queue::fake();

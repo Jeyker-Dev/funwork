@@ -33,6 +33,10 @@ class GitHubRepositoryWebhookController extends Controller
             return response()->json(['status' => 'ignored'], Response::HTTP_ACCEPTED);
         }
 
+        if ($connection->isBroken()) {
+            return response()->json(['status' => 'ignored'], Response::HTTP_ACCEPTED);
+        }
+
         $payload = json_decode($request->getContent(), true);
 
         if (! is_array($payload) || ! $this->shouldDispatchForPush($payload, $connection)) {

@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\GitHubRepositoryWebhookController;
 use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\NotebookExportController;
 use App\Http\Controllers\ProjectFilePreviewController;
@@ -19,11 +18,6 @@ Route::get('/', static function (): RedirectResponse {
 
 // Public: Google's OAuth consent screen links here.
 Route::view('/privacy', 'privacy')->name('privacy');
-
-// Public: GitHub repository webhooks verify HMAC-SHA256 signatures per connection.
-Route::post('/webhooks/github/repository-connections/{connection}', GitHubRepositoryWebhookController::class)
-    ->middleware('throttle:github-webhooks')
-    ->name('webhooks.github.repository-connections');
 
 Route::middleware(['auth', 'verified', RememberLastVisitedProject::class])->group(function () {
     Route::livewire('/projects', 'pages::projects.index')->name('projects');

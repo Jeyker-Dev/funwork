@@ -3,6 +3,7 @@
 use App\Jobs\SyncRepositoryDocsJob;
 use App\Models\RepositoryConnection;
 use Illuminate\Routing\Route as RoutingRoute;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Testing\TestResponse;
@@ -264,6 +265,60 @@ it('rate limits excessive webhook requests per connection', function (): void {
 
     postGitHubWebhook($connection, ['zen' => 'Too many'], event: 'ping')
         ->assertTooManyRequests();
+
+    Queue::assertNothingPushed();
+});
+
+it('creates no session row and sets no cookies on webhook deliveries', function (): void {
+    Queue::fake();
+
+    config(['session.driver' => 'database']);
+    app('session')->forgetDrivers();
+
+    $connection = RepositoryConnection::factory()->create([
+        'branch' => 'main',
+        'docs_path' => 'docs',
+    ]);
+
+    expect(DB::table('sessions')->count())->toBe(0);
+
+    $validResponse = postGitHubWebhook($connection, [
+        'ref' => 'refs/heads/main',
+        'deleted' => false,
+        'commits' => [['added' => ['docs/README.md']]],
+    ]);
+
+    $validResponse->assertAccepted();
+    expect(DB::table('sessions')->count())->toBe(0)
+        ->and($validResponse->headers->getCookies())->toBe([]);
+
+    $invalidResponse = postGitHubWebhook(
+        $connection,
+        ['ref' => 'refs/heads/main'],
+        signature: 'sha256='.str_repeat('0', 64),
+    );
+
+    $invalidResponse->assertUnauthorized();
+    expect(DB::table('sessions')->count())->toBe(0)
+        ->and($invalidResponse->headers->getCookies())->toBe([]);
+});
+
+it('returns 202 ignored and dispatches nothing when the connection is broken', function (): void {
+    Queue::fake();
+
+    $connection = RepositoryConnection::factory()->broken('GitHub authentication failed (HTTP 401).')->create([
+        'branch' => 'main',
+        'docs_path' => 'docs',
+    ]);
+
+    $response = postGitHubWebhook($connection, [
+        'ref' => 'refs/heads/main',
+        'deleted' => false,
+        'commits' => [['added' => ['docs/README.md']]],
+    ]);
+
+    $response->assertAccepted()
+        ->assertJson(['status' => 'ignored']);
 
     Queue::assertNothingPushed();
 });

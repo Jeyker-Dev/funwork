@@ -3,6 +3,7 @@
 namespace App\Actions\RepositoryConnections;
 
 use App\Data\RepositoryConnections\RepositoryConnectionData;
+use App\Jobs\SyncRepositoryDocsJob;
 use App\Models\RepositoryConnection;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -21,7 +22,7 @@ class UpdateRepositoryConnectionAction
     ): RepositoryConnection {
         Gate::forUser($user)->authorize('update', $connection);
 
-        return DB::transaction(function () use ($connection, $input): RepositoryConnection {
+        $updated = DB::transaction(function () use ($connection, $input): RepositoryConnection {
             ($this->validateConnection)($connection->project, $input, $connection);
 
             $attributes = [
@@ -52,6 +53,10 @@ class UpdateRepositoryConnectionAction
 
             return $connection;
         });
+
+        SyncRepositoryDocsJob::dispatch($updated);
+
+        return $updated;
     }
 
     /**

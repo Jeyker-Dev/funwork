@@ -67,14 +67,52 @@ class RepositoryConnection extends Model
     }
 
     /**
-     * Records a successful docs sync at the given commit SHA and clears any prior error.
+     * Whether the connection is active and eligible for automatic webhook syncs.
+     */
+    public function isActive(): bool
+    {
+        return $this->status === RepositoryConnectionStatus::Active;
+    }
+
+    /**
+     * Whether the connection is broken and paused until updated or manually resynced.
+     */
+    public function isBroken(): bool
+    {
+        return $this->status === RepositoryConnectionStatus::Broken;
+    }
+
+    /**
+     * Records a successful docs sync at the given commit SHA, restores Active status, and clears any prior error.
      */
     public function markSynced(string $commitSha): void
     {
         $this->update([
             'last_synced_sha' => $commitSha,
             'last_synced_at' => now(),
+            'status' => RepositoryConnectionStatus::Active,
             'last_error' => null,
+        ]);
+    }
+
+    /**
+     * Marks the connection as broken with a safe error summary.
+     */
+    public function markBroken(string $error): void
+    {
+        $this->update([
+            'status' => RepositoryConnectionStatus::Broken,
+            'last_error' => $error,
+        ]);
+    }
+
+    /**
+     * Records a safe error summary without altering the connection status.
+     */
+    public function recordError(string $error): void
+    {
+        $this->update([
+            'last_error' => $error,
         ]);
     }
 
