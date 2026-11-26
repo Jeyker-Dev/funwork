@@ -3,7 +3,6 @@
 namespace App\Actions\RepositoryConnections;
 
 use App\Data\RepositoryConnections\RepositoryConnectionData;
-use App\Jobs\SyncRepositoryDocsJob;
 use App\Models\RepositoryConnection;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -13,6 +12,7 @@ class UpdateRepositoryConnectionAction
 {
     public function __construct(
         private readonly ValidateRepositoryConnectionAction $validateConnection,
+        private readonly RequestRepositoryDocsSyncAction $requestSync,
     ) {}
 
     public function __invoke(
@@ -54,7 +54,7 @@ class UpdateRepositoryConnectionAction
             return $connection;
         });
 
-        SyncRepositoryDocsJob::dispatch($updated);
+        ($this->requestSync)($updated);
 
         return $updated;
     }

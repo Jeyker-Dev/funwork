@@ -257,6 +257,7 @@ new class extends Component
             'editingConnection' => $editingConnection,
             'removingConnection' => $removingConnection,
             'revealedWebhookSecret' => $revealedWebhookSecret,
+            'hasPendingSync' => $connections->contains(fn (RepositoryConnection $connection): bool => $connection->isSyncing()),
         ];
     }
 
@@ -291,6 +292,7 @@ new class extends Component
 <section
     id="repositories"
     aria-labelledby="repositories-settings-heading"
+    @if ($hasPendingSync) wire:poll.{{ \App\Models\RepositoryConnection::SYNC_POLL_SECONDS }}s @endif
     class="bg-surface-card rounded-2xl border border-ghost shadow-ambient p-5 sm:p-7 flex flex-col gap-6 scroll-mt-20"
 >
     <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
@@ -363,7 +365,14 @@ new class extends Component
                                         </span>
                                     @endif
 
-                                    @if ($isBroken)
+                                    @if ($connection->isSyncing())
+                                        <flux:badge size="sm" rounded color="amber">
+                                            <span class="inline-flex items-center gap-1.5" role="status">
+                                                <flux:icon.arrow-path class="size-3 animate-spin motion-reduce:animate-none" aria-hidden="true" />
+                                                <span>{{ __('Syncing…') }}</span>
+                                            </span>
+                                        </flux:badge>
+                                    @elseif ($isBroken)
                                         <flux:badge size="sm" rounded color="red">
                                             <span class="inline-flex items-center gap-1.5">
                                                 <span class="size-1.5 rounded-full bg-red-500" aria-hidden="true"></span>

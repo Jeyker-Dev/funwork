@@ -2,7 +2,6 @@
 
 namespace App\Actions\RepositoryConnections;
 
-use App\Jobs\SyncRepositoryDocsJob;
 use App\Models\RepositoryConnection;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
@@ -12,10 +11,14 @@ use Illuminate\Support\Facades\Gate;
  */
 class SyncRepositoryConnectionNowAction
 {
+    public function __construct(
+        private readonly RequestRepositoryDocsSyncAction $requestSync,
+    ) {}
+
     public function __invoke(RepositoryConnection $connection, User $user): void
     {
         Gate::forUser($user)->authorize('update', $connection);
 
-        SyncRepositoryDocsJob::dispatch($connection);
+        ($this->requestSync)($connection);
     }
 }
