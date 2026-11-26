@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-11-26
+
+- Sincronización automática de documentación desde repositorios GitHub (`RepositoryConnection`, `GitHubTokenDocsSource`, `GitHubRepositoryWebhookController`, `SyncRepositoryDocsJob`, `projects.repository-connections`, `pages::projects.notebooks.index`):
+  - Nueva tarjeta **Repositories** en Project Settings (`/projects/{project}/settings#repositories`) para conectar repositorios de GitHub (`owner/name`, rama, carpeta `docs/`, área opcional y personal access token cifrado mostrando solo los últimos 4 caracteres), con panel lateral de creación/edición, botón **Sync now**, guía en 3 pasos, URL y secreto de webhook copiables/regenerables y revocación con confirmación que conserva los notebooks existentes.
+  - Nuevo endpoint webhook público sin estado (`POST /webhooks/github/repository-connections/{connection}` en `routes/webhooks.php`) con verificación HMAC SHA-256 (`X-Hub-Signature-256`), límite de tasa por conexión y exclusión CSRF; al recibir pushes hacia la rama configurada que afecten la carpeta de docs, encola `SyncRepositoryDocsJob` (`ShouldBeUniqueUntilProcessing` + `WithoutOverlapping`) obteniendo el árbol completo vía GitHub Git Trees API sin depender de GitHub Actions.
+  - Manejo de fallos sin borrar ni alterar páginas existentes: respuestas `401`/`403`/`404` marcan la conexión como `Broken`, guardan un resumen seguro en `last_error`, notifican al dueño una sola vez (`RepositoryConnectionBrokenNotification` por base de datos y Web Push) y muestran un aviso con acceso directo a **Update token**.
+  - Renovación del estado vacío de Notebooks (`pages::projects.notebooks.index`) con dos opciones: **Write in FunWork** y **Connect a repository**, enlazando a la sección Repositories de ajustes del proyecto.
+
 ## 2026-11-24
 
 - Proxy de entrada compartido fuera de FunWork: el servicio `caddy` sale de `compose.prod.yml` y pasa a un stack propio en `~/proxy` del VPS, dueño de los puertos 80/443 y de los certificados (sigue usando el volumen `funwork_caddy_data`). La red `edge` ahora es externa: la crea el stack del proxy y FunWork solo se une. Cada dominio es un archivo en `~/proxy/sites/`, así que agregar o cambiar un sitio no requiere desplegar FunWork.

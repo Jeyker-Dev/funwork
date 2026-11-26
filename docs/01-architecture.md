@@ -40,21 +40,21 @@
 
 | Capa | Ubicación | Responsabilidad |
 |---|---|---|
-| Rutas | `routes/web.php`, `routes/settings.php`, `routes/ai.php` | Rutas full-page con `Route::livewire` bajo `auth` y endpoint MCP HTTP (`/mcp/funwork`) con `AuthenticateMcpWithApiToken`. |
+| Rutas | `routes/web.php`, `routes/settings.php`, `routes/ai.php`, `routes/webhooks.php` | Rutas full-page con `Route::livewire` bajo `auth`, endpoint MCP HTTP (`/mcp/funwork`) con `AuthenticateMcpWithApiToken` y webhooks públicos sin sesión (`/webhooks/github/...`). |
 | MCP | `app/Mcp/Servers`, `app/Mcp/Tools` | Servidor MCP (`FunWorkServer`) y herramientas para agentes externos (Antigravity): `list_projects`, `list_tasks`, `get_task`, `update_task_status`, `update_task_description`, `add_task`, `add_inbox_item`, `read_notebook`. |
 | Páginas | `resources/views/pages/**/⚡*.blade.php` | Componentes SFC que orquestan cada vista. |
 | Componentes | `resources/views/components/projects/**` | UI reutilizable por módulo. |
 | Form Objects | `app/Livewire/Forms` | Validación y persistencia de formularios. |
-| Actions | `app/Actions` (`Auth`, `Files`, `Fortify`, `Notebooks`, `Projects`, `Tasks`) | Lógica de negocio reutilizable. |
+| Actions | `app/Actions` (`Auth`, `Files`, `Fortify`, `Notebooks`, `Projects`, `RepositoryConnections`, `Tasks`) | Lógica de negocio reutilizable. |
 | Jobs / Notifications | `app/Jobs`, `app/Notifications` | Trabajo asíncrono y avisos al usuario. |
-| Modelos | `app/Models` | `Project`, `Area`, `Task`, `InboxItem`, `Notebook`, `NotebookPage`, `Folder`, `ProjectFile`, `GoogleAccount`, `ApiToken`, `User`. |
+| Modelos | `app/Models` | `Project`, `Area`, `Task`, `InboxItem`, `Notebook`, `NotebookPage`, `RepositoryConnection`, `Folder`, `ProjectFile`, `GoogleAccount`, `ApiToken`, `User`. |
 
 ## Convenciones críticas
 
 - Los componentes Livewire se crean **siempre** con `php artisan make:livewire`, nunca a mano.
 - No usar `Livewire\Volt\Volt`; en tests usar `Livewire::test()` / `Livewire::actingAs()`.
 - La lógica de negocio va en Actions o Form Objects, no en las vistas (skill `laravel-conventions`).
-- Autorización: todas las rutas `/projects/{project}/*`, componentes Livewire, Form Objects, Actions y herramientas MCP verifican propiedad mediante Policies en `app/Policies` (`ProjectPolicy`, `TaskPolicy`, `NotebookPolicy`, `NotebookPagePolicy`, `FolderPolicy`, `ProjectFilePolicy`, `InboxItemPolicy`).
+- Autorización: todas las rutas `/projects/{project}/*`, componentes Livewire, Form Objects, Actions y herramientas MCP verifican propiedad mediante Policies en `app/Policies` (`ProjectPolicy`, `TaskPolicy`, `NotebookPolicy`, `NotebookPagePolicy`, `RepositoryConnectionPolicy`, `FolderPolicy`, `ProjectFilePolicy`, `InboxItemPolicy`).
 
 ## Mapa de rutas
 
