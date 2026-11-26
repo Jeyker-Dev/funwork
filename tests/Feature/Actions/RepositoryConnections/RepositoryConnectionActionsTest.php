@@ -23,6 +23,8 @@ use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Queue;
 
+beforeEach(fn () => Queue::fake());
+
 it('creates a repository connection with encrypted token and generated webhook secret', function () {
     $owner = User::factory()->create();
     $project = Project::factory()->create(['owner_id' => $owner->id]);
