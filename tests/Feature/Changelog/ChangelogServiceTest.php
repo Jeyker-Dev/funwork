@@ -95,7 +95,7 @@ it('returns empty releases and null latest date when the changelog directory is 
 it('seeds resources/changelog with all real shipped releases in English', function () {
     $files = glob(resource_path('changelog/*.md'));
 
-    expect($files)->toHaveCount(4);
+    expect($files)->toHaveCount(7);
 
     $userWithProject = User::factory()->create();
     $project = Project::factory()->create(['owner_id' => $userWithProject->id]);
@@ -105,15 +105,20 @@ it('seeds resources/changelog with all real shipped releases in English', functi
     $releases = $service->releases($userWithProject);
 
     expect($releases->map(fn ($release) => $release->date->toDateString())->all())
-        ->toBe(['2026-11-24', '2026-11-23', '2026-11-22', '2026-11-21'])
+        ->toBe(['2026-11-26', '2026-11-25', '2026-11-24', '2026-11-23', '2026-11-22', '2026-11-21'])
         ->and($releases->map(fn ($release) => $release->formattedDate)->all())
-        ->toBe(['November 24, 2026', 'November 23, 2026', 'November 22, 2026', 'November 21, 2026']);
+        ->toBe(['November 26, 2026', 'November 25, 2026', 'November 24, 2026', 'November 23, 2026', 'November 22, 2026', 'November 21, 2026']);
 
     $allTitles = $releases
         ->flatMap(fn ($release) => $release->entries->pluck('title'))
         ->implode(' | ');
 
     expect($allTitles)
+        ->toContain('GitHub repository docs sync')
+        ->toContain('Daily digest by email')
+        ->toContain('Copy context for AI')
+        ->toContain('MCP project kickoff')
+        ->toContain('Global quick capture')
         ->toContain('Account settings')
         ->toContain('Project settings')
         ->toContain('Notebooks')
@@ -134,7 +139,12 @@ it('seeds resources/changelog with all real shipped releases in English', functi
         ->flatMap(fn ($release) => $release->entries)
         ->keyBy('title');
 
-    expect($entriesByTitle['Account settings']->url)->toBe(route('profile.edit'))
+    expect($entriesByTitle['GitHub repository docs sync']->url)->toBe(route('project.settings', ['project' => $project]))
+        ->and($entriesByTitle['Daily digest by email']->url)->toBe(route('notifications.edit'))
+        ->and($entriesByTitle['Copy context for AI']->url)->toBe(route('projects.show', ['project' => $project]))
+        ->and($entriesByTitle['MCP project kickoff']->url)->toBe(route('integrations.edit'))
+        ->and($entriesByTitle['Global quick capture']->url)->toBe(route('project.inbox', ['project' => $project]))
+        ->and($entriesByTitle['Account settings']->url)->toBe(route('profile.edit'))
         ->and($entriesByTitle['Project settings']->url)->toBe(route('project.settings', ['project' => $project]))
         ->and($entriesByTitle['Notebooks']->url)->toBe(route('project.notebooks', ['project' => $project]))
         ->and($entriesByTitle['Files']->url)->toBe(route('project.files', ['project' => $project]))
@@ -147,8 +157,13 @@ it('seeds resources/changelog with all real shipped releases in English', functi
         ->flatMap(fn ($release) => $release->entries)
         ->keyBy('title');
 
-    expect($withoutProjectEntries['Account settings']->url)->toBe(route('profile.edit'))
+    expect($withoutProjectEntries['Daily digest by email']->url)->toBe(route('notifications.edit'))
+        ->and($withoutProjectEntries['MCP project kickoff']->url)->toBe(route('integrations.edit'))
+        ->and($withoutProjectEntries['Account settings']->url)->toBe(route('profile.edit'))
         ->and($withoutProjectEntries['Projects overview']->url)->toBe(route('projects'))
+        ->and($withoutProjectEntries['GitHub repository docs sync']->url)->toBeNull()
+        ->and($withoutProjectEntries['Copy context for AI']->url)->toBeNull()
+        ->and($withoutProjectEntries['Global quick capture']->url)->toBeNull()
         ->and($withoutProjectEntries['Project settings']->url)->toBeNull()
         ->and($withoutProjectEntries['Notebooks']->url)->toBeNull()
         ->and($withoutProjectEntries['Files']->url)->toBeNull()

@@ -43,16 +43,18 @@ it('redirects guests from whats-new and renders for authenticated users outside 
 });
 
 it('renders seeded releases with colored pills, quiet links, and marks groups newer than last visit before updating last_seen_changelog_at', function () {
-    Carbon::setTestNow('2026-11-24 15:00:00');
+    Carbon::setTestNow('2026-11-26 15:00:00');
 
     $user = User::factory()->create([
-        'last_seen_changelog_at' => Carbon::parse('2026-11-23 18:00:00'),
+        'last_seen_changelog_at' => Carbon::parse('2026-11-25 18:00:00'),
     ]);
     $project = Project::factory()->create(['owner_id' => $user->id]);
 
     $firstVisit = $this->actingAs($user)
         ->get(route('whats-new'))
         ->assertSuccessful()
+        ->assertSee('November 26, 2026')
+        ->assertSee('November 25, 2026')
         ->assertSee('November 24, 2026')
         ->assertSee('November 23, 2026')
         ->assertSee('November 22, 2026')
@@ -67,8 +69,12 @@ it('renders seeded releases with colored pills, quiet links, and marks groups ne
         ->assertSee('Open Files')
         ->assertSee('Open Account settings')
         ->assertSee('Open Project settings')
+        ->assertSee('Open Notification settings')
+        ->assertSee('Open Integrations')
         ->assertSee(route('project.tasks', ['project' => $project]))
         ->assertSee(route('project.settings', ['project' => $project]))
+        ->assertSee(route('notifications.edit'))
+        ->assertSee(route('integrations.edit'))
         ->assertSee(route('profile.edit'));
 
     $firstHtml = $firstVisit->getContent();
@@ -77,10 +83,10 @@ it('renders seeded releases with colored pills, quiet links, and marks groups ne
         ->toContain('bg-blue-50')
         ->toContain('bg-amber-50');
 
-    // Only the Nov 24 group should be marked as new since last visit (Nov 23 18:00)
+    // Only the Nov 26 group should be marked as new since last visit (Nov 25 18:00)
     expect(substr_count($firstHtml, 'New since your last visit'))->toBe(1);
 
-    expect($user->fresh()->last_seen_changelog_at?->toDateTimeString())->toBe('2026-11-24 15:00:00');
+    expect($user->fresh()->last_seen_changelog_at?->toDateTimeString())->toBe('2026-11-26 15:00:00');
 
     // Second visit immediately after should not mark any group as new
     $this->actingAs($user->fresh())
@@ -99,6 +105,10 @@ it('omits project links on whats-new when the user has no projects while keeping
         ->assertSuccessful()
         ->assertSee('Open Account settings')
         ->assertSee(route('profile.edit'))
+        ->assertSee('Open Notification settings')
+        ->assertSee(route('notifications.edit'))
+        ->assertSee('Open Integrations')
+        ->assertSee(route('integrations.edit'))
         ->assertSee('Open Projects')
         ->assertSee(route('projects'))
         ->assertDontSee('Open History')
@@ -108,7 +118,7 @@ it('omits project links on whats-new when the user has no projects while keeping
 });
 
 it('replaces Change Log button in sidebar with What\'s new link and shows unread dot based on last_seen_changelog_at', function () {
-    Carbon::setTestNow('2026-11-24 15:00:00');
+    Carbon::setTestNow('2026-11-26 15:00:00');
 
     $neverSeenUser = User::factory()->create(['last_seen_changelog_at' => null]);
     $project = Project::factory()->create(['owner_id' => $neverSeenUser->id]);
@@ -127,7 +137,7 @@ it('replaces Change Log button in sidebar with What\'s new link and shows unread
 
     expect($xpath->query('//*[@aria-label="New updates"]')->length)->toBe(1);
 
-    $seenUser = User::factory()->create(['last_seen_changelog_at' => Carbon::parse('2026-11-24 12:00:00')]);
+    $seenUser = User::factory()->create(['last_seen_changelog_at' => Carbon::parse('2026-11-26 12:00:00')]);
     $seenProject = Project::factory()->create(['owner_id' => $seenUser->id]);
 
     $readHtml = $this->actingAs($seenUser)
