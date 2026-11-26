@@ -56,11 +56,12 @@ class extends Component
      */
     public function with(GetProjectHomeDataAction $getProjectHomeData): array
     {
-        $home = $getProjectHomeData($this->project);
+        $home = $getProjectHomeData($this->project, auth()->user());
 
         return [
             'home' => $home,
             'stats' => $home->stats,
+            'health' => $home->health,
             'todayTasks' => $home->todayTasks,
             'upcomingTasks' => $home->upcomingTasks,
             'areas' => $home->areas,
@@ -72,6 +73,8 @@ class extends Component
 
 <div class="max-w-7xl mx-auto w-full py-2 sm:py-4 space-y-6 sm:space-y-8">
     <x-projects.dashboard.project-header :project="$project" :stats="$stats" />
+
+    <x-projects.dashboard.project-health :health="$health" />
 
     <x-projects.dashboard.quick-capture :project="$project" />
 

@@ -5,9 +5,11 @@ use App\Enums\DecisionStatus;
 use App\Enums\TaskStatus;
 use App\Models\Area;
 use App\Models\Decision;
+use App\Models\InboxItem;
 use App\Models\Notebook;
 use App\Models\Project;
 use App\Models\ProjectFile;
+use App\Models\RepositoryConnection;
 use App\Models\Task;
 use App\Models\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -546,4 +548,106 @@ test('today card omits Upcoming when Today already has enough tasks', function (
     Livewire::test('pages::projects.show', ['project' => $project])
         ->assertDontSee('Upcoming')
         ->assertDontSee('Future task hidden when full');
+});
+
+test('project health card is hidden when no checks fire and never renders design notes', function () {
+    $this->travelTo(Carbon::parse('2026-11-26 12:00:00', 'UTC'));
+
+    $user = User::factory()->create(['timezone' => 'UTC']);
+    $project = Project::factory()->create(['owner_id' => $user->id]);
+
+    $this->actingAs($user);
+
+    Livewire::test('pages::projects.show', ['project' => $project])
+        ->assertOk()
+        ->assertDontSee('Project health')
+        ->assertDontSee('Hidden when all checks pass');
+});
+
+test('project health card renders below header ordered by severity with at most 3 visible rows and Show all toggle', function () {
+    $this->travelTo(Carbon::parse('2026-11-26 12:00:00', 'UTC'));
+
+    $user = User::factory()->create(['timezone' => 'UTC']);
+    $project = Project::factory()->create([
+        'owner_id' => $user->id,
+        'name' => 'Website Relaunch',
+    ]);
+
+    Notebook::factory()->create([
+        'project_id' => $project->id,
+        'created_by' => $user->id,
+        'content_changed_at' => now()->subDays(20),
+    ]);
+    Task::factory()->count(10)->create([
+        'project_id' => $project->id,
+        'status' => TaskStatus::Done,
+        'completed_at' => now()->subDay(),
+    ]);
+    Task::factory()->count(2)->create([
+        'project_id' => $project->id,
+        'status' => TaskStatus::Doing,
+        'status_changed_at' => now()->subDays(10),
+    ]);
+    InboxItem::factory()->count(2)->create([
+        'project_id' => $project->id,
+        'user_id' => $user->id,
+        'created_at' => now()->subDays(10),
+    ]);
+    RepositoryConnection::factory()->broken('GitHub rejected the token (401).')->create([
+        'project_id' => $project->id,
+        'repository' => 'jeyker-dev/ahorra-api',
+    ]);
+
+    $this->actingAs($user);
+
+    $html = Livewire::test('pages::projects.show', ['project' => $project])
+        ->assertOk()
+        ->assertSeeInOrder([
+            'Website Relaunch',
+            'Project health',
+            '5 items need attention',
+            'Repository sync is broken',
+            'jeyker-dev/ahorra-api: GitHub rejected the token (401).',
+            'Fix in settings',
+            '2 tasks stuck in Doing',
+            'Review tasks',
+            'Docs may be out of date',
+            'Open notebooks',
+            'Capture an idea for the inbox',
+        ])
+        ->assertSee('Show all (5)')
+        ->assertDontSee('Hidden when all checks pass')
+        ->html();
+
+    $dom = new DOMDocument;
+    @$dom->loadHTML($html);
+    $xpath = new DOMXPath($dom);
+
+    $allRows = $xpath->query('//*[@aria-labelledby="project-health-heading"]//*[@data-health-check]');
+    $initiallyHiddenRows = $xpath->query('//*[@aria-labelledby="project-health-heading"]//*[@data-health-check][@x-show="expanded"]');
+
+    expect($allRows->length)->toBe(5)
+        ->and($initiallyHiddenRows->length)->toBe(2);
+});
+
+test('project health card omits Show all toggle when three or fewer checks fire', function () {
+    $this->travelTo(Carbon::parse('2026-11-26 12:00:00', 'UTC'));
+
+    $user = User::factory()->create(['timezone' => 'UTC']);
+    $project = Project::factory()->create(['owner_id' => $user->id]);
+
+    Task::factory()->create([
+        'project_id' => $project->id,
+        'status' => TaskStatus::Doing,
+        'status_changed_at' => now()->subDays(10),
+    ]);
+
+    $this->actingAs($user);
+
+    Livewire::test('pages::projects.show', ['project' => $project])
+        ->assertOk()
+        ->assertSee('Project health')
+        ->assertSee('1 item needs attention')
+        ->assertSee('1 task stuck in Doing')
+        ->assertDontSee('Show all');
 });

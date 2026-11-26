@@ -2,6 +2,7 @@
 
 namespace App\Actions\Projects;
 
+use App\Data\Projects\ProjectHealthData;
 use App\Data\Projects\ProjectHomeData;
 use App\Enums\TaskStatus;
 use App\Models\Area;
@@ -22,6 +23,7 @@ class GetProjectHomeDataAction
     public function __construct(
         private readonly GetDashboardStatsAction $getDashboardStats,
         private readonly ListRecentActivitiesAction $listRecentActivities,
+        private readonly GetProjectHealthAction $getProjectHealth,
     ) {}
 
     /**
@@ -29,8 +31,9 @@ class GetProjectHomeDataAction
      */
     public function __invoke(Project $project, ?User $user = null): ProjectHomeData
     {
-        $timezone = DateHelper::userTimezone($user);
-        $localToday = DateHelper::userToday($user);
+        $resolvedUser = $user ?? auth()->user();
+        $timezone = DateHelper::userTimezone($resolvedUser);
+        $localToday = DateHelper::userToday($resolvedUser);
 
         $todayTasks = $this->loadTodayTasks($project, $localToday, $timezone);
         $remainingSlots = max(0, self::TODAY_SPARE_ROOM_TARGET - $todayTasks->count());
@@ -38,8 +41,13 @@ class GetProjectHomeDataAction
             ? $this->loadUpcomingTasks($project, $localToday, $remainingSlots)
             : new Collection;
 
+        $health = $resolvedUser instanceof User
+            ? ($this->getProjectHealth)($project, $resolvedUser)
+            : ProjectHealthData::empty();
+
         return new ProjectHomeData(
-            stats: ($this->getDashboardStats)($project, $user),
+            stats: ($this->getDashboardStats)($project, $resolvedUser),
+            health: $health,
             todayTasks: $todayTasks,
             upcomingTasks: $upcomingTasks,
             nextOpenTask: $todayTasks->isEmpty() ? $upcomingTasks->first() : null,
