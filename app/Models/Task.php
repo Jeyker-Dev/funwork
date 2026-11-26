@@ -36,6 +36,10 @@ class Task extends Model
     protected static function booted(): void
     {
         static::saving(function (Task $task): void {
+            if ((! $task->exists || $task->isDirty('status')) && ! $task->isDirty('status_changed_at')) {
+                $task->status_changed_at = now();
+            }
+
             if ($task->status !== TaskStatus::Done) {
                 $task->completed_at = null;
 
@@ -53,6 +57,7 @@ class Task extends Model
         return [
             'due_date' => 'datetime',
             'completed_at' => 'datetime',
+            'status_changed_at' => 'datetime',
             'status' => TaskStatus::class,
             'priority' => TaskPriority::class,
         ];
