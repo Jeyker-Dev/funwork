@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Actions\Notebooks\ReadDocsDirectoryAction;
 use App\Actions\Notebooks\SyncDocsNotebookAction;
 use App\Exceptions\AreaNotFound;
 use App\Models\Project;
@@ -24,6 +25,7 @@ class SyncDocsCommand extends Command
     protected $description = "Mirror repository docs into the project's Docs notebook";
 
     public function __construct(
+        private ReadDocsDirectoryAction $readDocsDirectory,
         private SyncDocsNotebookAction $syncDocsNotebook,
     ) {
         parent::__construct();
@@ -64,7 +66,8 @@ class SyncDocsCommand extends Command
             return self::FAILURE;
         }
 
-        $counts = ($this->syncDocsNotebook)($project, $docsPath, $area);
+        $files = ($this->readDocsDirectory)($docsPath);
+        $counts = ($this->syncDocsNotebook)($project, $files, $area);
 
         $this->info("Docs sincronizados: {$counts['created']} creadas, {$counts['updated']} actualizadas, {$counts['deleted']} borradas.");
 

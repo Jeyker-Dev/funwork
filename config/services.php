@@ -24,6 +24,12 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI', '/auth/google/callback'),
     ],
 
+    'github' => [
+        'base_url' => env('GITHUB_API_URL', 'https://api.github.com'),
+        'api_version' => '2022-11-28',
+        'timeout' => 15,
+    ],
+
     'resend' => [
         'key' => env('RESEND_API_KEY'),
     ],

@@ -701,7 +701,10 @@ class extends Component
             @endif
         </section>
 
-        {{-- Card 3: Danger Zone --}}
+        {{-- Card 3: Repositories --}}
+        <livewire:projects.repository-connections :project="$project" />
+
+        {{-- Card 4: Danger Zone --}}
         @if ($canManageDangerZone)
             <section
                 id="danger-zone"

@@ -14,8 +14,10 @@ test('index component mounts successfully and shows empty state', function () {
     $component = Livewire::test('pages::projects.notebooks.index', ['project' => $project]);
 
     $component->assertSee('Notebooks')
-        ->assertSee('Create your first notebook')
-        ->assertSee('funwork:sync-docs')
+        ->assertSee('No notebooks yet')
+        ->assertSee('Write in FunWork')
+        ->assertSee('Connect a repository')
+        ->assertSee('How repository sync works')
         ->assertDontSee('No Notebooks,')
         ->assertDontSee('Yet.');
 });
