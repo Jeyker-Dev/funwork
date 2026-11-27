@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Actions\AiConversations\SendAiMessageAction;
 use App\Contracts\RepositoryDocsSource;
 use App\Models\RepositoryConnection;
+use App\Models\User;
 use App\Policies\RepositoryConnectionPolicy;
 use App\Services\AiProviders\AiProviderResolver;
 use App\Services\GitHub\GitHubTokenDocsSource;
@@ -47,6 +49,11 @@ class AppServiceProvider extends ServiceProvider
                 : (string) $connection;
 
             return Limit::perMinute(60)->by($connectionKey !== '' ? $connectionKey : (string) $request->ip());
+        });
+
+        RateLimiter::for(SendAiMessageAction::RATE_LIMITER_NAME, function (User $user): Limit {
+            return Limit::perHour(SendAiMessageAction::MAX_MESSAGES_PER_HOUR)
+                ->by('ai-messages:'.$user->getKey());
         });
     }
 

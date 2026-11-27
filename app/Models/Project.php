@@ -124,6 +124,11 @@ class Project extends Model
         return $this->hasMany(RepositoryConnection::class, 'project_id');
     }
 
+    public function aiConversations(): HasMany
+    {
+        return $this->hasMany(AiConversation::class, 'project_id');
+    }
+
     /**
      * @param  Builder<Project>  $query
      * @return Builder<Project>
