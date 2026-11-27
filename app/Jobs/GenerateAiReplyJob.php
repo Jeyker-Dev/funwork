@@ -94,9 +94,8 @@ class GenerateAiReplyJob implements ShouldBeUnique, ShouldQueue
             return;
         }
 
-        $chatMessages = ($buildMessages)($conversation, $currentUserMessage);
-
         try {
+            $chatMessages = ($buildMessages)($conversation, $currentUserMessage);
             $reply = $resolver->resolve($connection)->chat($connection, $chatMessages);
 
             $message->markCompleted($reply->text, $reply->model);
@@ -106,6 +105,19 @@ class GenerateAiReplyJob implements ShouldBeUnique, ShouldQueue
         } catch (Throwable $exception) {
             $message->markFailed(self::GENERIC_ERROR_MESSAGE);
             report($this->scrubApiKey($exception, $connection));
+        }
+    }
+
+    /**
+     * Marks the reply as failed when the worker gives up on the job (timeout or
+     * crash), so the conversation is never left waiting on a pending reply.
+     */
+    public function failed(?Throwable $exception): void
+    {
+        $message = $this->assistantMessage->fresh();
+
+        if ($message instanceof AiMessage && $message->status->isPending()) {
+            $message->markFailed(self::GENERIC_ERROR_MESSAGE);
         }
     }
 

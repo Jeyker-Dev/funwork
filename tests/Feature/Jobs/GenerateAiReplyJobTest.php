@@ -252,3 +252,25 @@ it('falls back to the users current default connection when the conversation con
         ->and($fake->lastConnection()?->is($fallbackConnection))->toBeTrue()
         ->and($fake->lastMessages()[array_key_last($fake->lastMessages())]->content)->toBe('Second question');
 });
+
+it('marks a still-pending reply as Failed when the worker gives up on the job', function () {
+    $assistantMessage = AiMessage::factory()->pending()->create();
+
+    (new GenerateAiReplyJob($assistantMessage))->failed(new RuntimeException('Job timed out.'));
+
+    expect($assistantMessage->fresh())
+        ->status->toBe(AiMessageStatus::Failed)
+        ->error->toBe('Something went wrong. Try again.');
+});
+
+it('leaves a completed reply untouched when the job failure arrives late', function () {
+    $assistantMessage = AiMessage::factory()->create([
+        'role' => AiMessageRole::Assistant,
+        'status' => AiMessageStatus::Completed,
+        'content' => 'Done.',
+    ]);
+
+    (new GenerateAiReplyJob($assistantMessage))->failed(new RuntimeException('Job timed out.'));
+
+    expect($assistantMessage->fresh()->status)->toBe(AiMessageStatus::Completed);
+});
