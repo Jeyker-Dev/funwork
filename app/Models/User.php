@@ -203,4 +203,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(ApiToken::class);
     }
+
+    public function aiConnections(): HasMany
+    {
+        return $this->hasMany(AiConnection::class);
+    }
 }
