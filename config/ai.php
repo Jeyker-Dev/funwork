@@ -29,9 +29,12 @@ return [
         ],
 
         // Official docs: https://platform.claude.com/docs/en/api/messages
-        // Uses Anthropic's native Messages API (/v1/messages), not its testing-only OpenAI shim.
+        // Versioning docs: https://platform.claude.com/docs/en/api/versioning
+        // Uses Anthropic's native Messages API (POST {base_url}/v1/messages), not its testing-only OpenAI shim.
         'anthropic' => [
-            'base_url' => 'https://api.anthropic.com/v1',
+            'base_url' => 'https://api.anthropic.com',
+            'version' => '2023-06-01',
+            'max_tokens' => 4096,
             'timeout' => 60,
             'models' => [
                 'claude-sonnet-5-5',
