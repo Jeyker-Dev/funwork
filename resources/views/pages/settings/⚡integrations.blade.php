@@ -127,6 +127,8 @@ new #[Title('Integrations settings')] class extends Component
             <flux:callout variant="success" icon="check-circle" :heading="session('google_status')" />
         @endif
 
+        <livewire:settings.ai-connections />
+
         <section class="bg-surface-card rounded-2xl border border-ghost shadow-ambient p-6 sm:p-8 flex flex-col gap-6">
             <div class="flex items-start justify-between gap-4">
                 <div>
