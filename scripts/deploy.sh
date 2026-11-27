@@ -7,14 +7,15 @@
 #   3. Backs up MySQL to ~/funwork/backups (retaining the 10 newest backups).
 #   4. Runs database migrations in a one-off container with the new image.
 #   5. Restarts the stack with the new image (--remove-orphans).
-#   6. Mirrors docs/ into the FunWork "Docs" notebook.
-#   7. Prunes old Docker images.
+#   6. Prunes old Docker images.
+#
+# docs/ reaches the FunWork "Docs" notebook through the repository connection
+# webhook on each push, not through this script.
 #
 # Usage: scripts/deploy.sh [--skip-checks]
 #
 # Settings (environment variables, or a gitignored .deploy.env at the repo root):
 #   FUNWORK_DEPLOY_HOST      SSH destination, e.g. "deploy@1.2.3.4" or a ~/.ssh/config alias (required)
-#   FUNWORK_DOCS_PROJECT_ID  FunWork project that receives docs/ (optional; skips the sync if empty)
 #   FUNWORK_DEPLOY_BRANCH    Branch to deploy (default: master)
 #   FUNWORK_REPO_URL         Repository to clone on the VPS (default: public GitHub HTTPS URL)
 #
@@ -33,7 +34,6 @@ if [[ -f .deploy.env ]]; then
 fi
 
 host="${FUNWORK_DEPLOY_HOST:-}"
-project_id="${FUNWORK_DOCS_PROJECT_ID:-}"
 branch="${FUNWORK_DEPLOY_BRANCH:-master}"
 repo_url="${FUNWORK_REPO_URL:-https://github.com/Jeyker-Dev/funwork.git}"
 skip_checks=false
@@ -66,7 +66,7 @@ echo "==> Deploying origin/$branch to $host"
 
 # Values are quoted with printf %q so they reach the remote shell unchanged.
 # shellcheck disable=SC2029  # client-side expansion is intended here
-ssh "$host" "BRANCH=$(printf %q "$branch") REPO_URL=$(printf %q "$repo_url") PROJECT_ID=$(printf %q "$project_id") bash -s" <<'REMOTE'
+ssh "$host" "BRANCH=$(printf %q "$branch") REPO_URL=$(printf %q "$repo_url") bash -s" <<'REMOTE'
 set -euo pipefail
 
 # bash -s reads this script from stdin as it runs, and docker compose exec
@@ -141,18 +141,6 @@ main() {
 
     echo "==> Starting production stack"
     docker compose -f compose.prod.yml up -d --remove-orphans
-
-    # docs/ is excluded from the image (.dockerignore), so it is copied in from the checkout.
-    # docker compose cp keeps the host uid, which appuser cannot delete in /tmp, so cleanup runs as root.
-    if [[ -n "$PROJECT_ID" ]]; then
-        echo "==> Syncing docs into project $PROJECT_ID"
-        docker compose -f compose.prod.yml exec -T -u root app rm -rf /tmp/funwork-docs </dev/null
-        docker compose -f compose.prod.yml cp src/docs/. app:/tmp/funwork-docs
-        docker compose -f compose.prod.yml exec -T app php artisan funwork:sync-docs "$PROJECT_ID" --path=/tmp/funwork-docs </dev/null
-        docker compose -f compose.prod.yml exec -T -u root app rm -rf /tmp/funwork-docs </dev/null
-    else
-        echo "==> FUNWORK_DOCS_PROJECT_ID is empty, skipping docs sync"
-    fi
 
     # Keep the running build, latest, and the previous image so rollback works (one prior version only).
     keep_pattern="latest|$sha"
