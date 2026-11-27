@@ -23,6 +23,7 @@ readonly class ProjectHomeData
      */
     public function __construct(
         public DashboardStatsData $stats,
+        public ProjectHealthData $health,
         public Collection $todayTasks,
         public Collection $upcomingTasks,
         public ?Task $nextOpenTask,
